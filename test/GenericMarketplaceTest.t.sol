@@ -53,7 +53,7 @@ contract TestERC1155 is ERC1155 {
     }
 }
 
-contract SampleContractTest is DSTestPlus {
+contract GenericMarketplaceTest is DSTestPlus {
     Vm vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
 
     Config seaport;
@@ -81,18 +81,39 @@ contract SampleContractTest is DSTestPlus {
     function _prepareTest(
         Config target
     ) internal returns (address to, uint256 value, bytes memory callData) {
+        uint256 tokenId = 100;
+
+        erc721.mint(seller, tokenId);
+
         to = target.marketplace();
-
-        uint256 amount = 100;
-
-        erc20.mint(seller, amount);
 
         address approvalTarget = target.approvalTarget();
 
         vm.prank(seller);
-        erc20.approve(approvalTarget, amount);
+        erc721.setApprovalForAll(approvalTarget, true);
 
-        (value, callData) = target.simpleSwapPayload();
+        (bytes32 payloadToSign, bool use2098) = target.supplyPayloadToSign();
+
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
+            _pkOfSigner,
+            payloadToSign
+        );
+
+        bytes memory signature;
+        if (use2098) {
+            uint256 yParity;
+            if (v == 27) {
+                yParity = 0;
+            } else {
+                yParity = 1;
+            }
+            uint256 yParityAndS = (yParity << 255) | uint256(s);
+            signature = abi.encodePacked(r, yParityAndS);
+        } else {
+            signature = abi.encodePacked(r, s, v);
+        }
+
+        (value, callData) = target.simpleSwapPayload(signature);
     }
 
     function testSeaport() public {
