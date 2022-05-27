@@ -3,12 +3,33 @@ pragma solidity >=0.8.7;
 
 import "./ConsiderationStructs.sol";
 
+uint256 constant EIP712_Order_size = 0x180;
+uint256 constant EIP712_OfferItem_size = 0xc0;
+uint256 constant EIP712_ConsiderationItem_size = 0xe0;
+uint256 constant EIP712_DomainSeparator_offset = 0x02;
+uint256 constant EIP712_OrderHash_offset = 0x22;
+uint256 constant EIP712_DigestPayload_size = 0x42;
+uint256 constant EIP_712_PREFIX = (
+    0x1901000000000000000000000000000000000000000000000000000000000000
+);
+
 contract ConsiderationTypeHashes {
+    bytes32 internal immutable _NAME_HASH;
+    bytes32 internal immutable _VERSION_HASH;
+    bytes32 internal immutable _EIP_712_DOMAIN_TYPEHASH;
     bytes32 internal immutable _OFFER_ITEM_TYPEHASH;
     bytes32 internal immutable _CONSIDERATION_ITEM_TYPEHASH;
     bytes32 internal immutable _ORDER_TYPEHASH;
+    bytes32 internal immutable _DOMAIN_SEPARATOR;
+    address internal constant seaport = 0x00000000006CEE72100D161c57ADA5Bb2be1CA79;
 
     constructor () {
+        // Derive hash of the name of the contract.
+        _NAME_HASH = keccak256(bytes("Seaport"));
+
+        // Derive hash of the version string of the contract.
+        _VERSION_HASH = keccak256(bytes("1"));
+
         bytes memory offerItemTypeString = abi.encodePacked(
             "OfferItem(",
                 "uint8 itemType,",
@@ -55,6 +76,20 @@ contract ConsiderationTypeHashes {
         // Derive ConsiderationItem type hash using corresponding type string.
         bytes32 considerationItemTypehash = keccak256(considerationItemTypeString);
 
+
+        // Construct the primary EIP-712 domain type string.
+        // prettier-ignore
+        _EIP_712_DOMAIN_TYPEHASH = keccak256(
+            abi.encodePacked(
+                "EIP712Domain(",
+                    "string name,",
+                    "string version,",
+                    "uint256 chainId,",
+                    "address verifyingContract",
+                ")"
+            )
+        );
+
         _OFFER_ITEM_TYPEHASH = offerItemTypehash;
         _CONSIDERATION_ITEM_TYPEHASH = considerationItemTypehash;
 
@@ -66,6 +101,62 @@ contract ConsiderationTypeHashes {
                 offerItemTypeString
             )
         );
+
+        _DOMAIN_SEPARATOR = _deriveDomainSeparator();
+    }
+
+    /**
+     * @dev Internal view function to derive the EIP-712 domain separator.
+     *
+     * @return The derived domain separator.
+     */
+    function _deriveDomainSeparator() internal view returns (bytes32) {
+        // prettier-ignore
+        return keccak256(
+            abi.encode(
+                _EIP_712_DOMAIN_TYPEHASH,
+                _NAME_HASH,
+                _VERSION_HASH,
+                1,
+                seaport
+            )
+        );
+    }
+
+    /**
+     * @dev Internal pure function to efficiently derive an digest to sign for
+     *      an order in accordance with EIP-712.
+     *
+     * @param orderHash       The order hash.
+     *
+     * @return value The hash.
+     */
+    function _deriveEIP712Digest(bytes32 orderHash)
+        internal
+        view
+        returns (bytes32 value)
+    {
+        bytes32 domainSeparator = _DOMAIN_SEPARATOR;
+        // Leverage scratch space to perform an efficient hash.
+        assembly {
+            // Place the EIP-712 prefix at the start of scratch space.
+            mstore(0, EIP_712_PREFIX)
+
+            // Place the domain separator in the next region of scratch space.
+            mstore(EIP712_DomainSeparator_offset, domainSeparator)
+
+            // Place the order hash in scratch space, spilling into the first
+            // two bytes of the free memory pointer — this should never be set
+            // as memory cannot be expanded to that size, and will be zeroed out
+            // after the hash is performed.
+            mstore(EIP712_OrderHash_offset, orderHash)
+
+            // Hash the relevant region (65 bytes).
+            value := keccak256(0, EIP712_DigestPayload_size)
+
+            // Clear out the dirtied bits in the memory pointer.
+            mstore(EIP712_OrderHash_offset, 0)
+        }
     }
 
         /**
