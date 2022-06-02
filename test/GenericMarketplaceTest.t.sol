@@ -1,136 +1,474 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.14;
 
-import { DSTestPlus } from "solmate/test/utils/DSTestPlus.sol";
+//import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
+import { SeaportConfig } from "../src/marketplaces/seaport/SeaportConfig.sol";
+import { BaseMarketConfig } from "../src/BaseMarketConfig.sol";
 
-import { SeaportConfig } from "../src/marketplaces/wyvern/SeaportConfig.sol";
-import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
+import { TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "../src/Types.sol";
 
-import "@rari-capital/solmate/src/tokens/ERC20.sol";
-import "@rari-capital/solmate/src/tokens/ERC721.sol";
-import "@rari-capital/solmate/src/tokens/ERC1155.sol";
+import "./tokens/TestERC20.sol";
+import "./tokens/TestERC721.sol";
+import "./tokens/TestERC1155.sol";
+import "./utils/BaseOrderTest.sol";
 
-interface Vm {
-    function prank(address) external;
-}
+contract BaseMarketplaceTester is BaseOrderTest {
+  BaseMarketConfig seaportConfig;
 
-interface ConfigInterface {
-    function marketplace() external view returns (address);
-    function approvalTarget() external view returns (address);
-    function simpleSwapPayload() external view returns (uint256 value, bytes memory callData);
-}
+  constructor() {
+    seaportConfig = BaseMarketConfig(address(new SeaportConfig()));
+  }
 
-contract TestERC20 is ERC20("Test20", "TST20", 18) {
-    function mint(address to, uint256 amount) external returns (bool) {
-        _mint(to, amount);
-        return true;
-    }
-}
-
-contract TestERC721 is ERC721("Test721", "TST721") {
-    function mint(address to, uint256 tokenId) public returns (bool) {
-        _mint(to, tokenId);
-        return true;
+    function signDigest(address signer, bytes32 digest)
+        external
+        returns (bytes memory)
+    {
+        (uint8 v, bytes32 r, bytes32 s) = hevm.sign(privateKeys[signer], digest);
+        return abi.encodePacked(r, s, v);
     }
 
-    function tokenURI(uint256) public pure override returns (string memory) {
-        return "tokenURI";
-    }
-}
-
-contract TestERC1155 is ERC1155 {
-    function mint(
-        address to,
-        uint256 tokenId,
-        uint256 amount
-    ) public returns (bool) {
-        _mint(to, tokenId, amount, "");
-        return true;
+    function testSeaport() external {
+      benchmarkMarket(seaportConfig);
     }
 
-    function uri(uint256) public pure override returns (string memory) {
-        return "uri";
-    }
-}
-
-contract GenericMarketplaceTest is DSTestPlus {
-    Vm vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
-
-    Config seaport;
-    Config wyvern;
-    TestERC20 erc20;
-    TestERC721 erc721;
-    TestERC1155 erc1155;
-
-    address constant seller = address(
-        0x0734d56DA60852A03e2Aafae8a36FFd8c12B32f1
-    );
-
-    address constant buyer = address(
-        0x939C8d89EBC11fA45e576215E2353673AD0bA18A
-    );
-
-    function setUp() public {
-        seaport = Config(address(new SeaportConfig()));
-        wyvern = Config(address(new WyvernConfig()));
-        erc20 = new TestERC20();
-        erc721 = new TestERC721();
-        erc1155 = new TestERC1155();
+    function benchmarkMarket(BaseMarketConfig config) public {
+      benchmark_BuyOfferedERC721WithEther_ListOnChain(config);
+      benchmark_BuyOfferedERC721WithEther(config);
+      benchmark_BuyOfferedERC1155WithEther_ListOnChain(config);
+      benchmark_BuyOfferedERC1155WithEther(config);
+      benchmark_BuyOfferedERC721WithERC20_ListOnChain(config);
+      benchmark_BuyOfferedERC721WithERC20(config);
+      benchmark_BuyOfferedERC1155WithERC20_ListOnChain(config);
+      benchmark_BuyOfferedERC1155WithERC20(config);
+      benchmark_BuyOfferedERC20WithERC721_ListOnChain(config);
+      benchmark_BuyOfferedERC20WithERC721(config);
+      benchmark_BuyOfferedERC20WithERC1155_ListOnChain(config);
+      benchmark_BuyOfferedERC20WithERC1155(config);
     }
 
-    function _prepareTest(
-        Config target
-    ) internal returns (address to, uint256 value, bytes memory callData) {
-        uint256 tokenId = 100;
+    function setUp() public virtual override {
+        super.setUp();
+    }
 
-        erc721.mint(seller, tokenId);
+    function concat(
+      string memory a,
+      string memory b,
+      string memory c
+    ) internal pure returns (string memory d) {
+      d = string(abi.encodePacked(a, b, c));
+    }
 
-        to = target.marketplace();
-
-        address approvalTarget = target.approvalTarget();
-
-        vm.prank(seller);
-        erc721.setApprovalForAll(approvalTarget, true);
-
-        (bytes32 payloadToSign, bool use2098) = target.supplyPayloadToSign();
-
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
-            _pkOfSigner,
-            payloadToSign
-        );
-
-        bytes memory signature;
-        if (use2098) {
-            uint256 yParity;
-            if (v == 27) {
-                yParity = 0;
-            } else {
-                yParity = 1;
-            }
-            uint256 yParityAndS = (yParity << 255) | uint256(s);
-            signature = abi.encodePacked(r, yParityAndS);
-        } else {
-            signature = abi.encodePacked(r, s, v);
+    function _benchmarkCallWithParams(
+      string memory name,
+      string memory label,
+      address sender,
+      TestCallParameters memory params
+    )
+    internal
+    {
+      hevm.startPrank(sender);
+      uint256 gasDelta;
+      bool success;
+      assembly {
+        let to := mload(params)
+        let value := mload(add(params, 0x20))
+      let data := mload(add(params, 0x40))
+      let ptr := add(data, 0x20)
+      let len := mload(data)
+        let g1 := gas()
+        success := call(
+          gas(),
+          to,
+          value,
+          ptr,
+          len,
+          0,
+          0
+        )
+        let g2 := gas()
+        gasDelta := sub(g1, g2)
+        if iszero(success) {
+          returndatacopy(0, 0, returndatasize())
+          revert(0, returndatasize())
         }
-
-        (value, callData) = target.simpleSwapPayload(signature);
+      }
+      hevm.stopPrank();
+      emit log_named_uint(concat(name, label, " Gas: "), gasDelta);
     }
 
-    function testSeaport() public {
-        (address to, bytes memory callData) = _prepareTest(seaport);
-
-        vm.prank(buyer);
-        (bool ok, ) = to.call{value}(callData);
-
-        require(ok);
+    function prepareMarketplaceTest(
+      BaseMarketConfig config
+    ) internal resetTokenBalancesBetweenRuns {
+      address target = config.approvalTarget();
+      _setApprovals(alice, target);
+      _setApprovals(bob, target);
     }
 
-    function testWyvern() public {
-        (address to, bytes memory callData) = _prepareTest(wyvern);
+  /*//////////////////////////////////////////////////////////////
+                          BUY ERC721 WITH ETH
+    //////////////////////////////////////////////////////////////*/
 
-        vm.prank(buyer);
-        (bool ok, ) = to.call{value}(callData);
 
-        require(ok);
+    function benchmark_BuyOfferedERC721WithEther_ListOnChain(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      test721_1.mint(alice, 1);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC721WithEther(
+        TestOrderContext(true, alice, bob),
+        TestItem721(address(test721_1), 1),
+        100
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "List ERC721 -> ETH on-chain",
+        alice,
+        payload.submitOrder
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC721 -> ETH listed on-chain",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+    function benchmark_BuyOfferedERC721WithEther(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      test721_1.mint(alice, 1);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC721WithEther(
+        TestOrderContext(false, alice, bob),
+        TestItem721(address(test721_1), 1),
+        100
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC721 -> ETH with signature",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+  /*//////////////////////////////////////////////////////////////
+                          BUY ERC1155 WITH ETH
+    //////////////////////////////////////////////////////////////*/
+
+    function benchmark_BuyOfferedERC1155WithEther_ListOnChain(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      test1155_1.mint(alice, 1, 1);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC1155WithEther(
+        TestOrderContext(false, alice, bob),
+        TestItem1155(address(test1155_1), 1, 1),
+        100
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "List ERC1155 -> ETH on-chain",
+        alice,
+        payload.submitOrder
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC1155 -> ETH listed on-chain",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+    function benchmark_BuyOfferedERC1155WithEther(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      test1155_1.mint(alice, 1, 1);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC1155WithEther(
+        TestOrderContext(false, alice, bob),
+        TestItem1155(address(test1155_1), 1, 1),
+        100
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC1155 -> ETH with signature",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+  /*//////////////////////////////////////////////////////////////
+                          BUY ERC721 WITH ERC20
+    //////////////////////////////////////////////////////////////*/
+
+    function benchmark_BuyOfferedERC721WithERC20_ListOnChain(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      test721_1.mint(alice, 1);
+      token1.mint(bob, 100);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC721WithERC20(
+        TestOrderContext(true, alice, bob),
+        TestItem721(address(test721_1), 1),
+        TestItem20(address(token1), 100)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "List ERC721 -> ERC20 on-chain",
+        alice,
+        payload.submitOrder
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC721 -> ERC20 listed on-chain",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+    function benchmark_BuyOfferedERC721WithERC20(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      test721_1.mint(alice, 1);
+      token1.mint(bob, 100);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC721WithERC20(
+        TestOrderContext(false, alice, bob),
+        TestItem721(address(test721_1), 1),
+        TestItem20(address(token1), 100)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC721 -> ERC20 with signature",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+  /*//////////////////////////////////////////////////////////////
+                          BUY ERC1155 WITH ERC20
+    //////////////////////////////////////////////////////////////*/
+
+    function benchmark_BuyOfferedERC1155WithERC20_ListOnChain(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      test1155_1.mint(alice, 1, 1);
+      token1.mint(bob, 100);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC1155WithERC20(
+        TestOrderContext(true, alice, bob),
+        TestItem1155(address(test1155_1), 1, 1),
+        TestItem20(address(token1), 100)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "List ERC1155 -> ERC20 on-chain",
+        alice,
+        payload.submitOrder
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC1155 -> ERC20 listed on-chain",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+    function benchmark_BuyOfferedERC1155WithERC20(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      test1155_1.mint(alice, 1, 1);
+      token1.mint(bob, 100);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC1155WithERC20(
+        TestOrderContext(false, alice, bob),
+        TestItem1155(address(test1155_1), 1, 1),
+        TestItem20(address(token1), 100)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC1155 -> ERC20 with signature",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+  /*//////////////////////////////////////////////////////////////
+                          BUY ERC20 WITH ERC721
+    //////////////////////////////////////////////////////////////*/
+
+    function benchmark_BuyOfferedERC20WithERC721_ListOnChain(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      token1.mint(alice, 100);
+      test721_1.mint(bob, 1);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC20WithERC721(
+        TestOrderContext(true, alice, bob),
+        TestItem20(address(token1), 100),
+        TestItem721(address(test721_1), 1)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "List ERC20 -> ERC721 on-chain",
+        alice,
+        payload.submitOrder
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC20 -> ERC721 listed on-chain",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+    function benchmark_BuyOfferedERC20WithERC721(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      token1.mint(alice, 100);
+      test721_1.mint(bob, 1);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC20WithERC721(
+        TestOrderContext(false, alice, bob),
+        TestItem20(address(token1), 100),
+        TestItem721(address(test721_1), 1)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC20 -> ERC721 with signature",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+  /*//////////////////////////////////////////////////////////////
+                          BUY ERC20 WITH ERC1155
+    //////////////////////////////////////////////////////////////*/
+
+    function benchmark_BuyOfferedERC20WithERC1155_ListOnChain(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      TestOrderContext memory context = TestOrderContext(true, alice, bob);
+      token1.mint(alice, 100);
+      test1155_1.mint(bob, 1, 1);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC20WithERC1155(
+        context,
+        TestItem20(address(token1), 100),
+        TestItem1155(address(test1155_1), 1, 1)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "List ERC20 -> ERC1155 on-chain",
+        alice,
+        payload.submitOrder
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC20 -> ERC1155 listed on-chain",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+    function benchmark_BuyOfferedERC20WithERC1155(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      TestOrderContext memory context = TestOrderContext(false, alice, bob);
+      token1.mint(alice, 100);
+      test1155_1.mint(bob, 1, 1);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC20WithERC1155(
+        context,
+        TestItem20(address(token1), 100),
+        TestItem1155(address(test1155_1), 1, 1)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC20 -> ERC1155 with signature",
+        bob,
+        payload.submitOrder
+      );
     }
 }
+
+// contract GenericMarketplaceTest is DSTestPlus, BaseOrderTest {
+//     Config seaport;
+//     Config wyvern;
+//     TestERC20 erc20;
+//     TestERC721 erc721;
+//     TestERC1155 erc1155;
+
+//     function signDigest(address signer, bytes32 digest)
+//         external
+//         view
+//         returns (bytes memory)
+//     {
+//         (uint8 v, bytes32 r, bytes32 s) = vm.sign(_pkOfSigner1s, payloadToSign);
+//     }
+
+//     function setUp() public virtual override {
+//         super.setUp();
+//         seaport = Config(address(new SeaportConfig()));
+//     }
+
+
+
+//     function _prepareTest(Config target)
+//         internal
+//         returns (
+//             address to,
+//             uint256 value,
+//             bytes memory callData
+//         )
+//     {
+//         uint256 tokenId = 100;
+
+//         erc721.mint(seller, tokenId);
+
+//         to = target.marketplace();
+
+//         address approvalTarget = target.approvalTarget();
+
+//         vm.prank(seller);
+//         erc721.setApprovalForAll(approvalTarget, true);
+
+//         (bytes32 payloadToSign, bool use2098) = target.supplyPayloadToSign();
+
+//         (uint8 v, bytes32 r, bytes32 s) = vm.sign(_pkOfSigner, payloadToSign);
+
+//         bytes memory signature;
+//         if (use2098) {
+//             uint256 yParity;
+//             if (v == 27) {
+//                 yParity = 0;
+//             } else {
+//                 yParity = 1;
+//             }
+//             uint256 yParityAndS = (yParity << 255) | uint256(s);
+//             signature = abi.encodePacked(r, yParityAndS);
+//         } else {
+//             signature = abi.encodePacked(r, s, v);
+//         }
+
+//         (value, callData) = target.simpleSwapPayload(signature);
+//     }
+
+//     function testSeaport() public {
+//         (address to, bytes memory callData) = _prepareTest(seaport);
+
+//         vm.prank(buyer);
+//         (bool ok, ) = to.call{ value: value }(callData);
+
+//         require(ok);
+//     }
+
+//     function testWyvern() public {
+//         (address to, bytes memory callData) = _prepareTest(wyvern);
+
+//         vm.prank(buyer);
+//         (bool ok, ) = to.call{ value: value }(callData);
+
+//         require(ok);
+//     }
+// }
