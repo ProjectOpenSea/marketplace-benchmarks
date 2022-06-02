@@ -378,83 +378,83 @@ contract BaseMarketplaceTester is BaseOrderTest {
     }
 }
 
-contract GenericMarketplaceTest is DSTestPlus, BaseOrderTest {
-    Config seaport;
-    Config wyvern;
-    TestERC20 erc20;
-    TestERC721 erc721;
-    TestERC1155 erc1155;
+// contract GenericMarketplaceTest is DSTestPlus, BaseOrderTest {
+//     Config seaport;
+//     Config wyvern;
+//     TestERC20 erc20;
+//     TestERC721 erc721;
+//     TestERC1155 erc1155;
 
-    function signDigest(address signer, bytes32 digest)
-        external
-        view
-        returns (bytes memory)
-    {
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(_pkOfSigner1s, payloadToSign);
-    }
+//     function signDigest(address signer, bytes32 digest)
+//         external
+//         view
+//         returns (bytes memory)
+//     {
+//         (uint8 v, bytes32 r, bytes32 s) = vm.sign(_pkOfSigner1s, payloadToSign);
+//     }
 
-    function setUp() public virtual override {
-        super.setUp();
-        seaport = Config(address(new SeaportConfig()));
-    }
+//     function setUp() public virtual override {
+//         super.setUp();
+//         seaport = Config(address(new SeaportConfig()));
+//     }
 
 
 
-    function _prepareTest(Config target)
-        internal
-        returns (
-            address to,
-            uint256 value,
-            bytes memory callData
-        )
-    {
-        uint256 tokenId = 100;
+//     function _prepareTest(Config target)
+//         internal
+//         returns (
+//             address to,
+//             uint256 value,
+//             bytes memory callData
+//         )
+//     {
+//         uint256 tokenId = 100;
 
-        erc721.mint(seller, tokenId);
+//         erc721.mint(seller, tokenId);
 
-        to = target.marketplace();
+//         to = target.marketplace();
 
-        address approvalTarget = target.approvalTarget();
+//         address approvalTarget = target.approvalTarget();
 
-        vm.prank(seller);
-        erc721.setApprovalForAll(approvalTarget, true);
+//         vm.prank(seller);
+//         erc721.setApprovalForAll(approvalTarget, true);
 
-        (bytes32 payloadToSign, bool use2098) = target.supplyPayloadToSign();
+//         (bytes32 payloadToSign, bool use2098) = target.supplyPayloadToSign();
 
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(_pkOfSigner, payloadToSign);
+//         (uint8 v, bytes32 r, bytes32 s) = vm.sign(_pkOfSigner, payloadToSign);
 
-        bytes memory signature;
-        if (use2098) {
-            uint256 yParity;
-            if (v == 27) {
-                yParity = 0;
-            } else {
-                yParity = 1;
-            }
-            uint256 yParityAndS = (yParity << 255) | uint256(s);
-            signature = abi.encodePacked(r, yParityAndS);
-        } else {
-            signature = abi.encodePacked(r, s, v);
-        }
+//         bytes memory signature;
+//         if (use2098) {
+//             uint256 yParity;
+//             if (v == 27) {
+//                 yParity = 0;
+//             } else {
+//                 yParity = 1;
+//             }
+//             uint256 yParityAndS = (yParity << 255) | uint256(s);
+//             signature = abi.encodePacked(r, yParityAndS);
+//         } else {
+//             signature = abi.encodePacked(r, s, v);
+//         }
 
-        (value, callData) = target.simpleSwapPayload(signature);
-    }
+//         (value, callData) = target.simpleSwapPayload(signature);
+//     }
 
-    function testSeaport() public {
-        (address to, bytes memory callData) = _prepareTest(seaport);
+//     function testSeaport() public {
+//         (address to, bytes memory callData) = _prepareTest(seaport);
 
-        vm.prank(buyer);
-        (bool ok, ) = to.call{ value: value }(callData);
+//         vm.prank(buyer);
+//         (bool ok, ) = to.call{ value: value }(callData);
 
-        require(ok);
-    }
+//         require(ok);
+//     }
 
-    function testWyvern() public {
-        (address to, bytes memory callData) = _prepareTest(wyvern);
+//     function testWyvern() public {
+//         (address to, bytes memory callData) = _prepareTest(wyvern);
 
-        vm.prank(buyer);
-        (bool ok, ) = to.call{ value: value }(callData);
+//         vm.prank(buyer);
+//         (bool ok, ) = to.call{ value: value }(callData);
 
-        require(ok);
-    }
-}
+//         require(ok);
+//     }
+// }
