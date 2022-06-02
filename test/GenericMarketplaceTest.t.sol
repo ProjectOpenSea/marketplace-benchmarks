@@ -22,15 +22,41 @@ contract BaseMarketplaceTester is BaseOrderTest {
         return abi.encodePacked(r, s, v);
     }
 
+    function benchmarkMarket(BaseMarketConfig config) external {
+      benchmark_BuyOfferedERC721WithEther_ListOnChain(config);
+      benchmark_BuyOfferedERC721WithEther(config);
+      benchmark_BuyOfferedERC1155WithEther_ListOnChain(config);
+      benchmark_BuyOfferedERC1155WithEther(config);
+      benchmark_BuyOfferedERC721WithERC20_ListOnChain(config);
+      benchmark_BuyOfferedERC721WithERC20(config);
+      benchmark_BuyOfferedERC1155WithERC20_ListOnChain(config);
+      benchmark_BuyOfferedERC1155WithERC20(config);
+      benchmark_BuyOfferedERC20WithERC721_ListOnChain(config);
+      benchmark_BuyOfferedERC20WithERC721(config);
+      benchmark_BuyOfferedERC20WithERC1155_ListOnChain(config);
+      benchmark_BuyOfferedERC20WithERC1155(config);
+    }
+
     function setUp() public virtual override {
         super.setUp();
     }
 
-    function _callWithParams(
+    function concat(
+      string memory a,
+      string memory b,
+      string memory c
+    ) internal view returns (string memory d) {
+      d = string(abi.encodePacked(a, b, c));
+    }
+
+    function _benchmarkCallWithParams(
+      string memory name,
       string memory label,
       address sender,
       TestCallParameters memory params
-    ) internal {
+    )
+    internal 
+    {
       hevm.startPrank(sender);
       uint256 gasDelta;
       assembly {
@@ -53,39 +79,303 @@ contract BaseMarketplaceTester is BaseOrderTest {
         gasDelta := sub(g1, g2)
       }
       hevm.stopPrank();
-      emit log_named_uint(string(abi.encodePacked(label, " Gas")), gasDelta);
+      emit log_named_uint(concat(name, label, " Gas: "), gasDelta);
     }
 
     function prepareMarketplaceTest(
       BaseMarketConfig config
-    ) internal {
+    ) internal resetTokenBalancesBetweenRuns {
       address target = config.approvalTarget();
       _setApprovals(alice, target);
       _setApprovals(bob, target);
     }
 
-    // @todo move the approvals/minting logic into this contract
-    // and only mint/approve needed tokens
+  /*//////////////////////////////////////////////////////////////
+                          BUY ERC721 WITH ETH
+    //////////////////////////////////////////////////////////////*/
+
+
+    function benchmark_BuyOfferedERC721WithEther_ListOnChain(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      test721_1.mint(alice, 1);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC721WithEther(
+        TestOrderContext(true, alice, bob),
+        TestItem721(address(test721_1), 1),
+        100
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "List ERC721 -> ETH on-chain",
+        alice,
+        payload.submitOrder
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC721 -> ETH listed on-chain",
+        bob,
+        payload.submitOrder
+      );
+    }
+
     function benchmark_BuyOfferedERC721WithEther(
       BaseMarketConfig config
-    )
-      resetTokenBalancesBetweenRuns
-    {
+    ) internal {
       prepareMarketplaceTest(config);
-      TestOrderContext memory context = TestOrderContext(true, alice, bob);
+      test721_1.mint(alice, 1);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC721WithEther(
+        TestOrderContext(false, alice, bob),
+        TestItem721(address(test721_1), 1),
+        100
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC721 -> ETH with signature",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+  /*//////////////////////////////////////////////////////////////
+                          BUY ERC1155 WITH ETH
+    //////////////////////////////////////////////////////////////*/
+
+    function benchmark_BuyOfferedERC1155WithEther_ListOnChain(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
       test1155_1.mint(alice, 1, 1);
-      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC1155WithERC20(
-        context,
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC1155WithEther(
+        TestOrderContext(false, alice, bob),
         TestItem1155(address(test1155_1), 1, 1),
         100
       );
-      
+      _benchmarkCallWithParams(
+        config.name(),
+        "List ERC1155 -> ETH on-chain",
+        alice,
+        payload.submitOrder
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC1155 -> ETH listed on-chain",
+        bob,
+        payload.submitOrder
+      );
     }
-// getPayload_BuyOfferedERC1155WithEther
-// getPayload_BuyOfferedERC721WithERC20
-// getPayload_BuyOfferedERC1155WithERC20
-// getPayload_BuyOfferedERC20WithERC721
-// getPayload_BuyOfferedERC20WithERC1155
+
+    function benchmark_BuyOfferedERC1155WithEther(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      test1155_1.mint(alice, 1, 1);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC1155WithEther(
+        TestOrderContext(false, alice, bob),
+        TestItem1155(address(test1155_1), 1, 1),
+        100
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC1155 -> ETH with signature",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+  /*//////////////////////////////////////////////////////////////
+                          BUY ERC721 WITH ERC20
+    //////////////////////////////////////////////////////////////*/
+
+    function benchmark_BuyOfferedERC721WithERC20_ListOnChain(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      test721_1.mint(alice, 1);
+      token1.mint(bob, 100);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC721WithERC20(
+        TestOrderContext(true, alice, bob),
+        TestItem721(address(test721_1), 1),
+        TestItem20(token1, 100)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "List ERC721 -> ERC20 on-chain",
+        alice,
+        payload.submitOrder
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC721 -> ERC20 listed on-chain",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+    function benchmark_BuyOfferedERC721WithERC20(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      test721_1.mint(alice, 1);
+      token1.mint(bob, 100);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC721WithERC20(
+        TestOrderContext(false, alice, bob),
+        TestItem721(address(test721_1), 1),
+        TestItem20(token1, 100)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC721 -> ERC20 with signature",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+  /*//////////////////////////////////////////////////////////////
+                          BUY ERC1155 WITH ERC20
+    //////////////////////////////////////////////////////////////*/
+
+    function benchmark_BuyOfferedERC1155WithERC20_ListOnChain(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      test1155_1.mint(alice, 1, 1);
+      token1.mint(bob, 100);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC1155WithERC20(
+        TestOrderContext(true, alice, bob),
+        TestItem1155(address(test1155_1), 1, 1),
+        TestItem20(token1, 100)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "List ERC1155 -> ERC20 on-chain",
+        alice,
+        payload.submitOrder
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC1155 -> ERC20 listed on-chain",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+    function benchmark_BuyOfferedERC1155WithERC20(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      test1155_1.mint(alice, 1, 1);
+      token1.mint(bob, 100);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC1155WithERC20(
+        TestOrderContext(false, alice, bob),
+        TestItem1155(address(test1155_1), 1, 1),
+        TestItem20(token1, 100)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC1155 -> ERC20 with signature",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+  /*//////////////////////////////////////////////////////////////
+                          BUY ERC20 WITH ERC721
+    //////////////////////////////////////////////////////////////*/
+
+    function benchmark_BuyOfferedERC20WithERC721_ListOnChain(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      token1.mint(alice, 100);
+      test721_1.mint(bob, 1);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC20WithERC721(
+        TestOrderContext(true, alice, bob),
+        TestItem20(token1, 100),
+        TestItem721(address(test721_1), 1)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "List ERC20 -> ERC721 on-chain",
+        alice,
+        payload.submitOrder
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC20 -> ERC721 listed on-chain",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+    function benchmark_BuyOfferedERC20WithERC721(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      token1.mint(alice, 100);
+      test721_1.mint(bob, 1);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC20WithERC721(
+        TestOrderContext(false, alice, bob),
+        TestItem20(token1, 100),
+        TestItem721(address(test721_1), 1)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC20 -> ERC721 with signature",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+  /*//////////////////////////////////////////////////////////////
+                          BUY ERC20 WITH ERC1155
+    //////////////////////////////////////////////////////////////*/
+
+    function benchmark_BuyOfferedERC20WithERC1155_ListOnChain(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      TestOrderContext memory context = TestOrderContext(true, alice, bob);
+      token1.mint(alice, 100);
+      test1155_1.mint(bob, 1, 1);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC20WithERC1155(
+        context,
+        TestItem20(token1, 100),
+        TestItem1155(address(test1155_1), 1, 1)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "List ERC20 -> ERC1155 on-chain",
+        alice,
+        payload.submitOrder
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC20 -> ERC1155 listed on-chain",
+        bob,
+        payload.submitOrder
+      );
+    }
+
+    function benchmark_BuyOfferedERC20WithERC1155(
+      BaseMarketConfig config
+    ) internal {
+      prepareMarketplaceTest(config);
+      TestOrderContext memory context = TestOrderContext(false, alice, bob);
+      token1.mint(alice, 100);
+      test1155_1.mint(bob, 1, 1);
+      TestOrderPayload memory payload = config.getPayload_BuyOfferedERC20WithERC1155(
+        context,
+        TestItem20(token1, 100),
+        TestItem1155(address(test1155_1), 1, 1)
+      );
+      _benchmarkCallWithParams(
+        config.name(),
+        "Execute ERC20 -> ERC1155 with signature",
+        bob,
+        payload.submitOrder
+      );
+    }
 }
 
 contract GenericMarketplaceTest is DSTestPlus, BaseOrderTest {
