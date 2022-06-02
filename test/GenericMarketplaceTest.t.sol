@@ -18,7 +18,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
         view
         returns (bytes memory)
     {
-        (uint8 v, bytes32 r, bytes32 s) = hevm.sign(_pkOfSigner1s, payloadToSign);
+        (uint8 v, bytes32 r, bytes32 s) = hevm.sign(privateKeys[signer], digest);
         return abi.encodePacked(r, s, v);
     }
 
