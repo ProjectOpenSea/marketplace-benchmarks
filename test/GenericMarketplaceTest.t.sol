@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.14;
 
-import { DSTestPlus } from "solmate/test/utils/DSTestPlus.sol";
 //import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
+import { SeaportConfig } from "../src/marketplaces/seaport/SeaportConfig.sol";
 import { BaseMarketConfig } from "../src/BaseMarketConfig.sol";
 
 import { TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "../src/Types.sol";
@@ -13,6 +13,12 @@ import "./tokens/TestERC1155.sol";
 import "./utils/BaseOrderTest.sol";
 
 contract BaseMarketplaceTester is BaseOrderTest {
+  BaseMarketConfig seaportConfig;
+
+  constructor() {
+    seaportConfig = BaseMarketConfig(address(new SeaportConfig()));
+  }
+
     function signDigest(address signer, bytes32 digest)
         external
         returns (bytes memory)
@@ -21,7 +27,11 @@ contract BaseMarketplaceTester is BaseOrderTest {
         return abi.encodePacked(r, s, v);
     }
 
-    function testBenchmarkMarket(BaseMarketConfig config) external {
+    function testSeaport() external {
+      benchmarkMarket(seaportConfig);
+    }
+
+    function benchmarkMarket(BaseMarketConfig config) external {
       benchmark_BuyOfferedERC721WithEther_ListOnChain(config);
       benchmark_BuyOfferedERC721WithEther(config);
       benchmark_BuyOfferedERC1155WithEther_ListOnChain(config);
