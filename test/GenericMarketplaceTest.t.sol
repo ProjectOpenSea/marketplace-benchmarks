@@ -68,6 +68,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
     {
       hevm.startPrank(sender);
       uint256 gasDelta;
+      bool success;
       assembly {
         let to := mload(params)
         let value := mload(add(params, 0x20))
@@ -75,7 +76,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
         let ptr := add(data, 0x20)
         let len := mload(data)
         let g1 := gas()
-        let success := call(
+        success := call(
           gas(),
           to,
           value,
@@ -86,6 +87,10 @@ contract BaseMarketplaceTester is BaseOrderTest {
         )
         let g2 := gas()
         gasDelta := sub(g1, g2)
+        if iszero(success) {
+          returndatacopy(0, 0, returndatasize())
+          revert(0, returndatasize())
+        }
       }
       hevm.stopPrank();
       emit log_named_uint(concat(name, label, " Gas: "), gasDelta);
