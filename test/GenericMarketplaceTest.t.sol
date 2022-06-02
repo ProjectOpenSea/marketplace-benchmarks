@@ -15,7 +15,6 @@ import "./utils/BaseOrderTest.sol";
 contract BaseMarketplaceTester is BaseOrderTest {
     function signDigest(address signer, bytes32 digest)
         external
-        view
         returns (bytes memory)
     {
         (uint8 v, bytes32 r, bytes32 s) = hevm.sign(privateKeys[signer], digest);
