@@ -77,8 +77,6 @@ contract BaseOrderTest is DSTestPlus {
     }
 
     function setUp() public virtual override {
-        super.setUp();
-
         hevm.label(alice, "alice");
         hevm.label(bob, "bob");
         hevm.label(cal, "cal");
