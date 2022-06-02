@@ -196,7 +196,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
       TestOrderPayload memory payload = config.getPayload_BuyOfferedERC721WithERC20(
         TestOrderContext(true, alice, bob),
         TestItem721(address(test721_1), 1),
-        TestItem20(token1, 100)
+        TestItem20(address(token1), 100)
       );
       _benchmarkCallWithParams(
         config.name(),
@@ -221,7 +221,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
       TestOrderPayload memory payload = config.getPayload_BuyOfferedERC721WithERC20(
         TestOrderContext(false, alice, bob),
         TestItem721(address(test721_1), 1),
-        TestItem20(token1, 100)
+        TestItem20(address(token1), 100)
       );
       _benchmarkCallWithParams(
         config.name(),
@@ -244,7 +244,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
       TestOrderPayload memory payload = config.getPayload_BuyOfferedERC1155WithERC20(
         TestOrderContext(true, alice, bob),
         TestItem1155(address(test1155_1), 1, 1),
-        TestItem20(token1, 100)
+        TestItem20(address(token1), 100)
       );
       _benchmarkCallWithParams(
         config.name(),
@@ -269,7 +269,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
       TestOrderPayload memory payload = config.getPayload_BuyOfferedERC1155WithERC20(
         TestOrderContext(false, alice, bob),
         TestItem1155(address(test1155_1), 1, 1),
-        TestItem20(token1, 100)
+        TestItem20(address(token1), 100)
       );
       _benchmarkCallWithParams(
         config.name(),
@@ -291,7 +291,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
       test721_1.mint(bob, 1);
       TestOrderPayload memory payload = config.getPayload_BuyOfferedERC20WithERC721(
         TestOrderContext(true, alice, bob),
-        TestItem20(token1, 100),
+        TestItem20(address(token1), 100),
         TestItem721(address(test721_1), 1)
       );
       _benchmarkCallWithParams(
@@ -316,7 +316,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
       test721_1.mint(bob, 1);
       TestOrderPayload memory payload = config.getPayload_BuyOfferedERC20WithERC721(
         TestOrderContext(false, alice, bob),
-        TestItem20(token1, 100),
+        TestItem20(address(token1), 100),
         TestItem721(address(test721_1), 1)
       );
       _benchmarkCallWithParams(
@@ -340,7 +340,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
       test1155_1.mint(bob, 1, 1);
       TestOrderPayload memory payload = config.getPayload_BuyOfferedERC20WithERC1155(
         context,
-        TestItem20(token1, 100),
+        TestItem20(address(token1), 100),
         TestItem1155(address(test1155_1), 1, 1)
       );
       _benchmarkCallWithParams(
@@ -366,7 +366,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
       test1155_1.mint(bob, 1, 1);
       TestOrderPayload memory payload = config.getPayload_BuyOfferedERC20WithERC1155(
         context,
-        TestItem20(token1, 100),
+        TestItem20(address(token1), 100),
         TestItem1155(address(test1155_1), 1, 1)
       );
       _benchmarkCallWithParams(
