@@ -31,7 +31,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
       benchmarkMarket(seaportConfig);
     }
 
-    function benchmarkMarket(BaseMarketConfig config) external {
+    function benchmarkMarket(BaseMarketConfig config) public {
       benchmark_BuyOfferedERC721WithEther_ListOnChain(config);
       benchmark_BuyOfferedERC721WithEther(config);
       benchmark_BuyOfferedERC1155WithEther_ListOnChain(config);
