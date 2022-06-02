@@ -2,7 +2,7 @@
 pragma solidity 0.8.14;
 
 import { DSTestPlus } from "solmate/test/utils/DSTestPlus.sol";
-import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
+//import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
 import { BaseMarketConfig } from "../src/BaseMarketConfig.sol";
 
 import { TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "../src/Types.sol";
@@ -55,7 +55,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
       address sender,
       TestCallParameters memory params
     )
-    internal 
+    internal
     {
       hevm.startPrank(sender);
       uint256 gasDelta;
