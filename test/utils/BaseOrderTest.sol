@@ -76,7 +76,7 @@ contract BaseOrderTest is DSTestPlus {
         _resetTokensAndEthForTestAccounts();
     }
 
-    function setUp() public virtual override {
+    function setUp() public virtual {
         hevm.label(alice, "alice");
         hevm.label(bob, "bob");
         hevm.label(cal, "cal");
