@@ -9,6 +9,7 @@ import { ArithmeticUtil } from "./ArithmeticUtil.sol";
 
 contract BaseOrderTest is DSTestPlus {
     using stdStorage for StdStorage;
+    StdStorage stdstore;
     using ArithmeticUtil for uint256;
     using ArithmeticUtil for uint128;
     using ArithmeticUtil for uint120;
