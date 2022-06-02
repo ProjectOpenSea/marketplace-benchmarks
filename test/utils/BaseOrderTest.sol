@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.14;
-import { DSTestPlus } from "@rari-capital/solmate/src/test/utils/DSTestPlus.sol";
+import { DSTestPlus } from "solmate/src/test/utils/DSTestPlus.sol";
 import { stdStorage, StdStorage } from "forge-std/Test.sol";
 import { TestERC1155 } from "../tokens/TestERC1155.sol";
 import { TestERC20 } from "../tokens/TestERC20.sol";

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.14;
 
-import "@rari-capital/solmate/src/tokens/ERC1155.sol";
+import "solmate/src/tokens/ERC1155.sol";
 
 contract TestERC1155 is ERC1155 {
     function mint(
