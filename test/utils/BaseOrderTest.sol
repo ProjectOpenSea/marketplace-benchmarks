@@ -205,7 +205,7 @@ contract BaseOrderTest is DSTestPlus {
      *      note: must be called in conjunction with vm.record()
      */
     function _resetStorage(address _addr) internal {
-        (, bytes32[] memory writeSlots) = vm.accesses(_addr);
+        (, bytes32[] memory writeSlots) = hevm.accesses(_addr);
         for (uint256 i = 0; i < writeSlots.length; i++) {
             vm.store(_addr, writeSlots[i], bytes32(0));
         }
