@@ -72,9 +72,9 @@ contract BaseMarketplaceTester is BaseOrderTest {
       assembly {
         let to := mload(params)
         let value := mload(add(params, 0x20))
-        let data := mload(mload(add(params, 0x40)))
-        let ptr := add(data, 0x20)
-        let len := mload(data)
+      let data := mload(add(params, 0x40))
+      let ptr := add(data, 0x20)
+      let len := mload(data)
         let g1 := gas()
         success := call(
           gas(),
