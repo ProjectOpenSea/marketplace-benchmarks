@@ -69,7 +69,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         returns (TestOrderPayload memory execution)
     {
         (
-            /* Order memory order */,
+            Order memory order,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
                 BasicOrderRouteType.ETH_TO_ERC721,
@@ -86,6 +86,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             );
         if (context.listOnChain) {
             Order[] memory orders = new Order[](1);
+            orders[0] = order;
             execution.submitOrder = TestCallParameters(
                 address(seaport),
                 0,
@@ -114,7 +115,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         returns (TestOrderPayload memory execution)
     {
         (
-            /* Order memory order */,
+            Order memory order,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
                 BasicOrderRouteType.ETH_TO_ERC721,
@@ -137,6 +138,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             );
         if (context.listOnChain) {
             Order[] memory orders = new Order[](1);
+            orders[0] = order;
             execution.submitOrder = TestCallParameters(
                 address(seaport),
                 0,
@@ -165,7 +167,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         returns (TestOrderPayload memory execution)
     {
         (
-            /* Order memory order */,
+            Order memory order,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
                 BasicOrderRouteType.ETH_TO_ERC721,
@@ -182,6 +184,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             );
         if (context.listOnChain) {
             Order[] memory orders = new Order[](1);
+            orders[0] = order;
             execution.submitOrder = TestCallParameters(
                 address(seaport),
                 0,
@@ -210,7 +213,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         returns (TestOrderPayload memory execution)
     {
         (
-            /* Order memory order */,
+            Order memory order,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
                 BasicOrderRouteType.ETH_TO_ERC721,
@@ -233,6 +236,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             );
         if (context.listOnChain) {
             Order[] memory orders = new Order[](1);
+            orders[0] = order;
             execution.submitOrder = TestCallParameters(
                 address(seaport),
                 0,
@@ -261,7 +265,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         returns (TestOrderPayload memory execution)
     {
         (
-            /* Order memory order */,
+            Order memory order,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
                 BasicOrderRouteType.ETH_TO_ERC721,
@@ -284,6 +288,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             );
         if (context.listOnChain) {
             Order[] memory orders = new Order[](1);
+            orders[0] = order;
             execution.submitOrder = TestCallParameters(
                 address(seaport),
                 0,
@@ -312,7 +317,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         returns (TestOrderPayload memory execution)
     {
         (
-            /* Order memory order */,
+            Order memory order,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
                 BasicOrderRouteType.ETH_TO_ERC721,
@@ -335,6 +340,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             );
         if (context.listOnChain) {
             Order[] memory orders = new Order[](1);
+            orders[0] = order;
             execution.submitOrder = TestCallParameters(
                 address(seaport),
                 0,

@@ -54,7 +54,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
       string memory a,
       string memory b,
       string memory c
-    ) internal view returns (string memory d) {
+    ) internal pure returns (string memory d) {
       d = string(abi.encodePacked(a, b, c));
     }
 
