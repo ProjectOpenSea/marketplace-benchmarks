@@ -7,7 +7,7 @@ import "./lib/ConsiderationStructs.sol";
 import "./lib/ConsiderationTypeHashes.sol";
 import { ConsiderationInterface as ISeaport } from "./interfaces/ConsiderationInterface.sol";
 
-contract OpenSeaConfig is BaseMarketConfig, ConsiderationTypeHashes {
+contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
     function name() external view virtual override returns (string memory) {
       return "Seaport";
     }
