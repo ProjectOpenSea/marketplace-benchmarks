@@ -21,7 +21,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
         return abi.encodePacked(r, s, v);
     }
 
-    function benchmarkMarket(BaseMarketConfig config) external {
+    function testBenchmarkMarket(BaseMarketConfig config) external {
       benchmark_BuyOfferedERC721WithEther_ListOnChain(config);
       benchmark_BuyOfferedERC721WithEther(config);
       benchmark_BuyOfferedERC1155WithEther_ListOnChain(config);
