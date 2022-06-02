@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.14;
 
-import { DSTestPlus } from "solmate/src/test/utils/DSTestPlus.sol";
+import { DSTestPlus } from "solmate/test/utils/DSTestPlus.sol";
 import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
 import { BaseMarketConfig } from "../src/BaseMarketConfig.sol";
 
