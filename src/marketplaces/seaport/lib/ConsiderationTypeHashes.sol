@@ -21,7 +21,9 @@ contract ConsiderationTypeHashes {
     bytes32 internal immutable _CONSIDERATION_ITEM_TYPEHASH;
     bytes32 internal immutable _ORDER_TYPEHASH;
     bytes32 internal immutable _DOMAIN_SEPARATOR;
-    address internal constant seaport = 0x00000000006CEE72100D161c57ADA5Bb2be1CA79;
+    address internal constant seaportAddress = address(
+        0x00000000006CEE72100D161c57ADA5Bb2be1CA79
+    );
 
     constructor () {
         // Derive hash of the name of the contract.
@@ -76,7 +78,6 @@ contract ConsiderationTypeHashes {
         // Derive ConsiderationItem type hash using corresponding type string.
         bytes32 considerationItemTypehash = keccak256(considerationItemTypeString);
 
-
         // Construct the primary EIP-712 domain type string.
         // prettier-ignore
         _EIP_712_DOMAIN_TYPEHASH = keccak256(
@@ -118,7 +119,7 @@ contract ConsiderationTypeHashes {
                 _NAME_HASH,
                 _VERSION_HASH,
                 1,
-                seaport
+                seaportAddress
             )
         );
     }

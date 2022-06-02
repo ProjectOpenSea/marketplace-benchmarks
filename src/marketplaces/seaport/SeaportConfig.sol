@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity >=0.8.7;
 
 import { BaseMarketConfig } from "../../BaseMarketConfig.sol";
@@ -68,7 +69,7 @@ contract OpenSeaConfig is BaseMarketConfig, ConsiderationTypeHashes {
         returns (TestOrderPayload memory execution)
     {
         (
-            Order memory order,
+            /* Order memory order */,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
                 BasicOrderRouteType.ETH_TO_ERC721,
@@ -113,7 +114,7 @@ contract OpenSeaConfig is BaseMarketConfig, ConsiderationTypeHashes {
         returns (TestOrderPayload memory execution)
     {
         (
-            Order memory order,
+            /* Order memory order */,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
                 BasicOrderRouteType.ETH_TO_ERC721,
@@ -164,7 +165,7 @@ contract OpenSeaConfig is BaseMarketConfig, ConsiderationTypeHashes {
         returns (TestOrderPayload memory execution)
     {
         (
-            Order memory order,
+            /* Order memory order */,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
                 BasicOrderRouteType.ETH_TO_ERC721,
@@ -209,7 +210,7 @@ contract OpenSeaConfig is BaseMarketConfig, ConsiderationTypeHashes {
         returns (TestOrderPayload memory execution)
     {
         (
-            Order memory order,
+            /* Order memory order */,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
                 BasicOrderRouteType.ETH_TO_ERC721,
@@ -260,7 +261,7 @@ contract OpenSeaConfig is BaseMarketConfig, ConsiderationTypeHashes {
         returns (TestOrderPayload memory execution)
     {
         (
-            Order memory order,
+            /* Order memory order */,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
                 BasicOrderRouteType.ETH_TO_ERC721,
@@ -311,7 +312,7 @@ contract OpenSeaConfig is BaseMarketConfig, ConsiderationTypeHashes {
         returns (TestOrderPayload memory execution)
     {
         (
-            Order memory order,
+            /* Order memory order */,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
                 BasicOrderRouteType.ETH_TO_ERC721,

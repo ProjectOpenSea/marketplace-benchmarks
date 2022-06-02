@@ -14,7 +14,7 @@ abstract contract BaseMarketConfig {
      * @dev Revert if the type of requested order is impossible
      * to execute for a marketplace.
      */
-    function _notImplemented() internal {
+    function _notImplemented() internal pure {
         revert NotImplemented();
     }
 
