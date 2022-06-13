@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.7;
 
-import { TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "./Types.sol";
+import {TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155} from "./Types.sol";
 
 abstract contract BaseMarketConfig {
     ITestRunner private _tester;
@@ -28,7 +28,11 @@ abstract contract BaseMarketConfig {
     function _sign(address signer, bytes32 digest)
         internal
         view
-        returns (bytes memory)
+        returns (
+            uint8,
+            bytes32,
+            bytes32
+        )
     {
         return _tester.signDigest(signer, digest);
     }
@@ -140,5 +144,9 @@ interface ITestRunner {
     function signDigest(address signer, bytes32 digest)
         external
         view
-        returns (bytes memory);
+        returns (
+            uint8,
+            bytes32,
+            bytes32
+        );
 }

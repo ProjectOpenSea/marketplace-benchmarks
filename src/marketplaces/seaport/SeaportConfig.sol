@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.7;
 
-import { BaseMarketConfig } from "../../BaseMarketConfig.sol";
-import { TestCallParameters, TestOrderContext, TestOrderPayload, TestItem721, TestItem1155, TestItem20 } from "../../Types.sol";
+import {BaseMarketConfig} from "../../BaseMarketConfig.sol";
+import {TestCallParameters, TestOrderContext, TestOrderPayload, TestItem721, TestItem1155, TestItem20} from "../../Types.sol";
 import "./lib/ConsiderationStructs.sol";
 import "./lib/ConsiderationTypeHashes.sol";
-import { ConsiderationInterface as ISeaport } from "./interfaces/ConsiderationInterface.sol";
+import {ConsiderationInterface as ISeaport} from "./interfaces/ConsiderationInterface.sol";
 
 contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
     function name() external view virtual override returns (string memory) {
-      return "Seaport";
+        return "Seaport";
     }
 
     ISeaport internal constant seaport =
@@ -53,7 +53,8 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         basicComponents.basicOrderType = BasicOrderType(uint256(routeType) * 4);
         basicComponents.totalOriginalAdditionalRecipients = 0;
         bytes32 digest = _deriveEIP712Digest(_deriveOrderHash(components, 0));
-        bytes memory signature = _sign(offerer, digest);
+        (uint8 v, bytes32 r, bytes32 s) = _sign(offerer, digest);
+        bytes memory signature = abi.encodePacked(r, s, v);
         basicComponents.signature = (order.signature = signature);
     }
 
