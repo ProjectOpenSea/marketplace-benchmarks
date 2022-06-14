@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.14;
-import { DSTestPlus } from "solmate/test/utils/DSTestPlus.sol";
-import { stdStorage, StdStorage } from "forge-std/Test.sol";
-import { TestERC1155 } from "../tokens/TestERC1155.sol";
-import { TestERC20 } from "../tokens/TestERC20.sol";
-import { TestERC721 } from "../tokens/TestERC721.sol";
-import { ArithmeticUtil } from "./ArithmeticUtil.sol";
+import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
+import {stdStorage, StdStorage} from "forge-std/Test.sol";
+import {TestERC1155} from "../tokens/TestERC1155.sol";
+import {TestERC20} from "../tokens/TestERC20.sol";
+import {TestERC721} from "../tokens/TestERC721.sol";
+import {ArithmeticUtil} from "./ArithmeticUtil.sol";
 
 contract BaseOrderTest is DSTestPlus {
     using stdStorage for StdStorage;
@@ -72,8 +72,8 @@ contract BaseOrderTest is DSTestPlus {
      */
 
     modifier resetTokenBalancesBetweenRuns() {
-        _;
         _resetTokensAndEthForTestAccounts();
+        _;
     }
 
     function setUp() public virtual {
@@ -127,16 +127,16 @@ contract BaseOrderTest is DSTestPlus {
         emit log("Deployed test token contracts");
     }
 
-    function _setApprovals(address _owner, address _target) internal {
+    function _setApprovals(address _owner, address _erc20Target, address _nftTarget) internal {
         hevm.startPrank(_owner);
         for (uint256 i = 0; i < erc20s.length; i++) {
-            erc20s[i].approve(_target, MAX_INT);
+            erc20s[i].approve(_erc20Target, MAX_INT);
         }
         for (uint256 i = 0; i < erc721s.length; i++) {
-            erc721s[i].setApprovalForAll(_target, true);
+            erc721s[i].setApprovalForAll(_nftTarget, true);
         }
         for (uint256 i = 0; i < erc1155s.length; i++) {
-            erc1155s[i].setApprovalForAll(_target, true);
+            erc1155s[i].setApprovalForAll(_nftTarget, true);
         }
 
         hevm.stopPrank();
@@ -193,8 +193,6 @@ contract BaseOrderTest is DSTestPlus {
             .with_key(restoreErc20Balance.who)
             .checked_write(uint128(MAX_INT));
     }
-
-
 
     /**
      * @dev reset all storage written at an address thus far to 0; will overwrite totalSupply()for ERC20s but that should be fine

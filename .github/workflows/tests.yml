@@ -18,12 +18,9 @@ jobs:
 
       - name: Check contract sizes
         run: forge build --sizes
-
-      - name: Check gas snapshots
-        run: forge snapshot --fork-url ${{ secrets.ETH_RPC_URL }} --check
-
+        
       - name: Run tests
-        run: forge test --fork-url ${{ secrets.ETH_RPC_URL }}
+        run: forge test --fork-url ${{ secrets.ETH_RPC_URL }} -vv
         env:
           # Only fuzz intensely if we're running this action on a push to main or for a PR going into main:
           FOUNDRY_PROFILE: ${{ (github.ref == 'refs/heads/main' || github.base_ref == 'main') && 'intense' }}

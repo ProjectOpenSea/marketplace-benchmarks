@@ -1,23 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.7;
 
-import { BaseMarketConfig } from "../../BaseMarketConfig.sol";
-import { TestCallParameters, TestOrderContext, TestOrderPayload, TestItem721, TestItem1155, TestItem20 } from "../../Types.sol";
+import {BaseMarketConfig} from "../../BaseMarketConfig.sol";
+import {TestCallParameters, TestOrderContext, TestOrderPayload, TestItem721, TestItem1155, TestItem20} from "../../Types.sol";
 import "./lib/ConsiderationStructs.sol";
 import "./lib/ConsiderationTypeHashes.sol";
-import { ConsiderationInterface as ISeaport } from "./interfaces/ConsiderationInterface.sol";
+import {ConsiderationInterface as ISeaport} from "./interfaces/ConsiderationInterface.sol";
 
 contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
     function name() external view virtual override returns (string memory) {
-      return "Seaport";
+        return "Seaport";
     }
 
     ISeaport internal constant seaport =
-        ISeaport(0x00000000006CEE72100D161c57ADA5Bb2be1CA79);
-
-    function approvalTarget() external view virtual override returns (address) {
-        return address(seaport);
-    }
+        ISeaport(0x00000000006c3852cbEf3e08E8dF289169EdE581);
 
     function buildBasicOrder(
         BasicOrderRouteType routeType,
@@ -40,6 +36,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         components.consideration[0] = considerationItem;
         components.startTime = 0;
         components.endTime = block.timestamp + 1;
+        components.totalOriginalConsiderationItems = 1;
         basicComponents.startTime = 0;
         basicComponents.endTime = block.timestamp + 1;
         basicComponents.considerationToken = considerationItem.token;
@@ -53,8 +50,18 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         basicComponents.basicOrderType = BasicOrderType(uint256(routeType) * 4);
         basicComponents.totalOriginalAdditionalRecipients = 0;
         bytes32 digest = _deriveEIP712Digest(_deriveOrderHash(components, 0));
-        bytes memory signature = _sign(offerer, digest);
+        (uint8 v, bytes32 r, bytes32 s) = _sign(offerer, digest);
+        bytes memory signature = abi.encodePacked(r, s, v);
         basicComponents.signature = (order.signature = signature);
+    }
+
+    function beforeAllPrepareMarketplaceCall(address, address) external pure override returns (address, address, bytes memory) {
+        return (address(0), address(0), "0x");
+    }
+
+    function beforeAllPrepareMarketplace(address, address) external override {
+        nftApprovalTarget = address(seaport);
+        erc20ApprovalTarget = address(seaport);
     }
 
     function getPayload_BuyOfferedERC721WithEther(
@@ -118,7 +125,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             Order memory order,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
-                BasicOrderRouteType.ETH_TO_ERC721,
+                BasicOrderRouteType.ETH_TO_ERC1155,
                 context.offerer,
                 OfferItem(
                     ItemType.ERC1155,
@@ -170,7 +177,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             Order memory order,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
-                BasicOrderRouteType.ETH_TO_ERC721,
+                BasicOrderRouteType.ERC20_TO_ERC721,
                 context.offerer,
                 OfferItem(ItemType.ERC721, nft.token, nft.identifier, 1, 1),
                 ConsiderationItem(
@@ -216,7 +223,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             Order memory order,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
-                BasicOrderRouteType.ETH_TO_ERC721,
+                BasicOrderRouteType.ERC20_TO_ERC1155,
                 context.offerer,
                 OfferItem(
                     ItemType.ERC1155,
@@ -268,7 +275,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             Order memory order,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
-                BasicOrderRouteType.ETH_TO_ERC721,
+                BasicOrderRouteType.ERC721_TO_ERC20,
                 context.offerer,
                 OfferItem(
                     ItemType.ERC20,
@@ -320,7 +327,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             Order memory order,
             BasicOrderParameters memory basicComponents
         ) = buildBasicOrder(
-                BasicOrderRouteType.ETH_TO_ERC721,
+                BasicOrderRouteType.ERC1155_TO_ERC20,
                 context.offerer,
                 OfferItem(
                     ItemType.ERC20,

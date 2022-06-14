@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.7;
 
-import { TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "./Types.sol";
+import {TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155} from "./Types.sol";
 
 abstract contract BaseMarketConfig {
     ITestRunner private _tester;
@@ -28,7 +28,11 @@ abstract contract BaseMarketConfig {
     function _sign(address signer, bytes32 digest)
         internal
         view
-        returns (bytes memory)
+        returns (
+            uint8,
+            bytes32,
+            bytes32
+        )
     {
         return _tester.signDigest(signer, digest);
     }
@@ -36,7 +40,9 @@ abstract contract BaseMarketConfig {
     /**
      * @dev Address that should be approved by buyer and seller.
      */
-    function approvalTarget() external view virtual returns (address);
+    address public nftApprovalTarget;
+
+    address public erc20ApprovalTarget;
 
     function getUserSetupCalls(TestOrderContext calldata context)
         external
@@ -44,6 +50,13 @@ abstract contract BaseMarketConfig {
         virtual
         returns (TestCallParameters[] memory)
     {}
+
+    /**
+     * @dev Any additional prep needed before benchmarking
+     */
+    function beforeAllPrepareMarketplaceCall(address seller, address buyer) external virtual returns (address, address, bytes memory);
+
+    function beforeAllPrepareMarketplace(address seller, address buyer) external virtual;
 
     /**
      * @dev Get call parameters to execute an order selling a 721 token for Ether.
@@ -140,5 +153,9 @@ interface ITestRunner {
     function signDigest(address signer, bytes32 digest)
         external
         view
-        returns (bytes memory);
+        returns (
+            uint8,
+            bytes32,
+            bytes32
+        );
 }
