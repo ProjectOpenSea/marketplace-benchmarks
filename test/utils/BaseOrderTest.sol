@@ -72,8 +72,8 @@ contract BaseOrderTest is DSTestPlus {
      */
 
     modifier resetTokenBalancesBetweenRuns() {
-        _;
         _resetTokensAndEthForTestAccounts();
+        _;
     }
 
     function setUp() public virtual {
@@ -127,16 +127,16 @@ contract BaseOrderTest is DSTestPlus {
         emit log("Deployed test token contracts");
     }
 
-    function _setApprovals(address _owner, address _target) internal {
+    function _setApprovals(address _owner, address _erc20Target, address _nftTarget) internal {
         hevm.startPrank(_owner);
         for (uint256 i = 0; i < erc20s.length; i++) {
-            erc20s[i].approve(_target, MAX_INT);
+            erc20s[i].approve(_erc20Target, MAX_INT);
         }
         for (uint256 i = 0; i < erc721s.length; i++) {
-            erc721s[i].setApprovalForAll(_target, true);
+            erc721s[i].setApprovalForAll(_nftTarget, true);
         }
         for (uint256 i = 0; i < erc1155s.length; i++) {
-            erc1155s[i].setApprovalForAll(_target, true);
+            erc1155s[i].setApprovalForAll(_nftTarget, true);
         }
 
         hevm.stopPrank();

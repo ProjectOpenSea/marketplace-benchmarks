@@ -4,7 +4,6 @@ pragma solidity 0.8.14;
 import {WyvernConfig} from "../src/marketplaces/wyvern/WyvernConfig.sol";
 import {SeaportConfig} from "../src/marketplaces/seaport/SeaportConfig.sol";
 import {BaseMarketConfig} from "../src/BaseMarketConfig.sol";
-import "forge-std/console2.sol";
 
 import {TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155} from "../src/Types.sol";
 
@@ -42,6 +41,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
     }
 
     function benchmarkMarket(BaseMarketConfig config) public {
+        beforeAllPrepareMarketplaceTest(config);
         benchmark_BuyOfferedERC721WithEther_ListOnChain(config);
         benchmark_BuyOfferedERC721WithEther(config);
         benchmark_BuyOfferedERC1155WithEther_ListOnChain(config);
@@ -106,13 +106,21 @@ contract BaseMarketplaceTester is BaseOrderTest {
         emit log_named_uint(formatLog(name, label), gasDelta);
     }
 
+    function beforeAllPrepareMarketplaceTest(BaseMarketConfig config) internal {
+        (address from, address target, bytes memory _calldata) = config.beforeAllPrepareMarketplaceCall(alice, bob);
+        hevm.startPrank(from);
+        target.call(_calldata);
+        hevm.stopPrank();
+
+        config.beforeAllPrepareMarketplace(alice, bob);
+    }
+
     function prepareMarketplaceTest(BaseMarketConfig config)
         internal
         resetTokenBalancesBetweenRuns
     {
-        address target = config.approvalTarget();
-        _setApprovals(alice, target);
-        _setApprovals(bob, target);
+        _setApprovals(alice, config.erc20ApprovalTarget(), config.nftApprovalTarget());
+        _setApprovals(bob, config.erc20ApprovalTarget(), config.nftApprovalTarget());
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -153,7 +161,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
             .getPayload_BuyOfferedERC721WithEther(
                 TestOrderContext(false, alice, bob),
                 TestItem721(address(test721_1), 1),
-                100
+                101
             );
         _benchmarkCallWithParams(
             config.name(),
@@ -174,7 +182,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
         test1155_1.mint(alice, 1, 1);
         TestOrderPayload memory payload = config
             .getPayload_BuyOfferedERC1155WithEther(
-                TestOrderContext(false, alice, bob),
+                TestOrderContext(true, alice, bob),
                 TestItem1155(address(test1155_1), 1, 1),
                 100
             );
@@ -201,7 +209,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
             .getPayload_BuyOfferedERC1155WithEther(
                 TestOrderContext(false, alice, bob),
                 TestItem1155(address(test1155_1), 1, 1),
-                100
+                101
             );
         _benchmarkCallWithParams(
             config.name(),
@@ -246,12 +254,12 @@ contract BaseMarketplaceTester is BaseOrderTest {
     {
         prepareMarketplaceTest(config);
         test721_1.mint(alice, 1);
-        token1.mint(bob, 100);
+        token1.mint(bob, 101);
         TestOrderPayload memory payload = config
             .getPayload_BuyOfferedERC721WithERC20(
                 TestOrderContext(false, alice, bob),
                 TestItem721(address(test721_1), 1),
-                TestItem20(address(token1), 100)
+                TestItem20(address(token1), 101)
             );
         _benchmarkCallWithParams(
             config.name(),
@@ -296,12 +304,12 @@ contract BaseMarketplaceTester is BaseOrderTest {
     {
         prepareMarketplaceTest(config);
         test1155_1.mint(alice, 1, 1);
-        token1.mint(bob, 100);
+        token1.mint(bob, 101);
         TestOrderPayload memory payload = config
             .getPayload_BuyOfferedERC1155WithERC20(
                 TestOrderContext(false, alice, bob),
                 TestItem1155(address(test1155_1), 1, 1),
-                TestItem20(address(token1), 100)
+                TestItem20(address(token1), 101)
             );
         _benchmarkCallWithParams(
             config.name(),

@@ -40,7 +40,9 @@ abstract contract BaseMarketConfig {
     /**
      * @dev Address that should be approved by buyer and seller.
      */
-    function approvalTarget() external view virtual returns (address);
+    address public nftApprovalTarget;
+
+    address public erc20ApprovalTarget;
 
     function getUserSetupCalls(TestOrderContext calldata context)
         external
@@ -48,6 +50,13 @@ abstract contract BaseMarketConfig {
         virtual
         returns (TestCallParameters[] memory)
     {}
+
+    /**
+     * @dev Any additional prep needed before benchmarking
+     */
+    function beforeAllPrepareMarketplaceCall(address seller, address buyer) external virtual returns (address, address, bytes memory);
+
+    function beforeAllPrepareMarketplace(address seller, address buyer) external virtual;
 
     /**
      * @dev Get call parameters to execute an order selling a 721 token for Ether.
