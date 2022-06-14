@@ -116,7 +116,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
             sum += callData[i] == 0 ? 4 : 16;
         }
 
-        return sum;
+        return sum - 2600; // Remove call opcode cost
     }
 
     function beforeAllPrepareMarketplaceTest(BaseMarketConfig config) internal {
