@@ -204,7 +204,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         order.exchange = address(wyvern);
         order.maker = maker;
         order.taker = taker;
-        order.makerRelayerFee = 950;
+        order.makerRelayerFee = 0;
         order.feeRecipient = feeRecipient;
         order.feeMethod = FeeMethod.SplitFee;
         order.side = Side.Sell;
@@ -412,7 +412,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         order.exchange = address(wyvern);
         order.maker = maker;
         order.taker = taker;
-        order.makerRelayerFee = 950;
+        order.makerRelayerFee = 0;
         order.feeRecipient = feeRecipient;
         order.feeMethod = FeeMethod.SplitFee;
         order.side = Side.Sell;
