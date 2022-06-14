@@ -22,7 +22,7 @@ contract ConsiderationTypeHashes {
     bytes32 internal immutable _ORDER_TYPEHASH;
     bytes32 internal immutable _DOMAIN_SEPARATOR;
     address internal constant seaportAddress = address(
-        0x00000000006CEE72100D161c57ADA5Bb2be1CA79
+        0x00000000006c3852cbEf3e08E8dF289169EdE581
     );
 
     constructor () {
@@ -30,7 +30,7 @@ contract ConsiderationTypeHashes {
         _NAME_HASH = keccak256(bytes("Seaport"));
 
         // Derive hash of the version string of the contract.
-        _VERSION_HASH = keccak256(bytes("1"));
+        _VERSION_HASH = keccak256(bytes("1.1"));
 
         bytes memory offerItemTypeString = abi.encodePacked(
             "OfferItem(",
@@ -69,7 +69,7 @@ contract ConsiderationTypeHashes {
                 "bytes32 zoneHash,",
                 "uint256 salt,",
                 "bytes32 conduitKey,",
-                "uint256 nonce",
+                "uint256 counter",
             ")"
         );
         // Derive the OfferItem type hash using the corresponding type string.
@@ -218,13 +218,13 @@ contract ConsiderationTypeHashes {
      *      caller.
      *
      * @param orderParameters The parameters of the order to hash.
-     * @param nonce           The nonce of the order to hash.
+     * @param counter           The counter of the order to hash.
      *
      * @return orderHash The hash.
      */
     function _deriveOrderHash(
         OrderParameters memory orderParameters,
-        uint256 nonce
+        uint256 counter
     ) internal view returns (bytes32 orderHash) {
         // Designate new memory regions for offer and consideration item hashes.
         bytes32[] memory offerHashes = new bytes32[](
@@ -268,7 +268,7 @@ contract ConsiderationTypeHashes {
                     orderParameters.zoneHash,
                     orderParameters.salt,
                     orderParameters.conduitKey,
-                    nonce
+                    counter
                 )
             );
     }

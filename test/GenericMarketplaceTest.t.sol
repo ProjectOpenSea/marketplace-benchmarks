@@ -11,6 +11,7 @@ import "./tokens/TestERC20.sol";
 import "./tokens/TestERC721.sol";
 import "./tokens/TestERC1155.sol";
 import "./utils/BaseOrderTest.sol";
+import "forge-std/console2.sol";
 
 contract BaseMarketplaceTester is BaseOrderTest {
     BaseMarketConfig seaportConfig;
@@ -103,7 +104,19 @@ contract BaseMarketplaceTester is BaseOrderTest {
             }
         }
         hevm.stopPrank();
-        emit log_named_uint(formatLog(name, label), gasDelta);
+        emit log_named_uint(formatLog(name, string(abi.encodePacked(label," (direct)"))), gasDelta);
+        emit log_named_uint(formatLog(name, label), gasDelta + additionalGasFee(params.data));
+    }
+
+    function additionalGasFee(bytes memory callData) internal pure returns (uint256) {
+        uint sum = 21000;
+
+        for(uint i = 0; i < callData.length; i++) {
+            // zero bytes = 4, non-zero = 16
+            sum += callData[i] == 0 ? 4 : 16;
+        }
+
+        return sum;
     }
 
     function beforeAllPrepareMarketplaceTest(BaseMarketConfig config) internal {

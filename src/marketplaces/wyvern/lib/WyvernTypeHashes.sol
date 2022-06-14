@@ -69,7 +69,7 @@ contract WyvernTypeHashes {
         }
     }
 
-    function hashOrder(Order memory order, uint nonce)
+    function hashOrder(Order memory order, uint counter)
         internal
         pure
         returns (bytes32 hash)
@@ -105,7 +105,7 @@ contract WyvernTypeHashes {
         index = ArrayUtils.unsafeWriteUint(index, order.listingTime);
         index = ArrayUtils.unsafeWriteUint(index, order.expirationTime);
         index = ArrayUtils.unsafeWriteUint(index, order.salt);
-        index = ArrayUtils.unsafeWriteUint(index, nonce);
+        index = ArrayUtils.unsafeWriteUint(index, counter);
         assembly {
             hash := keccak256(add(array, 0x20), size)
         }

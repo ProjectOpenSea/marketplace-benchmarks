@@ -13,7 +13,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
     }
 
     ISeaport internal constant seaport =
-        ISeaport(0x00000000006CEE72100D161c57ADA5Bb2be1CA79);
+        ISeaport(0x00000000006c3852cbEf3e08E8dF289169EdE581);
 
     function buildBasicOrder(
         BasicOrderRouteType routeType,

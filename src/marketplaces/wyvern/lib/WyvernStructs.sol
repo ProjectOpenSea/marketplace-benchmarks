@@ -61,5 +61,5 @@ struct Order {
     uint expirationTime;
     /* Order salt, used to prevent duplicate hashes. */
     uint salt;
-    /* NOTE: uint nonce is an additional component of the order but is read from storage */
+    /* NOTE: uint counter is an additional component of the order but is read from storage */
 }
