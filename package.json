@@ -1,20 +1,29 @@
 {
-  "name": "foundry-template",
+  "name": "marketplace-benchmarks",
   "license": "MIT",
   "version": "1.0.0",
-  "description": "Streamlined template for getting started with Foundry and Solmate.",
+  "description": "Marketplace Benchmarking for various NFT marketplaces",
   "files": [
     "src/**/*.sol"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/transmissions11/foundry-template.git"
-  },
   "devDependencies": {
     "prettier": "^2.3.1",
     "prettier-plugin-solidity": "^1.0.0-beta.13"
   },
   "scripts": {
-    "lint": "prettier --write **.sol"
+    "lint:check": "prettier --check **.sol",
+    "lint:fix": "prettier --write **.sol"
+  },
+  "prettier": {
+    "overrides": [
+      {
+        "files": "*.sol",
+        "options": {
+          "tabWidth": 4,
+          "printWidth": 80,
+          "bracketSpacing": true
+        }
+      }
+    ]
   }
 }

@@ -1,19 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.7;
 
-import {BaseMarketConfig} from "../../BaseMarketConfig.sol";
-import {TestCallParameters, TestOrderContext, TestOrderPayload, TestItem721, TestItem1155, TestItem20} from "../../Types.sol";
-import {WyvernInterface as IWyvern} from "./interfaces/WyvernInterface.sol";
-import {IWyvernProxyRegistry} from "./interfaces/IWyvernProxyRegistry.sol";
-import {IERC721} from "./interfaces/IERC721.sol";
-import {IERC1155} from "./interfaces/IERC1155.sol";
+import { BaseMarketConfig } from "../../BaseMarketConfig.sol";
+import { TestCallParameters, TestOrderContext, TestOrderPayload, TestItem721, TestItem1155, TestItem20 } from "../../Types.sol";
+import { WyvernInterface as IWyvern } from "./interfaces/WyvernInterface.sol";
+import { IWyvernProxyRegistry } from "./interfaces/IWyvernProxyRegistry.sol";
+import { IERC721 } from "./interfaces/IERC721.sol";
+import { IERC1155 } from "./interfaces/IERC1155.sol";
 import "./lib/WyvernStructs.sol";
 import "./lib/WyvernEnums.sol";
 import "./lib/WyvernTypeHashes.sol";
 
 contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
-    function name() external view virtual override returns (string memory) {
+    function name() external pure virtual override returns (string memory) {
         return "Wyvern";
+    }
+
+    function market() public pure override returns (address) {
+        return address(wyvern);
     }
 
     bytes internal constant EMPTY_BYTES = bytes("");
@@ -24,10 +28,10 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
     address internal constant feeRecipient =
         0x5b3256965e7C3cF26E11FCAf296DfC8807C01073;
 
-    IWyvern internal constant wyvern = 
+    IWyvern internal constant wyvern =
         IWyvern(0x7f268357A8c2552623316e2562D90e642bB538E5);
 
-    IWyvernProxyRegistry internal constant proxyRegistry = 
+    IWyvernProxyRegistry internal constant proxyRegistry =
         IWyvernProxyRegistry(0xa5409ec958C83C3f309868babACA7c86DCB077c1);
 
     /*//////////////////////////////////////////////////////////////
@@ -92,8 +96,6 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
                     order.target,
                     NULL_ADDRESS,
                     order.paymentToken,
-
-
                     order.exchange,
                     order.maker,
                     order.taker,
@@ -112,8 +114,6 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
                     order.listingTime,
                     order.expirationTime,
                     order.salt,
-
-
                     order.makerRelayerFee,
                     0,
                     0,
@@ -129,8 +129,6 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
                     uint8(0),
                     uint8(0),
                     uint8(0),
-
-
                     uint8(order.feeMethod),
                     uint8(order.side),
                     uint8(order.saleKind),
@@ -157,9 +155,11 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             );
     }
 
-    function encodeERC721ApproveOrder(
-        Order memory order
-    ) internal pure returns (bytes memory) {
+    function encodeERC721ApproveOrder(Order memory order)
+        internal
+        pure
+        returns (bytes memory)
+    {
         return
             abi.encodeWithSelector(
                 IWyvern.approveOrder_.selector,
@@ -185,7 +185,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
                 ],
                 order.feeMethod,
                 order.side,
-                order.saleKind, 
+                order.saleKind,
                 order.howToCall,
                 order._calldata,
                 order.replacementPattern,
@@ -249,14 +249,14 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         pure
         returns (bytes memory)
     {
-        bytes memory rawBytes =  abi.encodeWithSelector(
-                IERC1155.safeTransferFrom.selector,
-                NULL_ADDRESS,
-                0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff,
-                0,
-                0,
-                EMPTY_BYTES
-            );
+        bytes memory rawBytes = abi.encodeWithSelector(
+            IERC1155.safeTransferFrom.selector,
+            NULL_ADDRESS,
+            0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff,
+            0,
+            0,
+            EMPTY_BYTES
+        );
         rawBytes[0] = 0;
         rawBytes[1] = 0;
         rawBytes[2] = 0;
@@ -271,14 +271,14 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         pure
         returns (bytes memory)
     {
-        bytes memory rawBytes =  abi.encodeWithSelector(
-                IERC1155.safeTransferFrom.selector,
-                0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff,
-                NULL_ADDRESS,
-                0,
-                0,
-                EMPTY_BYTES
-            );
+        bytes memory rawBytes = abi.encodeWithSelector(
+            IERC1155.safeTransferFrom.selector,
+            0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff,
+            NULL_ADDRESS,
+            0,
+            0,
+            EMPTY_BYTES
+        );
         rawBytes[0] = 0;
         rawBytes[1] = 0;
         rawBytes[2] = 0;
@@ -304,8 +304,6 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
                     order.target,
                     NULL_ADDRESS,
                     order.paymentToken,
-
-
                     order.exchange,
                     order.maker,
                     order.taker,
@@ -324,8 +322,6 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
                     order.listingTime,
                     order.expirationTime,
                     order.salt,
-
-
                     order.makerRelayerFee,
                     0,
                     0,
@@ -341,14 +337,17 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
                     uint8(0),
                     uint8(0),
                     uint8(0),
-
-
                     uint8(order.feeMethod),
                     uint8(order.side),
                     uint8(order.saleKind),
                     uint8(order.howToCall)
                 ],
-                encodeERC1155SafeTransferFrom(NULL_ADDRESS, order.taker, nft.identifier, nft.amount),
+                encodeERC1155SafeTransferFrom(
+                    NULL_ADDRESS,
+                    order.taker,
+                    nft.identifier,
+                    nft.amount
+                ),
                 order._calldata,
                 encodeERC1155ReplacementPatternBuy(),
                 order.replacementPattern,
@@ -365,9 +364,11 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             );
     }
 
-    function encodeERC1155ApproveOrder(
-        Order memory order
-    ) internal pure returns (bytes memory) {
+    function encodeERC1155ApproveOrder(Order memory order)
+        internal
+        pure
+        returns (bytes memory)
+    {
         return
             abi.encodeWithSelector(
                 IWyvern.approveOrder_.selector,
@@ -393,7 +394,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
                 ],
                 order.feeMethod,
                 order.side,
-                order.saleKind, 
+                order.saleKind,
                 order.howToCall,
                 order._calldata,
                 order.replacementPattern,
@@ -419,7 +420,12 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         order.saleKind = SaleKind.FixedPrice;
         order.target = nft.token;
         order.howToCall = HowToCall.Call;
-        order._calldata = encodeERC1155SafeTransferFrom(maker, NULL_ADDRESS, nft.identifier, nft.amount);
+        order._calldata = encodeERC1155SafeTransferFrom(
+            maker,
+            NULL_ADDRESS,
+            nft.identifier,
+            nft.amount
+        );
         order.replacementPattern = encodeERC1155ReplacementPatternSell();
         order.paymentToken = paymentToken;
         order.basePrice = price;
@@ -427,17 +433,27 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         (signature.v, signature.r, signature.s) = _sign(maker, digest);
     }
 
-    function beforeAllPrepareMarketplaceCall(address seller, address) external pure override returns (address, address, bytes memory) {
+    function beforeAllPrepareMarketplaceCall(address seller, address)
+        external
+        pure
+        override
+        returns (
+            address,
+            address,
+            bytes memory
+        )
+    {
         return (
             address(seller),
-            address(proxyRegistry), 
-            abi.encodeWithSelector(
-                proxyRegistry.registerProxy.selector
-            )
+            address(proxyRegistry),
+            abi.encodeWithSelector(proxyRegistry.registerProxy.selector)
         );
     }
 
-    function beforeAllPrepareMarketplace(address seller, address) external override {
+    function beforeAllPrepareMarketplace(address seller, address)
+        external
+        override
+    {
         // Create Wyvern Proxy
         erc20ApprovalTarget = 0xE5c783EE536cf5E63E792988335c4255169be4E1;
         nftApprovalTarget = proxyRegistry.proxies(seller);
@@ -570,28 +586,4 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             encodeERC1155AtomicMatch(order, signature, nft)
         );
     }
-
-    function getPayload_BuyOfferedERC20WithERC721(
-        TestOrderContext calldata context,
-        TestItem20 memory erc20,
-        TestItem721 memory nft
-    )
-        external
-        view
-        virtual
-        override
-        returns (TestOrderPayload memory execution)
-    {}
-
-    function getPayload_BuyOfferedERC20WithERC1155(
-        TestOrderContext calldata context,
-        TestItem20 memory erc20,
-        TestItem1155 calldata nft
-    )
-        external
-        view
-        virtual
-        override
-        returns (TestOrderPayload memory execution)
-    {}
 }

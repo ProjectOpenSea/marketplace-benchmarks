@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.13;
 
-import {FeeMethod, Side, SaleKind, HowToCall} from "../lib/WyvernEnums.sol";
+import { FeeMethod, Side, SaleKind, HowToCall } from "../lib/WyvernEnums.sol";
 
 interface WyvernInterface {
     function atomicMatch_(
