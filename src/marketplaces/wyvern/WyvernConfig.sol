@@ -12,7 +12,7 @@ import "./lib/WyvernEnums.sol";
 import "./lib/WyvernTypeHashes.sol";
 
 contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
-    function name() external pure virtual override returns (string memory) {
+    function name() external pure override returns (string memory) {
         return "Wyvern";
     }
 
@@ -292,7 +292,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         Order memory order,
         Sig memory signature,
         TestItem1155 memory nft
-    ) internal view returns (bytes memory) {
+    ) internal pure returns (bytes memory) {
         return
             abi.encodeWithSelector(
                 IWyvern.atomicMatch_.selector,
@@ -463,13 +463,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestOrderContext calldata context,
         TestItem721 memory nft,
         uint256 ethAmount
-    )
-        external
-        view
-        virtual
-        override
-        returns (TestOrderPayload memory execution)
-    {
+    ) external view override returns (TestOrderPayload memory execution) {
         (Order memory order, Sig memory signature) = buildERC721SellOrder(
             context.offerer,
             context.fulfiller,
@@ -495,13 +489,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestOrderContext calldata context,
         TestItem1155 memory nft,
         uint256 ethAmount
-    )
-        external
-        view
-        virtual
-        override
-        returns (TestOrderPayload memory execution)
-    {
+    ) external view override returns (TestOrderPayload memory execution) {
         (Order memory order, Sig memory signature) = buildERC1155SellOrder(
             context.offerer,
             context.fulfiller,
@@ -527,13 +515,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestOrderContext calldata context,
         TestItem721 memory nft,
         TestItem20 memory erc20
-    )
-        external
-        view
-        virtual
-        override
-        returns (TestOrderPayload memory execution)
-    {
+    ) external view override returns (TestOrderPayload memory execution) {
         (Order memory order, Sig memory signature) = buildERC721SellOrder(
             context.offerer,
             context.fulfiller,
@@ -559,13 +541,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestOrderContext calldata context,
         TestItem1155 calldata nft,
         TestItem20 memory erc20
-    )
-        external
-        view
-        virtual
-        override
-        returns (TestOrderPayload memory execution)
-    {
+    ) external view override returns (TestOrderPayload memory execution) {
         (Order memory order, Sig memory signature) = buildERC1155SellOrder(
             context.offerer,
             context.fulfiller,

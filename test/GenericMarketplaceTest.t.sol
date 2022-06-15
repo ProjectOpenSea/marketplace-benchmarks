@@ -46,6 +46,8 @@ contract BaseMarketplaceTester is BaseOrderTest {
         benchmark_BuyOfferedERC20WithERC721(config);
         benchmark_BuyOfferedERC20WithERC1155_ListOnChain(config);
         benchmark_BuyOfferedERC20WithERC1155(config);
+        benchmark_BuyOfferedERC721WithERC1155_ListOnChain(config);
+        benchmark_BuyOfferedERC721WithERC1155(config);
     }
 
     function beforeAllPrepareMarketplaceTest(BaseMarketConfig config) internal {
@@ -111,7 +113,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
         returns (TestOrderPayload memory payload) {
             _benchmarkCallWithParams(
                 config.name(),
-                string(abi.encodePacked(testLabel, " Fulfill, w/ signature")),
+                string(abi.encodePacked(testLabel, " Fulfill, w/ Sig")),
                 bob,
                 payload.executeOrder
             );
@@ -167,7 +169,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
         returns (TestOrderPayload memory payload) {
             _benchmarkCallWithParams(
                 config.name(),
-                string(abi.encodePacked(testLabel, " Fulfill, w/ signature")),
+                string(abi.encodePacked(testLabel, " Fulfill, w/ Sig")),
                 bob,
                 payload.executeOrder
             );
@@ -232,7 +234,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
         returns (TestOrderPayload memory payload) {
             _benchmarkCallWithParams(
                 config.name(),
-                string(abi.encodePacked(testLabel, " Fulfill, w/ signature")),
+                string(abi.encodePacked(testLabel, " Fulfill, w/ Sig")),
                 bob,
                 payload.executeOrder
             );
@@ -395,7 +397,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
         internal
         prepareTest(config)
     {
-        string memory testLabel = "(ERC20 -> ERC1155) Fulfill, w/ signature";
+        string memory testLabel = "(ERC20 -> ERC1155)";
         TestOrderContext memory context = TestOrderContext(false, alice, bob);
         token1.mint(alice, 101);
         test1155_1.mint(bob, 1, 1);
@@ -408,7 +410,65 @@ contract BaseMarketplaceTester is BaseOrderTest {
         returns (TestOrderPayload memory payload) {
             _benchmarkCallWithParams(
                 config.name(),
-                testLabel,
+                string(abi.encodePacked(testLabel, " Fulfill w/ Sig")),
+                bob,
+                payload.executeOrder
+            );
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyOfferedERC721WithERC1155_ListOnChain(BaseMarketConfig config)
+        internal
+        prepareTest(config)
+    {
+        string memory testLabel = "(ERC721 -> ERC1155 List-On-Chain)";
+        TestOrderContext memory context = TestOrderContext(true, alice, bob);
+        test721_1.mint(alice, 1);
+        test1155_1.mint(bob, 1, 1);
+        try
+            config.getPayload_BuyOfferedERC721WithERC1155(
+                context,
+                TestItem721(address(test721_1), 1),
+                TestItem1155(address(test1155_1), 1, 1)
+            )
+        returns (TestOrderPayload memory payload) {
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " List")),
+                alice,
+                payload.submitOrder
+            );
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill")),
+                bob,
+                payload.executeOrder
+            );
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyOfferedERC721WithERC1155(BaseMarketConfig config)
+        internal
+        prepareTest(config)
+    {
+        string memory testLabel = "(ERC721 -> ERC1155)";
+        TestOrderContext memory context = TestOrderContext(false, alice, bob);
+        test721_1.mint(alice, 2);
+        test1155_1.mint(bob, 1, 1);
+        try
+            config.getPayload_BuyOfferedERC721WithERC1155(
+                context,
+                TestItem721(address(test721_1), 2),
+                TestItem1155(address(test1155_1), 1, 1)
+            )
+        returns (TestOrderPayload memory payload) {
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill w/ Sig")),
                 bob,
                 payload.executeOrder
             );

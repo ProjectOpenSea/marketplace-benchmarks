@@ -8,7 +8,7 @@ import "./lib/ConsiderationTypeHashes.sol";
 import { ConsiderationInterface as ISeaport } from "./interfaces/ConsiderationInterface.sol";
 
 contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
-    function name() external pure virtual override returns (string memory) {
+    function name() external pure override returns (string memory) {
         return "Seaport";
     }
 
@@ -59,6 +59,25 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         basicComponents.signature = (order.signature = signature);
     }
 
+    function buildOrder(
+        address offerer,
+        OfferItem[] memory offerItems,
+        ConsiderationItem[] memory considerationItems
+    ) internal view returns (Order memory order) {
+        OrderParameters memory components = order.parameters;
+        components.offerer = offerer;
+        components.offer = offerItems;
+        components.consideration = considerationItems;
+        components.orderType = OrderType.FULL_OPEN;
+        components.startTime = 0;
+        components.endTime = block.timestamp + 1;
+        components.totalOriginalConsiderationItems = 1;
+        bytes32 digest = _deriveEIP712Digest(_deriveOrderHash(components, 0));
+        (uint8 v, bytes32 r, bytes32 s) = _sign(offerer, digest);
+        bytes memory signature = abi.encodePacked(r, s, v);
+        order.signature = signature;
+    }
+
     function beforeAllPrepareMarketplace(address, address) external override {
         nftApprovalTarget = address(seaport);
         erc20ApprovalTarget = address(seaport);
@@ -68,13 +87,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         TestOrderContext calldata context,
         TestItem721 memory nft,
         uint256 ethAmount
-    )
-        external
-        view
-        virtual
-        override
-        returns (TestOrderPayload memory execution)
-    {
+    ) external view override returns (TestOrderPayload memory execution) {
         (
             Order memory order,
             BasicOrderParameters memory basicComponents
@@ -99,6 +112,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
+            basicComponents.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -114,13 +128,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         TestOrderContext calldata context,
         TestItem1155 memory nft,
         uint256 ethAmount
-    )
-        external
-        view
-        virtual
-        override
-        returns (TestOrderPayload memory execution)
-    {
+    ) external view override returns (TestOrderPayload memory execution) {
         (
             Order memory order,
             BasicOrderParameters memory basicComponents
@@ -151,6 +159,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
+            basicComponents.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -166,13 +175,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         TestOrderContext calldata context,
         TestItem721 memory nft,
         TestItem20 memory erc20
-    )
-        external
-        view
-        virtual
-        override
-        returns (TestOrderPayload memory execution)
-    {
+    ) external view override returns (TestOrderPayload memory execution) {
         (
             Order memory order,
             BasicOrderParameters memory basicComponents
@@ -197,6 +200,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
+            basicComponents.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -212,13 +216,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         TestOrderContext calldata context,
         TestItem1155 calldata nft,
         TestItem20 memory erc20
-    )
-        external
-        view
-        virtual
-        override
-        returns (TestOrderPayload memory execution)
-    {
+    ) external view override returns (TestOrderPayload memory execution) {
         (
             Order memory order,
             BasicOrderParameters memory basicComponents
@@ -249,6 +247,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
+            basicComponents.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -264,13 +263,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         TestOrderContext calldata context,
         TestItem20 memory erc20,
         TestItem721 memory nft
-    )
-        external
-        view
-        virtual
-        override
-        returns (TestOrderPayload memory execution)
-    {
+    ) external view override returns (TestOrderPayload memory execution) {
         (
             Order memory order,
             BasicOrderParameters memory basicComponents
@@ -301,6 +294,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
+            basicComponents.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -316,13 +310,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         TestOrderContext calldata context,
         TestItem20 memory erc20,
         TestItem1155 calldata nft
-    )
-        external
-        view
-        virtual
-        override
-        returns (TestOrderPayload memory execution)
-    {
+    ) external view override returns (TestOrderPayload memory execution) {
         (
             Order memory order,
             BasicOrderParameters memory basicComponents
@@ -353,6 +341,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
+            basicComponents.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -361,6 +350,58 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 ISeaport.fulfillBasicOrder.selector,
                 basicComponents
             )
+        );
+    }
+
+    function getPayload_BuyOfferedERC721WithERC1155(
+        TestOrderContext calldata context,
+        TestItem721 memory sellNft,
+        TestItem1155 calldata buyNft
+    ) external view override returns (TestOrderPayload memory execution) {
+        OfferItem memory offer = OfferItem(
+            ItemType.ERC721,
+            sellNft.token,
+            sellNft.identifier,
+            1,
+            1
+        );
+        ConsiderationItem memory consideration = ConsiderationItem(
+            ItemType.ERC1155,
+            buyNft.token,
+            buyNft.identifier,
+            buyNft.amount,
+            buyNft.amount,
+            payable(context.offerer)
+        );
+
+        OfferItem[] memory offerItems = new OfferItem[](1);
+        ConsiderationItem[] memory considerationItems = new ConsiderationItem[](
+            1
+        );
+
+        offerItems[0] = offer;
+        considerationItems[0] = consideration;
+
+        Order memory order = buildOrder(
+            context.offerer,
+            offerItems,
+            considerationItems
+        );
+
+        if (context.listOnChain) {
+            Order[] memory orders = new Order[](1);
+            orders[0] = order;
+            execution.submitOrder = TestCallParameters(
+                address(seaport),
+                0,
+                abi.encodeWithSelector(ISeaport.validate.selector, orders)
+            );
+            order.signature = "";
+        }
+        execution.executeOrder = TestCallParameters(
+            address(seaport),
+            0,
+            abi.encodeWithSelector(ISeaport.fulfillOrder.selector, order, 0)
         );
     }
 }
