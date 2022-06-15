@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.7;
 
-import {TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155} from "./Types.sol";
+import { TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "./Types.sol";
 
 abstract contract BaseMarketConfig {
     ITestRunner private _tester;
 
-    function name() external view virtual returns (string memory);
+    function name() external pure virtual returns (string memory);
+
+    function market() public pure virtual returns (address);
 
     error NotImplemented();
 
@@ -54,9 +56,22 @@ abstract contract BaseMarketConfig {
     /**
      * @dev Any additional prep needed before benchmarking
      */
-    function beforeAllPrepareMarketplaceCall(address seller, address buyer) external virtual returns (address, address, bytes memory);
+    function beforeAllPrepareMarketplaceCall(address seller, address buyer)
+        external
+        virtual
+        returns (
+            address,
+            address,
+            bytes memory
+        )
+    {
+        return (address(0), address(0), "");
+    }
 
-    function beforeAllPrepareMarketplace(address seller, address buyer) external virtual;
+    function beforeAllPrepareMarketplace(address seller, address buyer)
+        external
+        virtual
+    {}
 
     /**
      * @dev Get call parameters to execute an order selling a 721 token for Ether.
@@ -71,7 +86,9 @@ abstract contract BaseMarketConfig {
         TestOrderContext calldata context,
         TestItem721 calldata nft,
         uint256 ethAmount
-    ) external view virtual returns (TestOrderPayload memory execution);
+    ) external view virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
 
     /**
      * @dev Get call parameters to execute an order selling an 1155 token for Ether.
@@ -86,7 +103,9 @@ abstract contract BaseMarketConfig {
         TestOrderContext calldata context,
         TestItem1155 calldata nft,
         uint256 ethAmount
-    ) external view virtual returns (TestOrderPayload memory execution);
+    ) external view virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
 
     /**
      * @dev Get call parameters to execute an order selling a 721 token for an ERC20.
@@ -101,7 +120,9 @@ abstract contract BaseMarketConfig {
         TestOrderContext calldata context,
         TestItem721 calldata nft,
         TestItem20 calldata erc20
-    ) external view virtual returns (TestOrderPayload memory execution);
+    ) external view virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
 
     /**
      * @dev Get call parameters to execute an order selling an 1155 token for an ERC20.
@@ -116,7 +137,9 @@ abstract contract BaseMarketConfig {
         TestOrderContext calldata context,
         TestItem1155 calldata nft,
         TestItem20 calldata erc20
-    ) external view virtual returns (TestOrderPayload memory execution);
+    ) external view virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
 
     /**
      * @dev Get call parameters to execute an order selling an ERC20 token for an ERC721.
@@ -131,7 +154,9 @@ abstract contract BaseMarketConfig {
         TestOrderContext calldata context,
         TestItem20 calldata erc20,
         TestItem721 calldata nft
-    ) external view virtual returns (TestOrderPayload memory execution);
+    ) external view virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
 
     /**
      * @dev Get call parameters to execute an order selling an ERC20 token for an ERC1155.
@@ -146,7 +171,26 @@ abstract contract BaseMarketConfig {
         TestOrderContext calldata context,
         TestItem20 calldata erc20,
         TestItem1155 calldata nft
-    ) external view virtual returns (TestOrderPayload memory execution);
+    ) external view virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
+
+    /**
+     * @dev Get call parameters to execute an order selling an ERC721 token for an ERC1155.
+     *   If `context.listOnChain` is true and marketplace does not support on-chain
+     *   listing, this function must revert with NotImplemented.
+     * @param context Order context, including the buyer and seller and whether the
+     *  order should be listed on chain.
+     * @param sellNft Address and ID of 721 token to be sold.
+     * @param buyNft Address, ID and amount of 1155 token to be received for ERC721.
+     */
+    function getPayload_BuyOfferedERC721WithERC1155(
+        TestOrderContext calldata context,
+        TestItem721 calldata sellNft,
+        TestItem1155 calldata buyNft
+    ) external view virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
 }
 
 interface ITestRunner {

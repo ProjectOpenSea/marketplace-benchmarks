@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   tests:
+    name: Run Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -24,3 +25,14 @@ jobs:
         env:
           # Only fuzz intensely if we're running this action on a push to main or for a PR going into main:
           FOUNDRY_PROFILE: ${{ (github.ref == 'refs/heads/main' || github.base_ref == 'main') && 'intense' }}
+  lint:
+    name: Run Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+      - run: yarn install
+      - run: yarn lint:check
+

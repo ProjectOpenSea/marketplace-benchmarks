@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.14;
-import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
-import {stdStorage, StdStorage} from "forge-std/Test.sol";
-import {TestERC1155} from "../tokens/TestERC1155.sol";
-import {TestERC20} from "../tokens/TestERC20.sol";
-import {TestERC721} from "../tokens/TestERC721.sol";
-import {ArithmeticUtil} from "./ArithmeticUtil.sol";
+import { DSTestPlus } from "solmate/test/utils/DSTestPlus.sol";
+import { stdStorage, StdStorage } from "forge-std/Test.sol";
+import { TestERC1155 } from "../tokens/TestERC1155.sol";
+import { TestERC20 } from "../tokens/TestERC20.sol";
+import { TestERC721 } from "../tokens/TestERC721.sol";
+import { ArithmeticUtil } from "./ArithmeticUtil.sol";
+import "forge-std/console2.sol";
 
 contract BaseOrderTest is DSTestPlus {
     using stdStorage for StdStorage;
@@ -71,9 +72,8 @@ contract BaseOrderTest is DSTestPlus {
      * @dev hook to record storage writes and reset token balances in between differential runs
      */
 
-    modifier resetTokenBalancesBetweenRuns() {
+    function resetTokenBalancesBetweenRuns() internal {
         _resetTokensAndEthForTestAccounts();
-        _;
     }
 
     function setUp() public virtual {
@@ -123,11 +123,13 @@ contract BaseOrderTest is DSTestPlus {
         hevm.label(address(token1), "token1");
         hevm.label(address(test721_1), "test721_1");
         hevm.label(address(test1155_1), "test1155_1");
-
-        emit log("Deployed test token contracts");
     }
 
-    function _setApprovals(address _owner, address _erc20Target, address _nftTarget) internal {
+    function _setApprovals(
+        address _owner,
+        address _erc20Target,
+        address _nftTarget
+    ) internal {
         hevm.startPrank(_owner);
         for (uint256 i = 0; i < erc20s.length; i++) {
             erc20s[i].approve(_erc20Target, MAX_INT);
@@ -147,14 +149,19 @@ contract BaseOrderTest is DSTestPlus {
      */
     function _resetTokensAndEthForTestAccounts() internal {
         _resetTokensStorage();
-        _restoreERC20Balances();
         _restoreEthBalances();
+        hevm.record();
     }
 
     function _restoreEthBalances() internal {
         for (uint256 i = 0; i < accounts.length; i++) {
             hevm.deal(accounts[i], uint128(MAX_INT));
         }
+    }
+
+    // Fix this
+    function _resetMarketStorage(address market) internal {
+        _resetStorage(market);
     }
 
     function _resetTokensStorage() internal {
