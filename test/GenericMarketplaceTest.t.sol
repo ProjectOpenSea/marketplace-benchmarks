@@ -419,10 +419,9 @@ contract BaseMarketplaceTester is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyOfferedERC721WithERC1155_ListOnChain(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
+    function benchmark_BuyOfferedERC721WithERC1155_ListOnChain(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
         string memory testLabel = "(ERC721 -> ERC1155 List-On-Chain)";
         TestOrderContext memory context = TestOrderContext(true, alice, bob);
         test721_1.mint(alice, 1);
