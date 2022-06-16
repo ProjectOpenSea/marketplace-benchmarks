@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.7;
 
-import { TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "./Types.sol";
+import { SetupCall, TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "./Types.sol";
 
 abstract contract BaseMarketConfig {
     /**
@@ -15,13 +15,15 @@ abstract contract BaseMarketConfig {
      * @dev Address that should be approved for nft tokens
      *   (ERC721 and ERC1155). Should be set during `beforeAllPrepareMarketplace`.
      */
-    address public nftApprovalTarget;
+    address public sellerNftApprovalTarget;
+    address public buyerNftApprovalTarget;
 
     /**
      * @dev Address that should be approved for erc20 tokens.
      *   Should be set during `beforeAllPrepareMarketplace`.
      */
-    address public erc20ApprovalTarget;
+    address public sellerErc20ApprovalTarget;
+    address public buyerErc20ApprovalTarget;
 
     /**
      * @dev Get calldata to call from test prior to starting tests
@@ -33,13 +35,10 @@ abstract contract BaseMarketConfig {
     function beforeAllPrepareMarketplaceCall(address seller, address buyer)
         external
         virtual
-        returns (
-            address,
-            address,
-            bytes memory
-        )
+        returns (SetupCall[] memory)
     {
-        return (address(0), address(0), "");
+        SetupCall[] memory empty = new SetupCall[](0);
+        return empty;
     }
 
     /**

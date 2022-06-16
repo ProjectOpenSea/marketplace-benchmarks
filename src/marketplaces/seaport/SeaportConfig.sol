@@ -158,8 +158,9 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
     }
 
     function beforeAllPrepareMarketplace(address, address) external override {
-        nftApprovalTarget = address(seaport);
-        erc20ApprovalTarget = address(seaport);
+        buyerNftApprovalTarget = sellerNftApprovalTarget = buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(
+            seaport
+        );
     }
 
     function getPayload_BuyOfferedERC721WithEther(

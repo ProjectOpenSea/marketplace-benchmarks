@@ -5,7 +5,7 @@ import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
 import { SeaportConfig } from "../src/marketplaces/seaport/SeaportConfig.sol";
 import { BaseMarketConfig } from "../src/BaseMarketConfig.sol";
 
-import { TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "../src/Types.sol";
+import { SetupCall, TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "../src/Types.sol";
 
 import "./tokens/TestERC20.sol";
 import "./tokens/TestERC721.sol";
@@ -57,11 +57,15 @@ contract BaseMarketplaceTester is BaseOrderTest {
 
     function beforeAllPrepareMarketplaceTest(BaseMarketConfig config) internal {
         // Get requested call from marketplace. Needed by Wyvern to deploy proxy
-        (address from, address target, bytes memory _calldata) = config
-            .beforeAllPrepareMarketplaceCall(alice, bob);
-        hevm.startPrank(from);
-        target.call(_calldata);
-        hevm.stopPrank();
+        SetupCall[] memory setupCalls = config.beforeAllPrepareMarketplaceCall(
+            alice,
+            bob
+        );
+        for (uint256 i = 0; i < setupCalls.length; i++) {
+            hevm.startPrank(setupCalls[i].sender);
+            (setupCalls[i].target).call(setupCalls[i].data);
+            hevm.stopPrank();
+        }
 
         // Do any final setup within config
         config.beforeAllPrepareMarketplace(alice, bob);
@@ -870,13 +874,13 @@ contract BaseMarketplaceTester is BaseOrderTest {
         _resetStorageAndEth(config.market());
         _setApprovals(
             alice,
-            config.erc20ApprovalTarget(),
-            config.nftApprovalTarget()
+            config.sellerErc20ApprovalTarget(),
+            config.sellerNftApprovalTarget()
         );
         _setApprovals(
             bob,
-            config.erc20ApprovalTarget(),
-            config.nftApprovalTarget()
+            config.buyerErc20ApprovalTarget(),
+            config.buyerNftApprovalTarget()
         );
         _;
     }
