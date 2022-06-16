@@ -25,6 +25,12 @@ struct TestCallParameters {
     bytes data;
 }
 
+struct SetupCall {
+    address sender;
+    address target;
+    bytes data;
+}
+
 struct TestOrderContext {
     bool listOnChain;
     address offerer;
