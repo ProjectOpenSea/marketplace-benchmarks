@@ -4,57 +4,31 @@ pragma solidity >=0.8.7;
 import { TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "./Types.sol";
 
 abstract contract BaseMarketConfig {
-    ITestRunner private _tester;
-
+    /**
+     * @dev Market name used in results
+     */
     function name() external pure virtual returns (string memory);
 
     function market() public pure virtual returns (address);
 
-    error NotImplemented();
-
     /**
-     * @dev Revert if the type of requested order is impossible
-     * to execute for a marketplace.
-     */
-    function _notImplemented() internal pure {
-        revert NotImplemented();
-    }
-
-    constructor() {
-        _tester = ITestRunner(msg.sender);
-    }
-
-    /**
-     * @dev Request a signature from the testing contract.
-     */
-    function _sign(address signer, bytes32 digest)
-        internal
-        view
-        returns (
-            uint8,
-            bytes32,
-            bytes32
-        )
-    {
-        return _tester.signDigest(signer, digest);
-    }
-
-    /**
-     * @dev Address that should be approved by buyer and seller.
+     * @dev Address that should be approved for nft tokens
+     *   (ERC721 and ERC1155). Should be set during `beforeAllPrepareMarketplace`.
      */
     address public nftApprovalTarget;
 
+    /**
+     * @dev Address that should be approved for erc20 tokens.
+     *   Should be set during `beforeAllPrepareMarketplace`.
+     */
     address public erc20ApprovalTarget;
 
-    function getUserSetupCalls(TestOrderContext calldata context)
-        external
-        view
-        virtual
-        returns (TestCallParameters[] memory)
-    {}
-
     /**
-     * @dev Any additional prep needed before benchmarking
+     * @dev Get calldata to call from test prior to starting tests
+     *   (used by wyvern to create proxies)
+     * @param seller The seller address used for testing the marketplace
+     * @param buyer The buyer address used for testing the marketplace
+     * @return From address, to address, and calldata
      */
     function beforeAllPrepareMarketplaceCall(address seller, address buyer)
         external
@@ -68,17 +42,26 @@ abstract contract BaseMarketConfig {
         return (address(0), address(0), "");
     }
 
+    /**
+     * @dev Final setup prior to starting tests
+     * @param seller The seller address used for testing the marketplace
+     * @param buyer The buyer address used for testing the marketplace
+     */
     function beforeAllPrepareMarketplace(address seller, address buyer)
         external
         virtual
     {}
+
+    /*//////////////////////////////////////////////////////////////
+                        Test Payload Calls
+    //////////////////////////////////////////////////////////////*/
 
     /**
      * @dev Get call parameters to execute an order selling a 721 token for Ether.
      *   If `context.listOnChain` is true and marketplace does not support on-chain
      *   listing, this function must revert with NotImplemented.
      * @param context Order context, including the buyer and seller and whether the
-     *  order should be listed on chain.
+     *   order should be listed on chain.
      * @param nft Address and ID for ERC721 token to be sold.
      * @param ethAmount Amount of Ether to be received for the NFT.
      */
@@ -270,6 +253,39 @@ abstract contract BaseMarketConfig {
         uint256 ethAmount
     ) external view virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                          Helpers
+    //////////////////////////////////////////////////////////////*/
+    ITestRunner private _tester;
+    error NotImplemented();
+
+    /**
+     * @dev Revert if the type of requested order is impossible
+     * to execute for a marketplace.
+     */
+    function _notImplemented() internal pure {
+        revert NotImplemented();
+    }
+
+    constructor() {
+        _tester = ITestRunner(msg.sender);
+    }
+
+    /**
+     * @dev Request a signature from the testing contract.
+     */
+    function _sign(address signer, bytes32 digest)
+        internal
+        view
+        returns (
+            uint8,
+            bytes32,
+            bytes32
+        )
+    {
+        return _tester.signDigest(signer, digest);
     }
 }
 
