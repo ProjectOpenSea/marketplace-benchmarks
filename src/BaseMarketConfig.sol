@@ -254,6 +254,23 @@ abstract contract BaseMarketConfig {
     ) external view virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
+
+    /**
+     * @dev Get call parameters to execute an order selling many 721 tokens for Ether.
+     *   If `context.listOnChain` is true and marketplace does not support on-chain
+     *   listing, this function must revert with NotImplemented.
+     * @param context Order context, including the buyer and seller and whether the
+     *  order should be listed on chain.
+     * @param nfts Array of Address and ID for ERC721 tokens to be sold.
+     * @param ethAmount Amount of Ether to be received for the NFT.
+     */
+    function getPayload_BuyOfferedManyERC721WithEther(
+        TestOrderContext calldata context,
+        TestItem721[] calldata nfts,
+        uint256 ethAmount
+    ) external view virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
 }
 
 interface ITestRunner {

@@ -52,6 +52,8 @@ contract BaseMarketplaceTester is BaseOrderTest {
         benchmark_BuyOfferedERC721WithEtherFee(config);
         benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients_ListOnChain(config);
         benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients(config);
+        benchmark_BuyTenOfferedERC721WithEther_ListOnChain(config);
+        benchmark_BuyTenOfferedERC721WithEther(config);
     }
 
     function beforeAllPrepareMarketplaceTest(BaseMarketConfig config) internal {
@@ -643,15 +645,15 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 5
             )
         returns (TestOrderPayload memory payload) {
-            assertEq(test721_1.ownerOf(1), alice);
-            assertEq(feeReciever1.balance, 0);
-
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " List")),
                 alice,
                 payload.submitOrder
             );
+
+            assertEq(test721_1.ownerOf(1), alice);
+            assertEq(feeReciever1.balance, 0);
 
             _benchmarkCallWithParams(
                 config.name(),
@@ -716,16 +718,16 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 5
             )
         returns (TestOrderPayload memory payload) {
-            assertEq(test721_1.ownerOf(1), alice);
-            assertEq(feeReciever1.balance, 0);
-            assertEq(feeReciever2.balance, 0);
-
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " List")),
                 alice,
                 payload.submitOrder
             );
+
+            assertEq(test721_1.ownerOf(1), alice);
+            assertEq(feeReciever1.balance, 0);
+            assertEq(feeReciever2.balance, 0);
 
             _benchmarkCallWithParams(
                 config.name(),
@@ -772,6 +774,87 @@ contract BaseMarketplaceTester is BaseOrderTest {
             assertEq(test721_1.ownerOf(1), bob);
             assertEq(feeReciever1.balance, 5);
             assertEq(feeReciever2.balance, 6);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyTenOfferedERC721WithEther_ListOnChain(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string memory testLabel = "(ERC721x10 -> ETH List-On-Chain)";
+
+        TestItem721[] memory nfts = new TestItem721[](10);
+        for (uint256 i = 0; i < 10; i++) {
+            test721_1.mint(alice, i + 1);
+            nfts[i] = TestItem721(address(test721_1), i + 1);
+        }
+
+        try
+            config.getPayload_BuyOfferedManyERC721WithEther(
+                TestOrderContext(true, alice, bob),
+                nfts,
+                100
+            )
+        returns (TestOrderPayload memory payload) {
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " List")),
+                alice,
+                payload.submitOrder
+            );
+
+            for (uint256 i = 0; i < 10; i++) {
+                assertEq(test721_1.ownerOf(i + 1), alice);
+            }
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill")),
+                bob,
+                payload.executeOrder
+            );
+
+            for (uint256 i = 0; i < 10; i++) {
+                assertEq(test721_1.ownerOf(i + 1), bob);
+            }
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyTenOfferedERC721WithEther(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string memory testLabel = "(ERC721x10 -> ETH)";
+
+        TestItem721[] memory nfts = new TestItem721[](10);
+        for (uint256 i = 0; i < 10; i++) {
+            test721_1.mint(alice, i + 1);
+            nfts[i] = TestItem721(address(test721_1), i + 1);
+        }
+
+        try
+            config.getPayload_BuyOfferedManyERC721WithEther(
+                TestOrderContext(false, alice, bob),
+                nfts,
+                101
+            )
+        returns (TestOrderPayload memory payload) {
+            for (uint256 i = 0; i < 10; i++) {
+                assertEq(test721_1.ownerOf(i + 1), alice);
+            }
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill /w Sig")),
+                bob,
+                payload.executeOrder
+            );
+
+            for (uint256 i = 0; i < 10; i++) {
+                assertEq(test721_1.ownerOf(i + 1), bob);
+            }
         } catch {
             _logNotSupported(config.name(), testLabel);
         }

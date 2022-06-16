@@ -437,14 +437,19 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         TestItem721 memory sellNft,
         TestItem1155 calldata buyNft
     ) external view override returns (TestOrderPayload memory execution) {
-        OfferItem memory offer = OfferItem(
+        OfferItem[] memory offerItems = new OfferItem[](1);
+        ConsiderationItem[] memory considerationItems = new ConsiderationItem[](
+            1
+        );
+
+        offerItems[0] = OfferItem(
             ItemType.ERC721,
             sellNft.token,
             sellNft.identifier,
             1,
             1
         );
-        ConsiderationItem memory consideration = ConsiderationItem(
+        considerationItems[0] = ConsiderationItem(
             ItemType.ERC1155,
             buyNft.token,
             buyNft.identifier,
@@ -452,14 +457,6 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             buyNft.amount,
             payable(context.offerer)
         );
-
-        OfferItem[] memory offerItems = new OfferItem[](1);
-        ConsiderationItem[] memory considerationItems = new ConsiderationItem[](
-            1
-        );
-
-        offerItems[0] = offer;
-        considerationItems[0] = consideration;
 
         Order memory order = buildOrder(
             context.offerer,
@@ -489,14 +486,19 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         TestItem1155 memory sellNft,
         TestItem721 calldata buyNft
     ) external view override returns (TestOrderPayload memory execution) {
-        OfferItem memory offer = OfferItem(
+        OfferItem[] memory offerItems = new OfferItem[](1);
+        ConsiderationItem[] memory considerationItems = new ConsiderationItem[](
+            1
+        );
+
+        offerItems[0] = OfferItem(
             ItemType.ERC1155,
             sellNft.token,
             sellNft.identifier,
             sellNft.amount,
             sellNft.amount
         );
-        ConsiderationItem memory consideration = ConsiderationItem(
+        considerationItems[0] = ConsiderationItem(
             ItemType.ERC721,
             buyNft.token,
             buyNft.identifier,
@@ -504,14 +506,6 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             1,
             payable(context.offerer)
         );
-
-        OfferItem[] memory offerItems = new OfferItem[](1);
-        ConsiderationItem[] memory considerationItems = new ConsiderationItem[](
-            1
-        );
-
-        offerItems[0] = offer;
-        considerationItems[0] = consideration;
 
         Order memory order = buildOrder(
             context.offerer,
@@ -641,6 +635,59 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 ISeaport.fulfillBasicOrder.selector,
                 basicComponents
             )
+        );
+    }
+
+    function getPayload_BuyOfferedManyERC721WithEther(
+        TestOrderContext calldata context,
+        TestItem721[] calldata nfts,
+        uint256 ethAmount
+    ) external view override returns (TestOrderPayload memory execution) {
+        OfferItem[] memory offerItems = new OfferItem[](nfts.length);
+
+        for (uint256 i = 0; i < nfts.length; i++) {
+            offerItems[i] = OfferItem(
+                ItemType.ERC721,
+                nfts[i].token,
+                nfts[i].identifier,
+                1,
+                1
+            );
+        }
+
+        ConsiderationItem[] memory considerationItems = new ConsiderationItem[](
+            1
+        );
+
+        considerationItems[0] = ConsiderationItem(
+            ItemType.NATIVE,
+            address(0),
+            0,
+            ethAmount,
+            ethAmount,
+            payable(context.offerer)
+        );
+
+        Order memory order = buildOrder(
+            context.offerer,
+            offerItems,
+            considerationItems
+        );
+
+        if (context.listOnChain) {
+            Order[] memory orders = new Order[](1);
+            orders[0] = order;
+            execution.submitOrder = TestCallParameters(
+                address(seaport),
+                0,
+                abi.encodeWithSelector(ISeaport.validate.selector, orders)
+            );
+            order.signature = "";
+        }
+        execution.executeOrder = TestCallParameters(
+            address(seaport),
+            ethAmount,
+            abi.encodeWithSelector(ISeaport.fulfillOrder.selector, order, 0)
         );
     }
 }
