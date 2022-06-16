@@ -20,9 +20,13 @@ contract BaseOrderTest is DSTestPlus {
     uint256 internal alicePk = 0xa11ce;
     uint256 internal bobPk = 0xb0b;
     uint256 internal calPk = 0xca1;
+    uint256 internal feeReciever1Pk = 0xfee1;
+    uint256 internal feeReciever2Pk = 0xfee2;
     address payable internal alice = payable(hevm.addr(alicePk));
     address payable internal bob = payable(hevm.addr(bobPk));
     address payable internal cal = payable(hevm.addr(calPk));
+    address payable internal feeReciever1 = payable(hevm.addr(feeReciever1Pk));
+    address payable internal feeReciever2 = payable(hevm.addr(feeReciever2Pk));
 
     TestERC20 internal token1;
     TestERC20 internal token2;
@@ -123,6 +127,8 @@ contract BaseOrderTest is DSTestPlus {
         hevm.label(address(token1), "token1");
         hevm.label(address(test721_1), "test721_1");
         hevm.label(address(test1155_1), "test1155_1");
+        hevm.label(address(feeReciever1), "feeReciever1");
+        hevm.label(address(feeReciever2), "feeReciever2");
     }
 
     function _setApprovals(
@@ -157,6 +163,8 @@ contract BaseOrderTest is DSTestPlus {
         for (uint256 i = 0; i < accounts.length; i++) {
             hevm.deal(accounts[i], uint128(MAX_INT));
         }
+        hevm.deal(feeReciever1, 0);
+        hevm.deal(feeReciever2, 0);
     }
 
     // Fix this

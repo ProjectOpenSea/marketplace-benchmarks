@@ -40,14 +40,18 @@ contract BaseMarketplaceTester is BaseOrderTest {
         benchmark_BuyOfferedERC721WithERC20(config);
         benchmark_BuyOfferedERC1155WithERC20_ListOnChain(config);
         benchmark_BuyOfferedERC1155WithERC20(config);
-
-        // Disabled because Wyvern offers haven't been implemented yet
         benchmark_BuyOfferedERC20WithERC721_ListOnChain(config);
         benchmark_BuyOfferedERC20WithERC721(config);
         benchmark_BuyOfferedERC20WithERC1155_ListOnChain(config);
         benchmark_BuyOfferedERC20WithERC1155(config);
         benchmark_BuyOfferedERC721WithERC1155_ListOnChain(config);
         benchmark_BuyOfferedERC721WithERC1155(config);
+        benchmark_BuyOfferedERC1155WithERC721_ListOnChain(config);
+        benchmark_BuyOfferedERC1155WithERC721(config);
+        benchmark_BuyOfferedERC721WithEtherFee_ListOnChain(config);
+        benchmark_BuyOfferedERC721WithEtherFee(config);
+        benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients_ListOnChain(config);
+        benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients(config);
     }
 
     function beforeAllPrepareMarketplaceTest(BaseMarketConfig config) internal {
@@ -86,12 +90,16 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 alice,
                 payload.submitOrder
             );
+
+            assertEq(test721_1.ownerOf(1), alice);
+
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill")),
                 bob,
                 payload.executeOrder
             );
+
             assertEq(test721_1.ownerOf(1), bob);
         } catch {
             _logNotSupported(config.name(), testLabel);
@@ -111,12 +119,15 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 101
             )
         returns (TestOrderPayload memory payload) {
+            assertEq(test721_1.ownerOf(1), alice);
+
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill, w/ Sig")),
                 bob,
                 payload.executeOrder
             );
+
             assertEq(test721_1.ownerOf(1), bob);
         } catch {
             _logNotSupported(config.name(), testLabel);
@@ -141,13 +152,18 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 alice,
                 payload.submitOrder
             );
+
             assertEq(test1155_1.balanceOf(alice, 1), 1);
+            assertEq(test1155_1.balanceOf(bob, 1), 0);
+
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill")),
                 bob,
                 payload.executeOrder
             );
+
+            assertEq(test1155_1.balanceOf(alice, 1), 0);
             assertEq(test1155_1.balanceOf(bob, 1), 1);
         } catch {
             _logNotSupported(config.name(), testLabel);
@@ -167,12 +183,15 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 101
             )
         returns (TestOrderPayload memory payload) {
+            assertEq(test1155_1.balanceOf(alice, 1), 1);
+
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill, w/ Sig")),
                 bob,
                 payload.executeOrder
             );
+
             assertEq(test1155_1.balanceOf(bob, 1), 1);
         } catch {
             _logNotSupported(config.name(), testLabel);
@@ -200,8 +219,8 @@ contract BaseMarketplaceTester is BaseOrderTest {
             );
 
             assertEq(test721_1.ownerOf(1), alice);
-            assertEq(token1.balanceOf(bob), 100);
             assertEq(token1.balanceOf(alice), 0);
+            assertEq(token1.balanceOf(bob), 100);
 
             _benchmarkCallWithParams(
                 config.name(),
@@ -211,8 +230,8 @@ contract BaseMarketplaceTester is BaseOrderTest {
             );
 
             assertEq(test721_1.ownerOf(1), bob);
-            assertEq(token1.balanceOf(bob), 0);
             assertEq(token1.balanceOf(alice), 100);
+            assertEq(token1.balanceOf(bob), 0);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
@@ -232,13 +251,20 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 TestItem20(address(token1), 101)
             )
         returns (TestOrderPayload memory payload) {
+            assertEq(test721_1.ownerOf(1), alice);
+            assertEq(token1.balanceOf(alice), 0);
+            assertEq(token1.balanceOf(bob), 101);
+
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill, w/ Sig")),
                 bob,
                 payload.executeOrder
             );
+
             assertEq(test721_1.ownerOf(1), bob);
+            assertEq(token1.balanceOf(alice), 101);
+            assertEq(token1.balanceOf(bob), 0);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
@@ -263,14 +289,21 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 alice,
                 payload.submitOrder
             );
+
             assertEq(test1155_1.balanceOf(alice, 1), 1);
+            assertEq(token1.balanceOf(alice), 0);
+            assertEq(token1.balanceOf(bob), 100);
+
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill")),
                 bob,
                 payload.executeOrder
             );
+
             assertEq(test1155_1.balanceOf(bob, 1), 1);
+            assertEq(token1.balanceOf(alice), 100);
+            assertEq(token1.balanceOf(bob), 0);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
@@ -290,13 +323,20 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 TestItem20(address(token1), 101)
             )
         returns (TestOrderPayload memory payload) {
+            assertEq(test1155_1.balanceOf(alice, 1), 1);
+            assertEq(token1.balanceOf(alice), 0);
+            assertEq(token1.balanceOf(bob), 101);
+
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill w/ Sig")),
                 bob,
                 payload.executeOrder
             );
+
             assertEq(test1155_1.balanceOf(bob, 1), 1);
+            assertEq(token1.balanceOf(alice), 101);
+            assertEq(token1.balanceOf(bob), 0);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
@@ -321,17 +361,21 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 alice,
                 payload.submitOrder
             );
+
+            assertEq(test721_1.ownerOf(1), bob);
             assertEq(token1.balanceOf(alice), 100);
             assertEq(token1.balanceOf(bob), 0);
-            assertEq(test721_1.ownerOf(1), bob);
+
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill")),
                 bob,
                 payload.executeOrder
             );
-            assertEq(token1.balanceOf(bob), 100);
+
             assertEq(test721_1.ownerOf(1), alice);
+            assertEq(token1.balanceOf(alice), 0);
+            assertEq(token1.balanceOf(bob), 100);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
@@ -351,12 +395,20 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 TestItem721(address(test721_1), 1)
             )
         returns (TestOrderPayload memory payload) {
+            assertEq(test721_1.ownerOf(1), bob);
+            assertEq(token1.balanceOf(alice), 101);
+            assertEq(token1.balanceOf(bob), 0);
+
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill w/ Sig")),
                 bob,
                 payload.executeOrder
             );
+
+            assertEq(test721_1.ownerOf(1), alice);
+            assertEq(token1.balanceOf(alice), 0);
+            assertEq(token1.balanceOf(bob), 101);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
@@ -382,12 +434,21 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 alice,
                 payload.submitOrder
             );
+
+            assertEq(test1155_1.balanceOf(bob, 1), 1);
+            assertEq(token1.balanceOf(alice), 100);
+            assertEq(token1.balanceOf(bob), 0);
+
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill")),
                 bob,
                 payload.executeOrder
             );
+
+            assertEq(test1155_1.balanceOf(alice, 1), 1);
+            assertEq(token1.balanceOf(alice), 0);
+            assertEq(token1.balanceOf(bob), 100);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
@@ -408,12 +469,20 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 TestItem1155(address(test1155_1), 1, 1)
             )
         returns (TestOrderPayload memory payload) {
+            assertEq(test1155_1.balanceOf(bob, 1), 1);
+            assertEq(token1.balanceOf(alice), 101);
+            assertEq(token1.balanceOf(bob), 0);
+
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill w/ Sig")),
                 bob,
                 payload.executeOrder
             );
+
+            assertEq(test1155_1.balanceOf(alice, 1), 1);
+            assertEq(token1.balanceOf(alice), 0);
+            assertEq(token1.balanceOf(bob), 101);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
@@ -439,12 +508,19 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 alice,
                 payload.submitOrder
             );
+
+            assertEq(test721_1.ownerOf(1), alice);
+            assertEq(test1155_1.balanceOf(bob, 1), 1);
+
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill")),
                 bob,
                 payload.executeOrder
             );
+
+            assertEq(test721_1.ownerOf(1), bob);
+            assertEq(test1155_1.balanceOf(alice, 1), 1);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
@@ -465,12 +541,237 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 TestItem1155(address(test1155_1), 1, 1)
             )
         returns (TestOrderPayload memory payload) {
+            assertEq(test721_1.ownerOf(2), alice);
+            assertEq(test1155_1.balanceOf(bob, 1), 1);
+
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill w/ Sig")),
                 bob,
                 payload.executeOrder
             );
+
+            assertEq(test721_1.ownerOf(2), bob);
+            assertEq(test1155_1.balanceOf(alice, 1), 1);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyOfferedERC1155WithERC721_ListOnChain(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string memory testLabel = "(ERC1155 -> ERC721 List-On-Chain)";
+        TestOrderContext memory context = TestOrderContext(true, alice, bob);
+        test1155_1.mint(alice, 1, 1);
+        test721_1.mint(bob, 1);
+        try
+            config.getPayload_BuyOfferedERC1155WithERC721(
+                context,
+                TestItem1155(address(test1155_1), 1, 1),
+                TestItem721(address(test721_1), 1)
+            )
+        returns (TestOrderPayload memory payload) {
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " List")),
+                alice,
+                payload.submitOrder
+            );
+
+            assertEq(test721_1.ownerOf(1), bob);
+            assertEq(test1155_1.balanceOf(alice, 1), 1);
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill")),
+                bob,
+                payload.executeOrder
+            );
+
+            assertEq(test721_1.ownerOf(1), alice);
+            assertEq(test1155_1.balanceOf(bob, 1), 1);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyOfferedERC1155WithERC721(BaseMarketConfig config)
+        internal
+        prepareTest(config)
+    {
+        string memory testLabel = "(ERC1155 -> ERC721)";
+        TestOrderContext memory context = TestOrderContext(false, alice, bob);
+        test1155_1.mint(alice, 1, 1);
+        test721_1.mint(bob, 2);
+        try
+            config.getPayload_BuyOfferedERC1155WithERC721(
+                context,
+                TestItem1155(address(test1155_1), 1, 1),
+                TestItem721(address(test721_1), 2)
+            )
+        returns (TestOrderPayload memory payload) {
+            assertEq(test721_1.ownerOf(2), bob);
+            assertEq(test1155_1.balanceOf(alice, 1), 1);
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill w/ Sig")),
+                bob,
+                payload.executeOrder
+            );
+
+            assertEq(test721_1.ownerOf(2), alice);
+            assertEq(test1155_1.balanceOf(bob, 1), 1);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyOfferedERC721WithEtherFee_ListOnChain(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string
+            memory testLabel = "(ERC721 -> ETH One-Fee-Recipient List-On-Chain)";
+        test721_1.mint(alice, 1);
+        try
+            config.getPayload_BuyOfferedERC721WithEtherOneFeeRecipient(
+                TestOrderContext(true, alice, bob),
+                TestItem721(address(test721_1), 1),
+                100,
+                feeReciever1,
+                5
+            )
+        returns (TestOrderPayload memory payload) {
+            assertEq(test721_1.ownerOf(1), alice);
+            assertEq(feeReciever1.balance, 0);
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " List")),
+                alice,
+                payload.submitOrder
+            );
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill")),
+                bob,
+                payload.executeOrder
+            );
+
+            assertEq(test721_1.ownerOf(1), bob);
+            assertEq(feeReciever1.balance, 5);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyOfferedERC721WithEtherFee(BaseMarketConfig config)
+        internal
+        prepareTest(config)
+    {
+        string memory testLabel = "(ERC721 -> ETH One-Fee-Recipient)";
+        test721_1.mint(alice, 1);
+        try
+            config.getPayload_BuyOfferedERC721WithEtherOneFeeRecipient(
+                TestOrderContext(false, alice, bob),
+                TestItem721(address(test721_1), 1),
+                100,
+                feeReciever1,
+                6
+            )
+        returns (TestOrderPayload memory payload) {
+            assertEq(test721_1.ownerOf(1), alice);
+            assertEq(feeReciever1.balance, 0);
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill w/ Sig")),
+                bob,
+                payload.executeOrder
+            );
+
+            assertEq(test721_1.ownerOf(1), bob);
+            assertEq(feeReciever1.balance, 6);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients_ListOnChain(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string
+            memory testLabel = "(ERC721 -> ETH Two-Fee-Recipient List-On-Chain)";
+        test721_1.mint(alice, 1);
+        try
+            config.getPayload_BuyOfferedERC721WithEtherTwoFeeRecipient(
+                TestOrderContext(true, alice, bob),
+                TestItem721(address(test721_1), 1),
+                100,
+                feeReciever1,
+                5,
+                feeReciever2,
+                5
+            )
+        returns (TestOrderPayload memory payload) {
+            assertEq(test721_1.ownerOf(1), alice);
+            assertEq(feeReciever1.balance, 0);
+            assertEq(feeReciever2.balance, 0);
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " List")),
+                alice,
+                payload.submitOrder
+            );
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill")),
+                bob,
+                payload.executeOrder
+            );
+
+            assertEq(test721_1.ownerOf(1), bob);
+            assertEq(feeReciever1.balance, 5);
+            assertEq(feeReciever2.balance, 5);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string memory testLabel = "(ERC721 -> ETH Two-Fee-Recipient)";
+        test721_1.mint(alice, 1);
+        try
+            config.getPayload_BuyOfferedERC721WithEtherTwoFeeRecipient(
+                TestOrderContext(false, alice, bob),
+                TestItem721(address(test721_1), 1),
+                100,
+                feeReciever1,
+                5,
+                feeReciever2,
+                6
+            )
+        returns (TestOrderPayload memory payload) {
+            assertEq(test721_1.ownerOf(1), alice);
+            assertEq(feeReciever1.balance, 0);
+            assertEq(feeReciever2.balance, 0);
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fullfil /w Sig")),
+                bob,
+                payload.executeOrder
+            );
+
+            assertEq(test721_1.ownerOf(1), bob);
+            assertEq(feeReciever1.balance, 5);
+            assertEq(feeReciever2.balance, 6);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
