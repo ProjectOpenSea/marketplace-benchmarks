@@ -823,9 +823,10 @@ contract BaseMarketplaceTester is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyTenOfferedERC721WithEther(
-        BaseMarketConfig config
-    ) internal prepareTest(config) {
+    function benchmark_BuyTenOfferedERC721WithEther(BaseMarketConfig config)
+        internal
+        prepareTest(config)
+    {
         string memory testLabel = "(ERC721x10 -> ETH)";
 
         TestItem721[] memory nfts = new TestItem721[](10);
