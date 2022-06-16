@@ -25,8 +25,8 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
     address internal constant NULL_ADDRESS =
         0x0000000000000000000000000000000000000000;
 
-    address internal constant feeRecipient =
-        0x5b3256965e7C3cF26E11FCAf296DfC8807C01073;
+    address internal constant DEFAULT_FEE_RECIPIENT =
+        0x0000000000000000000000000000000000000001;
 
     IWyvern internal constant wyvern =
         IWyvern(0x7f268357A8c2552623316e2562D90e642bB538E5);
@@ -199,12 +199,18 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         address taker,
         address paymentToken,
         uint256 price,
-        TestItem721 memory nft
+        TestItem721 memory nft,
+        address feeRecipient,
+        uint256 fee
     ) internal view returns (Order memory order, Sig memory signature) {
+        require(
+            feeRecipient != address(0),
+            "WyvernConfig::buildERC721SellOrder: fee recipient must not be null address"
+        );
         order.exchange = address(wyvern);
         order.maker = maker;
         order.taker = taker;
-        order.makerRelayerFee = 0;
+        order.makerRelayerFee = fee;
         order.feeRecipient = feeRecipient;
         order.feeMethod = FeeMethod.SplitFee;
         order.side = Side.Sell;
@@ -333,10 +339,10 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
                     order.salt
                 ],
                 [
-                    uint8(1),
+                    uint8(order.feeMethod),
                     uint8(0),
-                    uint8(0),
-                    uint8(0),
+                    uint8(order.saleKind),
+                    uint8(order.howToCall),
                     uint8(order.feeMethod),
                     uint8(order.side),
                     uint8(order.saleKind),
@@ -408,8 +414,14 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         address taker,
         address paymentToken,
         uint256 price,
-        TestItem1155 memory nft
+        TestItem1155 memory nft,
+        address feeRecipient,
+        uint256 feeAmount
     ) internal view returns (Order memory order, Sig memory signature) {
+        require(
+            feeRecipient != address(0),
+            "WyvernConfig::buildERC721SellOrder: fee recipient must not be null address"
+        );
         order.exchange = address(wyvern);
         order.maker = maker;
         order.taker = taker;
@@ -469,7 +481,9 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             context.fulfiller,
             0x0000000000000000000000000000000000000000,
             ethAmount,
-            nft
+            nft,
+            DEFAULT_FEE_RECIPIENT,
+            0
         );
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
@@ -477,6 +491,9 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
                 0,
                 encodeERC721ApproveOrder(order)
             );
+            signature.v = 0;
+            signature.r = 0;
+            signature.s = 0;
         }
         execution.executeOrder = TestCallParameters(
             address(wyvern),
@@ -495,7 +512,9 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             context.fulfiller,
             0x0000000000000000000000000000000000000000,
             ethAmount,
-            nft
+            nft,
+            DEFAULT_FEE_RECIPIENT,
+            0
         );
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
@@ -521,7 +540,9 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             context.fulfiller,
             erc20.token,
             erc20.amount,
-            nft
+            nft,
+            DEFAULT_FEE_RECIPIENT,
+            0
         );
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
@@ -529,6 +550,9 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
                 0,
                 encodeERC721ApproveOrder(order)
             );
+            signature.v = 0;
+            signature.r = 0;
+            signature.s = 0;
         }
         execution.executeOrder = TestCallParameters(
             address(wyvern),
@@ -547,7 +571,9 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             context.fulfiller,
             erc20.token,
             erc20.amount,
-            nft
+            nft,
+            DEFAULT_FEE_RECIPIENT,
+            0
         );
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
@@ -555,11 +581,47 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
                 0,
                 encodeERC1155ApproveOrder(order)
             );
+            signature.v = 0;
+            signature.r = 0;
+            signature.s = 0;
         }
         execution.executeOrder = TestCallParameters(
             address(wyvern),
             0,
             encodeERC1155AtomicMatch(order, signature, nft)
+        );
+    }
+
+    function getPayload_BuyOfferedERC721WithEtherOneFeeRecipient(
+        TestOrderContext calldata context,
+        TestItem721 memory nft,
+        uint256 priceEthAmount,
+        address feeRecipient,
+        uint256 feeEthAmount
+    ) external view override returns (TestOrderPayload memory execution) {
+        (Order memory order, Sig memory signature) = buildERC721SellOrder(
+            context.offerer,
+            context.fulfiller,
+            0x0000000000000000000000000000000000000000,
+            priceEthAmount + feeEthAmount,
+            nft,
+            feeRecipient,
+            (feeEthAmount * 10000) / (priceEthAmount + feeEthAmount) + 1 // Calculate fee percentage
+        );
+        if (context.listOnChain) {
+            execution.submitOrder = TestCallParameters(
+                address(wyvern),
+                0,
+                encodeERC721ApproveOrder(order)
+            );
+            signature.v = 0;
+            signature.r = 0;
+            signature.s = 0;
+        }
+        execution.executeOrder = TestCallParameters(
+            address(wyvern),
+            priceEthAmount + feeEthAmount,
+            encodeERC721AtomicMatch(order, signature, nft)
         );
     }
 }

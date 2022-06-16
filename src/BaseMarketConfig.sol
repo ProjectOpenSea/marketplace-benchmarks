@@ -191,6 +191,86 @@ abstract contract BaseMarketConfig {
     ) external view virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
+
+    /**
+     * @dev Get call parameters to execute an order selling an ERC1155 token for an ERC721.
+     *   If `context.listOnChain` is true and marketplace does not support on-chain
+     *   listing, this function must revert with NotImplemented.
+     * @param context Order context, including the buyer and seller and whether the
+     *  order should be listed on chain.
+     * @param sellNft Address and ID of 1155 token to be sold.
+     * @param buyNft Address, ID and amount of 721 token to be received for ERC1155.
+     */
+    function getPayload_BuyOfferedERC1155WithERC721(
+        TestOrderContext calldata context,
+        TestItem1155 calldata sellNft,
+        TestItem721 calldata buyNft
+    ) external view virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
+
+    /**
+     * @dev Get call parameters to execute an order selling a 721 token for Ether with one fee recipient.
+     *   If `context.listOnChain` is true and marketplace does not support on-chain
+     *   listing, this function must revert with NotImplemented.
+     * @param context Order context, including the buyer and seller and whether the
+     *  order should be listed on chain.
+     * @param nft Address and ID for ERC721 token to be sold.
+     * @param priceEthAmount Amount of Ether to be received for the NFT.
+     * @param feeRecipient Address to send fee to.
+     * @param feeEthAmount Amount of Ether to send for fee.
+     */
+    function getPayload_BuyOfferedERC721WithEtherOneFeeRecipient(
+        TestOrderContext calldata context,
+        TestItem721 memory nft,
+        uint256 priceEthAmount,
+        address feeRecipient,
+        uint256 feeEthAmount
+    ) external view virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
+
+    /**
+     * @dev Get call parameters to execute an order selling a 721 token for Ether with two fee recipients.
+     *   If `context.listOnChain` is true and marketplace does not support on-chain
+     *   listing, this function must revert with NotImplemented.
+     * @param context Order context, including the buyer and seller and whether the
+     *  order should be listed on chain.
+     * @param nft Address and ID for ERC721 token to be sold.
+     * @param priceEthAmount Amount of Ether to be received for the NFT.
+     * @param feeRecipient1 Address to send first fee to.
+     * @param feeEthAmount1 Amount of Ether to send for first fee.
+     * @param feeRecipient2 Address to send second fee to.
+     * @param feeEthAmount2 Amount of Ether to send for second fee.
+     */
+    function getPayload_BuyOfferedERC721WithEtherTwoFeeRecipient(
+        TestOrderContext calldata context,
+        TestItem721 memory nft,
+        uint256 priceEthAmount,
+        address feeRecipient1,
+        uint256 feeEthAmount1,
+        address feeRecipient2,
+        uint256 feeEthAmount2
+    ) external view virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
+
+    /**
+     * @dev Get call parameters to execute an order selling many 721 tokens for Ether.
+     *   If `context.listOnChain` is true and marketplace does not support on-chain
+     *   listing, this function must revert with NotImplemented.
+     * @param context Order context, including the buyer and seller and whether the
+     *  order should be listed on chain.
+     * @param nfts Array of Address and ID for ERC721 tokens to be sold.
+     * @param ethAmount Amount of Ether to be received for the NFT.
+     */
+    function getPayload_BuyOfferedManyERC721WithEther(
+        TestOrderContext calldata context,
+        TestItem721[] calldata nfts,
+        uint256 ethAmount
+    ) external view virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
 }
 
 interface ITestRunner {
