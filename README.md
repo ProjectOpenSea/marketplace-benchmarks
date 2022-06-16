@@ -1,10 +1,6 @@
-# foundry-template
+# Marketplace Benchmarks
 
-Streamlined template for getting started with Foundry and Solmate.
-
-## Contributing
-
-You will need a copy of [Foundry](https://github.com/foundry-rs/foundry) installed before proceeding. See the [installation guide](https://github.com/foundry-rs/foundry#installation) for details.
+Marketplace Benchmarks is a repository which runs a variety of generaized tests on NFT marketplaces to benchmark them for gas efficiency.
 
 ### Setup
 
@@ -13,14 +9,27 @@ git clone https://github.com/transmissions11/foundry-template.git
 cd foundry-template
 ```
 
-### Run Tests
+#### Install Foundry
+To install Foundry (assuming a Linux or macOS system):
 
-```sh
-forge test
+```bash
+curl -L https://foundry.paradigm.xyz | bash
 ```
 
-### Update Gas Snapshots
+This will download foundryup. To start Foundry, run:
 
-```sh
-forge snapshot
+```bash
+foundryup
+```
+
+To install dependencies:
+
+```bash
+forge install
+```
+
+### Run Tests
+Tests are all run against mainnet deployments of active marketplaces, as such, a Mainnet Ethereum RPC is required.
+```bash
+forge test --fork-url <ETH_MAINNET_RPC>
 ```

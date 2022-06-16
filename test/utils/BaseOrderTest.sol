@@ -5,15 +5,11 @@ import { stdStorage, StdStorage } from "forge-std/Test.sol";
 import { TestERC1155 } from "../tokens/TestERC1155.sol";
 import { TestERC20 } from "../tokens/TestERC20.sol";
 import { TestERC721 } from "../tokens/TestERC721.sol";
-import { ArithmeticUtil } from "./ArithmeticUtil.sol";
 import "forge-std/console2.sol";
 
 contract BaseOrderTest is DSTestPlus {
     using stdStorage for StdStorage;
     StdStorage stdstore;
-    using ArithmeticUtil for uint256;
-    using ArithmeticUtil for uint128;
-    using ArithmeticUtil for uint120;
 
     uint256 constant MAX_INT = ~uint256(0);
 
@@ -62,14 +58,6 @@ contract BaseOrderTest is DSTestPlus {
     struct RestoreERC20Balance {
         address token;
         address who;
-    }
-
-    /**
-    @dev top up eth of this contract to uint128(MAX_INT) to avoid fuzz failures
-     */
-    modifier topUp() {
-        hevm.deal(address(this), uint128(MAX_INT));
-        _;
     }
 
     /**
@@ -177,38 +165,7 @@ contract BaseOrderTest is DSTestPlus {
             _resetStorage(allTokens[i]);
         }
     }
-
-    /**
-     * @dev restore erc20 balances for all accounts
-     */
-    function _restoreERC20Balances() internal {
-        for (uint256 i = 0; i < accounts.length; i++) {
-            _restoreERC20BalancesForAddress(accounts[i]);
-        }
-    }
-
-    /**
-     * @dev restore all erc20 balances for a given address
-     */
-    function _restoreERC20BalancesForAddress(address _who) internal {
-        for (uint256 i = 0; i < erc20s.length; i++) {
-            _restoreERC20Balance(RestoreERC20Balance(address(erc20s[i]), _who));
-        }
-    }
-
-    /**
-     * @dev reset token balance for an address to uint128(MAX_INT)
-     */
-    function _restoreERC20Balance(
-        RestoreERC20Balance memory restoreErc20Balance
-    ) internal {
-        stdstore
-            .target(restoreErc20Balance.token)
-            .sig("balanceOf(address)")
-            .with_key(restoreErc20Balance.who)
-            .checked_write(uint128(MAX_INT));
-    }
-
+    
     /**
      * @dev reset all storage written at an address thus far to 0; will overwrite totalSupply()for ERC20s but that should be fine
      *      with the goal of resetting the balances and owners of tokens - but note: should be careful about approvals, etc
