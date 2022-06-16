@@ -11,7 +11,6 @@ import "./tokens/TestERC20.sol";
 import "./tokens/TestERC721.sol";
 import "./tokens/TestERC1155.sol";
 import "./utils/BaseOrderTest.sol";
-import "forge-std/console2.sol";
 
 contract BaseMarketplaceTester is BaseOrderTest {
     BaseMarketConfig seaportConfig;
@@ -68,8 +67,6 @@ contract BaseMarketplaceTester is BaseOrderTest {
         config.beforeAllPrepareMarketplace(alice, bob);
     }
 
-    function prepareMarketplaceTest(BaseMarketConfig config) internal {}
-
     /*//////////////////////////////////////////////////////////////
                         Tests
     //////////////////////////////////////////////////////////////*/
@@ -118,7 +115,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
             config.getPayload_BuyOfferedERC721WithEther(
                 TestOrderContext(false, alice, bob),
                 TestItem721(address(test721_1), 1),
-                101
+                100
             )
         returns (TestOrderPayload memory payload) {
             assertEq(test721_1.ownerOf(1), alice);
@@ -182,7 +179,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
             config.getPayload_BuyOfferedERC1155WithEther(
                 TestOrderContext(false, alice, bob),
                 TestItem1155(address(test1155_1), 1, 1),
-                101
+                100
             )
         returns (TestOrderPayload memory payload) {
             assertEq(test1155_1.balanceOf(alice, 1), 1);
@@ -245,17 +242,17 @@ contract BaseMarketplaceTester is BaseOrderTest {
     {
         string memory testLabel = "(ERC721 -> ERC20)";
         test721_1.mint(alice, 1);
-        token1.mint(bob, 101);
+        token1.mint(bob, 100);
         try
             config.getPayload_BuyOfferedERC721WithERC20(
                 TestOrderContext(false, alice, bob),
                 TestItem721(address(test721_1), 1),
-                TestItem20(address(token1), 101)
+                TestItem20(address(token1), 100)
             )
         returns (TestOrderPayload memory payload) {
             assertEq(test721_1.ownerOf(1), alice);
             assertEq(token1.balanceOf(alice), 0);
-            assertEq(token1.balanceOf(bob), 101);
+            assertEq(token1.balanceOf(bob), 100);
 
             _benchmarkCallWithParams(
                 config.name(),
@@ -265,7 +262,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
             );
 
             assertEq(test721_1.ownerOf(1), bob);
-            assertEq(token1.balanceOf(alice), 101);
+            assertEq(token1.balanceOf(alice), 100);
             assertEq(token1.balanceOf(bob), 0);
         } catch {
             _logNotSupported(config.name(), testLabel);
@@ -317,17 +314,17 @@ contract BaseMarketplaceTester is BaseOrderTest {
     {
         string memory testLabel = "(ERC1155 -> ERC20)";
         test1155_1.mint(alice, 1, 1);
-        token1.mint(bob, 101);
+        token1.mint(bob, 100);
         try
             config.getPayload_BuyOfferedERC1155WithERC20(
                 TestOrderContext(false, alice, bob),
                 TestItem1155(address(test1155_1), 1, 1),
-                TestItem20(address(token1), 101)
+                TestItem20(address(token1), 100)
             )
         returns (TestOrderPayload memory payload) {
             assertEq(test1155_1.balanceOf(alice, 1), 1);
             assertEq(token1.balanceOf(alice), 0);
-            assertEq(token1.balanceOf(bob), 101);
+            assertEq(token1.balanceOf(bob), 100);
 
             _benchmarkCallWithParams(
                 config.name(),
@@ -337,7 +334,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
             );
 
             assertEq(test1155_1.balanceOf(bob, 1), 1);
-            assertEq(token1.balanceOf(alice), 101);
+            assertEq(token1.balanceOf(alice), 100);
             assertEq(token1.balanceOf(bob), 0);
         } catch {
             _logNotSupported(config.name(), testLabel);
@@ -388,17 +385,17 @@ contract BaseMarketplaceTester is BaseOrderTest {
         prepareTest(config)
     {
         string memory testLabel = "(ERC20 -> ERC721)";
-        token1.mint(alice, 101);
+        token1.mint(alice, 100);
         test721_1.mint(bob, 1);
         try
             config.getPayload_BuyOfferedERC20WithERC721(
                 TestOrderContext(false, alice, bob),
-                TestItem20(address(token1), 101),
+                TestItem20(address(token1), 100),
                 TestItem721(address(test721_1), 1)
             )
         returns (TestOrderPayload memory payload) {
             assertEq(test721_1.ownerOf(1), bob);
-            assertEq(token1.balanceOf(alice), 101);
+            assertEq(token1.balanceOf(alice), 100);
             assertEq(token1.balanceOf(bob), 0);
 
             _benchmarkCallWithParams(
@@ -410,7 +407,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
 
             assertEq(test721_1.ownerOf(1), alice);
             assertEq(token1.balanceOf(alice), 0);
-            assertEq(token1.balanceOf(bob), 101);
+            assertEq(token1.balanceOf(bob), 100);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
@@ -462,17 +459,17 @@ contract BaseMarketplaceTester is BaseOrderTest {
     {
         string memory testLabel = "(ERC20 -> ERC1155)";
         TestOrderContext memory context = TestOrderContext(false, alice, bob);
-        token1.mint(alice, 101);
+        token1.mint(alice, 100);
         test1155_1.mint(bob, 1, 1);
         try
             config.getPayload_BuyOfferedERC20WithERC1155(
                 context,
-                TestItem20(address(token1), 101),
+                TestItem20(address(token1), 100),
                 TestItem1155(address(test1155_1), 1, 1)
             )
         returns (TestOrderPayload memory payload) {
             assertEq(test1155_1.balanceOf(bob, 1), 1);
-            assertEq(token1.balanceOf(alice), 101);
+            assertEq(token1.balanceOf(alice), 100);
             assertEq(token1.balanceOf(bob), 0);
 
             _benchmarkCallWithParams(
@@ -484,7 +481,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
 
             assertEq(test1155_1.balanceOf(alice, 1), 1);
             assertEq(token1.balanceOf(alice), 0);
-            assertEq(token1.balanceOf(bob), 101);
+            assertEq(token1.balanceOf(bob), 100);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
@@ -534,16 +531,16 @@ contract BaseMarketplaceTester is BaseOrderTest {
     {
         string memory testLabel = "(ERC721 -> ERC1155)";
         TestOrderContext memory context = TestOrderContext(false, alice, bob);
-        test721_1.mint(alice, 2);
+        test721_1.mint(alice, 1);
         test1155_1.mint(bob, 1, 1);
         try
             config.getPayload_BuyOfferedERC721WithERC1155(
                 context,
-                TestItem721(address(test721_1), 2),
+                TestItem721(address(test721_1), 1),
                 TestItem1155(address(test1155_1), 1, 1)
             )
         returns (TestOrderPayload memory payload) {
-            assertEq(test721_1.ownerOf(2), alice);
+            assertEq(test721_1.ownerOf(1), alice);
             assertEq(test1155_1.balanceOf(bob, 1), 1);
 
             _benchmarkCallWithParams(
@@ -553,7 +550,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 payload.executeOrder
             );
 
-            assertEq(test721_1.ownerOf(2), bob);
+            assertEq(test721_1.ownerOf(1), bob);
             assertEq(test1155_1.balanceOf(alice, 1), 1);
         } catch {
             _logNotSupported(config.name(), testLabel);
@@ -605,15 +602,15 @@ contract BaseMarketplaceTester is BaseOrderTest {
         string memory testLabel = "(ERC1155 -> ERC721)";
         TestOrderContext memory context = TestOrderContext(false, alice, bob);
         test1155_1.mint(alice, 1, 1);
-        test721_1.mint(bob, 2);
+        test721_1.mint(bob, 1);
         try
             config.getPayload_BuyOfferedERC1155WithERC721(
                 context,
                 TestItem1155(address(test1155_1), 1, 1),
-                TestItem721(address(test721_1), 2)
+                TestItem721(address(test721_1), 1)
             )
         returns (TestOrderPayload memory payload) {
-            assertEq(test721_1.ownerOf(2), bob);
+            assertEq(test721_1.ownerOf(1), bob);
             assertEq(test1155_1.balanceOf(alice, 1), 1);
 
             _benchmarkCallWithParams(
@@ -623,7 +620,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 payload.executeOrder
             );
 
-            assertEq(test721_1.ownerOf(2), alice);
+            assertEq(test721_1.ownerOf(1), alice);
             assertEq(test1155_1.balanceOf(bob, 1), 1);
         } catch {
             _logNotSupported(config.name(), testLabel);
@@ -681,7 +678,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 TestItem721(address(test721_1), 1),
                 100,
                 feeReciever1,
-                6
+                5
             )
         returns (TestOrderPayload memory payload) {
             assertEq(test721_1.ownerOf(1), alice);
@@ -695,7 +692,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
             );
 
             assertEq(test721_1.ownerOf(1), bob);
-            assertEq(feeReciever1.balance, 6);
+            assertEq(feeReciever1.balance, 5);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
@@ -757,7 +754,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
                 feeReciever1,
                 5,
                 feeReciever2,
-                6
+                5
             )
         returns (TestOrderPayload memory payload) {
             assertEq(test721_1.ownerOf(1), alice);
@@ -773,7 +770,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
 
             assertEq(test721_1.ownerOf(1), bob);
             assertEq(feeReciever1.balance, 5);
-            assertEq(feeReciever2.balance, 6);
+            assertEq(feeReciever2.balance, 5);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
@@ -839,7 +836,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
             config.getPayload_BuyOfferedManyERC721WithEther(
                 TestOrderContext(false, alice, bob),
                 nfts,
-                101
+                100
             )
         returns (TestOrderPayload memory payload) {
             for (uint256 i = 0; i < 10; i++) {
@@ -870,7 +867,7 @@ contract BaseMarketplaceTester is BaseOrderTest {
     }
 
     modifier prepareTest(BaseMarketConfig config) {
-        resetTokenBalancesBetweenRuns();
+        _resetStorageAndEth(config.market());
         _setApprovals(
             alice,
             config.erc20ApprovalTarget(),
