@@ -12,7 +12,7 @@ import "./tokens/TestERC721.sol";
 import "./tokens/TestERC1155.sol";
 import "./utils/BaseOrderTest.sol";
 
-contract BaseMarketplaceTester is BaseOrderTest {
+contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig seaportConfig;
     BaseMarketConfig wyvernConfig;
 
@@ -872,6 +872,13 @@ contract BaseMarketplaceTester is BaseOrderTest {
 
     modifier prepareTest(BaseMarketConfig config) {
         _resetStorageAndEth(config.market());
+        require(
+            config.sellerErc20ApprovalTarget() != address(0) &&
+                config.sellerNftApprovalTarget() != address(0) &&
+                config.buyerErc20ApprovalTarget() != address(0) &&
+                config.buyerNftApprovalTarget() != address(0),
+                "BaseMarketplaceTester::prepareTest: approval target not set"
+        );
         _setApprovals(
             alice,
             config.sellerErc20ApprovalTarget(),
