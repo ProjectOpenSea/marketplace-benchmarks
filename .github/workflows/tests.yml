@@ -16,7 +16,7 @@ jobs:
 
       - name: Install dependencies
         run: forge install
-        run: yarn install --frozen-lockfile
+      - run: yarn install --frozen-lockfile
         
       - name: Run tests
         run: yarn test:generate ${{ secrets.ETH_RPC_URL }}
