@@ -51,7 +51,17 @@ A marketplace config must inherits [`BaseMarketConfig`](src/BaseMarketConfig.sol
 - `market()` - This function must return the address of the marketplace. It is used to reset the marketplace storage between tests.
 
 ##### *Optional Functions*
-There are a variety of different types of tests which your market can support by implementing any of the functions defined in the `Test Payload Calls` section of [`BaseMarketConfig`](src/BaseMarketConfig.sol). Tests which use unimplemented payload calls will show up as incompatable with your marketplace.
+There are a variety of different types of tests which your market can support by implementing any of the functions defined in the `Test Payload Calls` section of [`BaseMarketConfig`](src/BaseMarketConfig.sol). Tests that use unimplemented payload calls will show up as incompatable with your marketplace.
 
 `beforeAllPrepareMarketplaceCall` is an optional setup function which allows for any arbitrary calls to be sent from any address. For example: it is used to deploy Wyvern proxies for the buyer and seller prior to benchmarking Wyvern.
 
+### Adding A Test
+Anyone can add a generalized test to this repository which will enable for checkpointing different functionalities across marketplaces.
+
+#### Creating the Generalized Test
+Generalized tests are written in [`GenericMarketplaceTest`](test/GenericMarketplaceTest.t.sol). Use the simple [ERC721->Ether](test/GenericMarketplaceTest.t.sol#L78-L110) test as a reference.
+
+1. Ensure that the buyer (Bob) and seller (Alice) have sufficient funds for the transaction. Each user is dealt enough ETH prior to the test.
+2. Find an appropriate payload call in [`BaseMarketConfig`](src/BaseMarketConfig.sol). If none exists, you may create a new one.
+3. Use `_benchmarkCallWithParams` to call the payload.
+4. Add assertions throughout the test to ensure that the marketplace is actually doing what you expect it to.
