@@ -877,7 +877,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
                 config.sellerNftApprovalTarget() != address(0) &&
                 config.buyerErc20ApprovalTarget() != address(0) &&
                 config.buyerNftApprovalTarget() != address(0),
-                "BaseMarketplaceTester::prepareTest: approval target not set"
+            "BaseMarketplaceTester::prepareTest: approval target not set"
         );
         _setApprovals(
             alice,
