@@ -1,13 +1,8 @@
 # Marketplace Benchmarks
 
-Marketplace Benchmarks is a repository which runs a variety of generaized tests on NFT marketplaces to benchmark them for gas efficiency.
+Marketplace Benchmarks is a repository which runs a variety of generalized tests on NFT marketplaces to benchmark them for gas efficiency.
 
 ### Setup
-
-```sh
-git clone https://github.com/transmissions11/foundry-template.git
-cd foundry-template
-```
 
 #### Install Foundry
 To install Foundry (assuming a Linux or macOS system):
@@ -29,13 +24,13 @@ forge install
 ```
 
 ### Run Tests
-Tests are all run against mainnet deployments of active marketplaces, as such, a Mainnet Ethereum RPC is required.
+Tests are all run against mainnet deployments of active marketplaces, as such, a Mainnet Ethereum RPC is required. This will log gas snapshots for each individual test operation.
 ```bash
-forge test --fork-url <ETH_MAINNET_RPC>
+forge test --fork-url <ETH_MAINNET_RPC> -vv
 ```
 
 ### Adding A Marketplace
-1. Create a marketplace config
+1. Create a marketplace config in `/src/marketplaces`
 2. Integrate into [`GenericMarketplaceTest`](test/GenericMarketplaceTest.t.sol)
     - Import your marketplace config
     - Create a global variable for your marketpalce config
