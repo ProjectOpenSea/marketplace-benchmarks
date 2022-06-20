@@ -48,8 +48,7 @@ abstract contract BaseMarketConfig {
      */
     function beforeAllPrepareMarketplace(address seller, address buyer)
         external
-        virtual
-    {}
+        virtual;
 
     /*//////////////////////////////////////////////////////////////
                         Test Payload Calls
