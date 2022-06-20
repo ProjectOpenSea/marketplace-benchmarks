@@ -11,13 +11,17 @@
     "prettier-plugin-solidity": "^1.0.0-beta.13"
   },
   "scripts": {
-    "lint:check": "prettier --check **.sol",
-    "lint:fix": "prettier --write **.sol"
+    "lint:check": "prettier --check **.sol && prettier --check **.js",
+    "lint:fix": "prettier --write **.sol && prettier --write **.js",
+    "test:generate": "node script/runTest.js"
   },
   "prettier": {
     "overrides": [
       {
-        "files": "*.sol",
+        "files": [
+          "*.sol",
+          "*.js"
+        ],
         "options": {
           "tabWidth": 4,
           "printWidth": 80,
@@ -25,5 +29,10 @@
         }
       }
     ]
+  },
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "color-interpolate": "^1.0.5",
+    "color-parse": "^1.4.2"
   }
 }

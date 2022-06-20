@@ -1,6 +1,5 @@
 # Marketplace Benchmarks
-
-Marketplace Benchmarks is a repository which runs a variety of generalized tests on NFT marketplaces to benchmark them for gas efficiency.
+Marketplace Benchmarks is a repository which runs a variety of generalized tests on NFT marketplaces to benchmark them for gas efficiency. View benchmark results [here](../results/results.pdf).
 
 ### Setup
 
