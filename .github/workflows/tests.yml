@@ -2,18 +2,18 @@ name: Tests
 
 on:
   push:
-    branches: [ arr00/parse-output ]
+    branches: [ main ]
   pull_request:
-    branches: [ arr00/parse-output ]
+    branches: [ main ]
 
 jobs:
   tests:
     name: Run Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Checkout Results
+      - name: Checkout results branch
         uses: actions/checkout@v3
         with:
           ref: results
