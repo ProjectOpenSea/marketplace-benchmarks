@@ -1,6 +1,6 @@
 const { exec } = require("child_process");
 const interpolate = require("color-interpolate");
-const parse = require('color-parse')
+const parse = require("color-parse");
 const colormap = interpolate(["green", "red"]);
 const fs = require("fs");
 const RPC = process.argv[2];
@@ -68,12 +68,17 @@ function generateLatex() {
     const markets = Object.keys(tests);
     const testNames = Object.keys(tests[markets[0]]);
 
-    latex += "\\documentclass[12pt]{article}\n\\usepackage{emoji}\n\\usepackage{xcolor}\n\\usepackage{multirow}\n\\begin{document}" +
-        `\\setemojifont{TwemojiMozilla}\n\\begin{center}\n\\begin{tabular}{ |c|c|${"c|".repeat(markets.length)} } \n\\hline\n\\multicolumn{${2 + markets.length}}{|c|}{Benchmark Tests} \\\\ \n` +
-        "\\hline \n Test Name & Action Name "
+    latex +=
+        "\\documentclass[12pt]{article}\n\\usepackage{emoji}\n\\usepackage{xcolor}\n\\usepackage{multirow}\n\\begin{document}" +
+        `\\setemojifont{TwemojiMozilla}\n\\begin{center}\n\\begin{tabular}{ |c|c|${"c|".repeat(
+            markets.length
+        )} } \n\\hline\n\\multicolumn{${
+            2 + markets.length
+        }}{|c|}{Benchmark Tests} \\\\ \n` +
+        "\\hline \n Test Name & Action Name ";
 
     for (const market of markets) {
-        latex += `& ${market} `
+        latex += `& ${market} `;
     }
 
     latex += "\\\\ \n\\hline\\hline\n";
@@ -82,7 +87,8 @@ function generateLatex() {
         let actionNames = [];
         for (const market of markets) {
             const tempActionNames = Object.keys(tests[market][testName]);
-            if (actionNames.length < tempActionNames.length) actionNames = tempActionNames;
+            if (actionNames.length < tempActionNames.length)
+                actionNames = tempActionNames;
         }
 
         latex += `\\multirow{${actionNames.length}}{16em}{${testName}}`;
@@ -93,9 +99,10 @@ function generateLatex() {
             for (const market of markets) {
                 if (tests[market][testName][actionName] === undefined) {
                     gasValues.push(0);
-                }
-                else {
-                    gasValues.push(parseInt(tests[market][testName][actionName].gasUsage));
+                } else {
+                    gasValues.push(
+                        parseInt(tests[market][testName][actionName].gasUsage)
+                    );
                 }
             }
             const maxGas = Math.max(...gasValues);
@@ -104,10 +111,9 @@ function generateLatex() {
             for (const gasValue of gasValues) {
                 const color = getColor(minGas, maxGas, gasValue);
                 if (gasValue == 0) {
-                    latex += `& \\emoji{cross-mark} `
-                }
-                else {
-                    latex += `& \\color[RGB]{${color.values[0]},${color.values[1]},${color.values[2]}} ${gasValue} `
+                    latex += `& \\emoji{cross-mark} `;
+                } else {
+                    latex += `& \\color[RGB]{${color.values[0]},${color.values[1]},${color.values[2]}} ${gasValue} `;
                 }
             }
 
@@ -126,12 +132,10 @@ function getColor(minGas, maxGas, gas) {
     let color;
     if (minGas == maxGas) {
         color = colormap(0);
-    }
-    else if (!Number.isFinite(minGas)) {
+    } else if (!Number.isFinite(minGas)) {
         color = colormap(0);
-    }
-    else {
-        color = colormap((gas - minGas) * 1.0 / (maxGas - minGas));
+    } else {
+        color = colormap(((gas - minGas) * 1.0) / (maxGas - minGas));
     }
 
     const parsed = parse(color);
