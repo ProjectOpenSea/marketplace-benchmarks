@@ -1,0 +1,70 @@
+\documentclass[12pt]{article}
+\usepackage{emoji}
+\usepackage{xcolor}
+\usepackage{multirow}
+\begin{document}\setemojifont{TwemojiMozilla}
+\begin{center}
+\begin{tabular}{ |c|c|c|c| } 
+\hline
+\multicolumn{4}{|c|}{Benchmark Tests} \\ 
+\hline 
+ Test Name & Action Name & Seaport & Wyvern \\ 
+\hline\hline
+\multirow{2}{16em}{ERC721 -> ETH List-On-Chain}& List & \color[RGB]{0,128,0} 60932 & \color[RGB]{255,0,0} 80313 \\
+\cline{2-4}& Fulfill & \color[RGB]{0,128,0} 77300 & \color[RGB]{255,0,0} 147331 \\
+\cline{2-4}\cline{0-1} 
+\multirow{1}{16em}{ERC721 -> ETH}& Fulfill, w/ Sig & \color[RGB]{0,128,0} 98028 & \color[RGB]{255,0,0} 135489 \\
+\cline{2-4}\cline{0-1} 
+\multirow{2}{16em}{ERC1155 -> ETH List-On-Chain}& List & \color[RGB]{0,128,0} 54420 & \color[RGB]{255,0,0} 79104 \\
+\cline{2-4}& Fulfill & \color[RGB]{0,128,0} 73905 & \color[RGB]{255,0,0} 138583 \\
+\cline{2-4}\cline{0-1} 
+\multirow{1}{16em}{ERC1155 -> ETH}& Fulfill, w/ Sig & \color[RGB]{0,128,0} 98621 & \color[RGB]{255,0,0} 139990 \\
+\cline{2-4}\cline{0-1} 
+\multirow{2}{16em}{ERC721 -> ERC20 List-On-Chain}& List & \color[RGB]{0,128,0} 54684 & \color[RGB]{255,0,0} 76053 \\
+\cline{2-4}& Fulfill & \color[RGB]{0,128,0} 83828 & \color[RGB]{255,0,0} 152272 \\
+\cline{2-4}\cline{0-1} 
+\multirow{1}{16em}{ERC721 -> ERC20}& Fulfill, w/ Sig & \color[RGB]{0,128,0} 108556 & \color[RGB]{255,0,0} 147959 \\
+\cline{2-4}\cline{0-1} 
+\multirow{2}{16em}{ERC1155 -> ERC20 List-On-Chain}& List & \color[RGB]{0,128,0} 54684 & \color[RGB]{255,0,0} 79344 \\
+\cline{2-4}& Fulfill & \color[RGB]{0,128,0} 84535 & \color[RGB]{255,0,0} 150256 \\
+\cline{2-4}\cline{0-1} 
+\multirow{1}{16em}{ERC1155 -> ERC20}& Fulfill w/ Sig & \color[RGB]{0,128,0} 109263 & \color[RGB]{255,0,0} 152414 \\
+\cline{2-4}\cline{0-1} 
+\multirow{2}{16em}{ERC20 -> ERC721 List-On-Chain}& List & \color[RGB]{0,128,0} 54684 & \color[RGB]{255,0,0} 76041 \\
+\cline{2-4}& Fulfill & \color[RGB]{0,128,0} 83964 & \color[RGB]{255,0,0} 145793 \\
+\cline{2-4}\cline{0-1} 
+\multirow{1}{16em}{ERC20 -> ERC721}& Fulfill w/ Sig & \color[RGB]{0,128,0} 108692 & \color[RGB]{255,0,0} 147980 \\
+\cline{2-4}\cline{0-1} 
+\multirow{2}{16em}{ERC20 -> ERC1155 List-On-Chain}& List & \color[RGB]{0,128,0} 54672 & \color[RGB]{255,0,0} 79332 \\
+\cline{2-4}& Fulfill & \color[RGB]{0,128,0} 84588 & \color[RGB]{255,0,0} 150277 \\
+\cline{2-4}\cline{0-1} 
+\multirow{1}{16em}{ERC20 -> ERC1155}& Fulfill w/ Sig & \color[RGB]{0,128,0} 109304 & \color[RGB]{255,0,0} 152435 \\
+\cline{2-4}\cline{0-1} 
+\multirow{2}{16em}{ERC721 -> ERC1155 List-On-Chain}& List & \color[RGB]{0,128,0} 54696 & \emoji{cross-mark} \\
+\cline{2-4}& Fulfill & \color[RGB]{0,128,0} 94379 & \emoji{cross-mark} \\
+\cline{2-4}\cline{0-1} 
+\multirow{1}{16em}{ERC721 -> ERC1155}& Fulfill w/ Sig & \color[RGB]{0,128,0} 119168 & \emoji{cross-mark} \\
+\cline{2-4}\cline{0-1} 
+\multirow{2}{16em}{ERC1155 -> ERC721 List-On-Chain}& List & \color[RGB]{0,128,0} 54696 & \emoji{cross-mark} \\
+\cline{2-4}& Fulfill & \color[RGB]{0,128,0} 94379 & \emoji{cross-mark} \\
+\cline{2-4}\cline{0-1} 
+\multirow{1}{16em}{ERC1155 -> ERC721}& Fulfill w/ Sig & \color[RGB]{0,128,0} 119168 & \emoji{cross-mark} \\
+\cline{2-4}\cline{0-1} 
+\multirow{2}{16em}{ERC721 -> ETH One-Fee-Recipient List-On-Chain}& List & \color[RGB]{0,128,0} 56161 & \color[RGB]{255,0,0} 76065 \\
+\cline{2-4}& Fulfill & \color[RGB]{0,128,0} 107585 & \color[RGB]{255,0,0} 166004 \\
+\cline{2-4}\cline{0-1} 
+\multirow{1}{16em}{ERC721 -> ETH One-Fee-Recipient}& Fulfill w/ Sig & \color[RGB]{0,128,0} 132313 & \color[RGB]{255,0,0} 168191 \\
+\cline{2-4}\cline{0-1} 
+\multirow{2}{16em}{ERC721 -> ETH Two-Fee-Recipient List-On-Chain}& List & \color[RGB]{0,128,0} 57914 & \emoji{cross-mark} \\
+\cline{2-4}& Fulfill & \color[RGB]{0,128,0} 141845 & \emoji{cross-mark} \\
+\cline{2-4}\cline{0-1} 
+\multirow{1}{16em}{ERC721 -> ETH Two-Fee-Recipient}& Fullfil /w Sig & \color[RGB]{0,128,0} 166573 & \emoji{cross-mark} \\
+\cline{2-4}\cline{0-1} 
+\multirow{2}{16em}{ERC721x10 -> ETH List-On-Chain}& List & \color[RGB]{0,128,0} 68286 & \emoji{cross-mark} \\
+\cline{2-4}& Fulfill & \color[RGB]{0,128,0} 178527 & \emoji{cross-mark} \\
+\cline{2-4}\cline{0-1} 
+\multirow{1}{16em}{ERC721x10 -> ETH}& Fulfill /w Sig & \color[RGB]{0,128,0} 185317 & \emoji{cross-mark} \\
+\cline{2-4}\cline{0-1} 
+\end{tabular}
+\end{center}
+\end{document}
