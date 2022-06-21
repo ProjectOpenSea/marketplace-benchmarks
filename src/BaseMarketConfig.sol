@@ -253,6 +253,14 @@ abstract contract BaseMarketConfig {
         _notImplemented();
     }
 
+    function getPayload_BuyOfferedManyERC721WithEtherDistinctOrders(
+        TestOrderContext[] calldata contexts,
+        TestItem721[] calldata nfts,
+        uint256[] calldata ethAmounts
+    ) external view virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
+
     /*//////////////////////////////////////////////////////////////
                           Helpers
     //////////////////////////////////////////////////////////////*/
