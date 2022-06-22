@@ -6,8 +6,11 @@ const fs = require("fs");
 const RPC = process.argv[2];
 
 if (RPC === undefined || RPC == "") throw Error("RPC not set");
+
+/// {market:{testName:{actionName:{gas,direct}}}}
 var tests = {};
 
+// Execute forge tests and capture `stdout`
 exec(
     `forge clean && forge test --fork-url ${RPC} -vv`,
     (error, stdout, stderr) => {
@@ -20,6 +23,10 @@ exec(
     }
 );
 
+/**
+ * Parses the entire `stdout` from forge. Sets the values in `tests` global dictionary
+ * @param {*} stdout The output from running forge on the market-benchmark tests
+ */
 function parseOutput(stdout) {
     const outputLines = stdout.split("\n");
     let doNextLine = false;
@@ -36,7 +43,11 @@ function parseOutput(stdout) {
     }
 }
 
-function parseTestLine(testLine) {
+/**
+ * Parses a line of text from the forge output. Sets corresponding keys in `tests` global dictionary
+ * @param {*} testLine line of output from forge
+ */
+function parseTestLine(testLine,showDirect = false) {
     const marketName = testLine.split("]")[0].substring(1);
     const testName = testLine.split(")")[0].split("(")[1];
     const actionName = testLine
@@ -50,6 +61,7 @@ function parseTestLine(testLine) {
             ? testLine.split("gas:")[1].trim()
             : 0;
 
+    if(showDirect && !direct) return; // Skip EOA calls if want to show direct
     addTestResults(marketName, testName, actionName, direct, gasUsage);
 }
 
@@ -63,17 +75,20 @@ function addTestResults(market, testName, actionName, direct, gasUsage) {
     tests[market][testName][actionName] = { gasUsage, direct };
 }
 
+/**
+ * Generates the latex from the global dictionary `tests`
+ * @returns String containing latex
+ */
 function generateLatex() {
     let latex = "";
     const markets = Object.keys(tests);
     const testNames = Object.keys(tests[markets[0]]);
 
     latex +=
-        "\\documentclass[12pt]{article}\n\\usepackage{emoji}\n\\usepackage{xcolor}\n\\usepackage{multirow}\n\\begin{document}" +
-        `\\setemojifont{TwemojiMozilla}\n\\begin{center}\n\\begin{tabular}{ |c|c|${"c|".repeat(
+        "\\documentclass[border = 4pt]{standalone}\n\\usepackage{emoji}\n\\usepackage{xcolor}\n\\usepackage{multirow}\n\\begin{document}" +
+        `\n\\setemojifont{TwemojiMozilla}\n\\begin{tabular}{ |c|c|${"c|".repeat(
             markets.length
-        )} } \n\\hline\n\\multicolumn{${
-            2 + markets.length
+        )} } \n\\hline\n\\multicolumn{${2 + markets.length
         }}{|c|}{Benchmark Tests} \\\\ \n` +
         "\\hline \n Test Name & Action Name ";
 
@@ -113,7 +128,8 @@ function generateLatex() {
                 if (gasValue == 0) {
                     latex += `& \\emoji{cross-mark} `;
                 } else {
-                    latex += `& \\color[RGB]{${color.values[0]},${color.values[1]},${color.values[2]}} ${gasValue} `;
+                    const percentageOfMax = Math.round(gasValue * 100 / maxGas);
+                    latex += `& \\color[RGB]{${color.values[0]},${color.values[1]},${color.values[2]}} ${gasValue} (${percentageOfMax}\\%)`;
                 }
             }
 
@@ -123,11 +139,18 @@ function generateLatex() {
         latex += "\\cline{0-1} \n";
     }
 
-    latex += "\\end{tabular}\n\\end{center}\n\\end{document}";
+    latex += "\\end{tabular}\n\\end{document}";
 
     return latex;
 }
 
+/**
+ * Generate interpolated color between green and red (green lowest gas, and red highest)
+ * @param {*} minGas The minimum gas used for the test
+ * @param {*} maxGas The maximum gas used for the test
+ * @param {*} gas The gas used by a market for this test
+ * @returns The color to display market results as for the test
+ */
 function getColor(minGas, maxGas, gas) {
     let color;
     if (minGas == maxGas) {
