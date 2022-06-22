@@ -147,10 +147,12 @@ function generateLatex(tests, title) {
                 if (gasValue == 0) {
                     latex += `& \\emoji{cross-mark} `;
                 } else {
-                    const percentageOfMax = Math.round(
-                        (gasValue * 100) / maxGas
+                    const percentChange = Math.round(
+                        ((gasValue - maxGas) * 100.0) / maxGas
                     );
-                    latex += `& \\color[RGB]{${color.values[0]},${color.values[1]},${color.values[2]}} ${gasValue} (${percentageOfMax}\\%)`;
+                    latex +=
+                        `& \\color[RGB]{${color.values[0]},${color.values[1]},${color.values[2]}} ${gasValue}` +
+                        (percentChange != 0 ? `(${percentChange}\\%)` : ``); // Only show percent change if not 0
                 }
             }
 
