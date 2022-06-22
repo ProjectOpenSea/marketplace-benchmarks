@@ -29,10 +29,18 @@ jobs:
       - name: Run tests
         run: yarn test:generate ${{ secrets.ETH_RPC_URL }}
 
-      - name: Process latex
+      - name: Process latex EOA
         uses: dante-ev/latex-action@latest
         with:
           root_file: results.tex
+          compiler: lualatex
+          working_directory: results
+          args: -interaction=nonstopmode -shell-escape
+
+      - name: Process latex direct
+        uses: dante-ev/latex-action@latest
+        with:
+          root_file: results-direct.tex
           compiler: lualatex
           working_directory: results
           args: -interaction=nonstopmode -shell-escape
