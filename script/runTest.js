@@ -47,7 +47,7 @@ function parseOutput(stdout) {
  * Parses a line of text from the forge output. Sets corresponding keys in `tests` global dictionary
  * @param {*} testLine line of output from forge
  */
-function parseTestLine(testLine,showDirect = false) {
+function parseTestLine(testLine, showDirect = false) {
     const marketName = testLine.split("]")[0].substring(1);
     const testName = testLine.split(")")[0].split("(")[1];
     const actionName = testLine
@@ -61,7 +61,7 @@ function parseTestLine(testLine,showDirect = false) {
             ? testLine.split("gas:")[1].trim()
             : 0;
 
-    if(showDirect && !direct) return; // Skip EOA calls if want to show direct
+    if (showDirect && !direct) return; // Skip EOA calls if want to show direct
     addTestResults(marketName, testName, actionName, direct, gasUsage);
 }
 
@@ -88,7 +88,8 @@ function generateLatex() {
         "\\documentclass[border = 4pt]{standalone}\n\\usepackage{emoji}\n\\usepackage{xcolor}\n\\usepackage{multirow}\n\\begin{document}" +
         `\n\\setemojifont{TwemojiMozilla}\n\\begin{tabular}{ |c|c|${"c|".repeat(
             markets.length
-        )} } \n\\hline\n\\multicolumn{${2 + markets.length
+        )} } \n\\hline\n\\multicolumn{${
+            2 + markets.length
         }}{|c|}{Benchmark Tests} \\\\ \n` +
         "\\hline \n Test Name & Action Name ";
 
@@ -128,7 +129,9 @@ function generateLatex() {
                 if (gasValue == 0) {
                     latex += `& \\emoji{cross-mark} `;
                 } else {
-                    const percentageOfMax = Math.round(gasValue * 100 / maxGas);
+                    const percentageOfMax = Math.round(
+                        (gasValue * 100) / maxGas
+                    );
                     latex += `& \\color[RGB]{${color.values[0]},${color.values[1]},${color.values[2]}} ${gasValue} (${percentageOfMax}\\%)`;
                 }
             }
