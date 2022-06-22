@@ -53,6 +53,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients(config);
         benchmark_BuyTenOfferedERC721WithEther_ListOnChain(config);
         benchmark_BuyTenOfferedERC721WithEther(config);
+        benchmark_BuyTenOfferedERC721WithEtherDistinctOrders(config);
     }
 
     function beforeAllPrepareMarketplaceTest(BaseMarketConfig config) internal {
@@ -862,6 +863,48 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
+    function benchmark_BuyTenOfferedERC721WithEtherDistinctOrders(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string memory testLabel = "(ERC721x10 -> ETH Distinct Orders)";
+
+        TestOrderContext[] memory contexts = new TestOrderContext[](10);
+        TestItem721[] memory nfts = new TestItem721[](10);
+        uint256[] memory ethAmounts = new uint256[](10);
+
+        for (uint256 i = 0; i < 10; i++) {
+            test721_1.mint(alice, i + 1);
+            nfts[i] = TestItem721(address(test721_1), i + 1);
+            contexts[i] = TestOrderContext(false, alice, bob);
+            ethAmounts[i] = 100 + i;
+        }
+
+        try
+            config.getPayload_BuyOfferedManyERC721WithEtherDistinctOrders(
+                contexts,
+                nfts,
+                ethAmounts
+            )
+        returns (TestOrderPayload memory payload) {
+            for (uint256 i = 1; i <= 10; i++) {
+                assertEq(test721_1.ownerOf(i), alice);
+            }
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill /w Sigs")),
+                bob,
+                payload.executeOrder
+            );
+
+            for (uint256 i = 1; i <= 10; i++) {
+                assertEq(test721_1.ownerOf(i), bob);
+            }
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
     /*//////////////////////////////////////////////////////////////
                           Helpers
     //////////////////////////////////////////////////////////////*/
@@ -881,6 +924,11 @@ contract GenericMarketplaceTest is BaseOrderTest {
         );
         _setApprovals(
             alice,
+            config.sellerErc20ApprovalTarget(),
+            config.sellerNftApprovalTarget()
+        );
+        _setApprovals(
+            cal,
             config.sellerErc20ApprovalTarget(),
             config.sellerNftApprovalTarget()
         );

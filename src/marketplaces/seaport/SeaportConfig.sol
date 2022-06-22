@@ -150,7 +150,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         components.orderType = OrderType.FULL_OPEN;
         components.startTime = 0;
         components.endTime = block.timestamp + 1;
-        components.totalOriginalConsiderationItems = 1;
+        components.totalOriginalConsiderationItems = considerationItems.length;
         bytes32 digest = _deriveEIP712Digest(_deriveOrderHash(components, 0));
         (uint8 v, bytes32 r, bytes32 s) = _sign(offerer, digest);
         bytes memory signature = abi.encodePacked(r, s, v);
@@ -689,6 +689,149 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             address(seaport),
             ethAmount,
             abi.encodeWithSelector(ISeaport.fulfillOrder.selector, order, 0)
+        );
+    }
+
+    function getPayload_BuyOfferedManyERC721WithEtherDistinctOrders(
+        TestOrderContext[] calldata contexts,
+        TestItem721[] calldata nfts,
+        uint256[] calldata ethAmounts
+    ) external view override returns (TestOrderPayload memory execution) {
+        require(
+            contexts.length == nfts.length && nfts.length == ethAmounts.length,
+            "SeaportConfig::getPayload_BuyOfferedManyERC721WithEtherDistinctOrders: invalid input"
+        );
+
+        Order[] memory orders = new Order[](nfts.length + 1);
+
+        ConsiderationItem[]
+            memory fulfillerConsiderationItems = new ConsiderationItem[](
+                nfts.length
+            );
+
+        Fulfillment[] memory fullfillments = new Fulfillment[](nfts.length + 1);
+        uint256 sumEthAmount = 0;
+
+        for (uint256 i = 0; i < nfts.length; i++) {
+            {
+                // Sum eth amount
+                sumEthAmount += ethAmounts[i];
+            }
+
+            // Build offer orders
+            OfferItem[] memory offerItems = new OfferItem[](1);
+            ConsiderationItem[]
+                memory considerationItems = new ConsiderationItem[](1);
+            {
+                offerItems[0] = OfferItem(
+                    ItemType.ERC721,
+                    nfts[i].token,
+                    nfts[i].identifier,
+                    1,
+                    1
+                );
+            }
+            {
+                considerationItems[0] = ConsiderationItem(
+                    ItemType.NATIVE,
+                    address(0),
+                    0,
+                    ethAmounts[i],
+                    ethAmounts[i],
+                    payable(contexts[i].offerer)
+                );
+            }
+            {
+                orders[i] = buildOrder(
+                    contexts[i].offerer,
+                    offerItems,
+                    considerationItems
+                );
+            }
+            {
+                fulfillerConsiderationItems[i] = ConsiderationItem(
+                    ItemType.ERC721,
+                    nfts[i].token,
+                    nfts[i].identifier,
+                    1,
+                    1,
+                    payable(contexts[i].fulfiller)
+                );
+            }
+            {
+                // Add fulfillment components for each NFT
+                FulfillmentComponent
+                    memory nftConsiderationComponent = FulfillmentComponent(
+                        nfts.length,
+                        i
+                    );
+                FulfillmentComponent
+                    memory nftOfferComponent = FulfillmentComponent(i, 0);
+                FulfillmentComponent[]
+                    memory nftOfferComponents = new FulfillmentComponent[](1);
+                nftOfferComponents[0] = nftOfferComponent;
+                FulfillmentComponent[]
+                    memory nftConsiderationComponents = new FulfillmentComponent[](
+                        1
+                    );
+                nftConsiderationComponents[0] = nftConsiderationComponent;
+                fullfillments[i] = Fulfillment(
+                    nftOfferComponents,
+                    nftConsiderationComponents
+                );
+            }
+        }
+
+        // Build single eth fulfillment
+        FulfillmentComponent memory ethOfferComponent = FulfillmentComponent(
+            nfts.length,
+            0
+        );
+        FulfillmentComponent[]
+            memory ethOfferComponents = new FulfillmentComponent[](1);
+        ethOfferComponents[0] = ethOfferComponent;
+        FulfillmentComponent[]
+            memory ethConsiderationComponents = new FulfillmentComponent[](
+                nfts.length
+            );
+        for (uint256 i = 0; i < nfts.length; i++) {
+            {
+                FulfillmentComponent
+                    memory ethConsiderationComponent = FulfillmentComponent(
+                        i,
+                        0
+                    );
+                ethConsiderationComponents[i] = ethConsiderationComponent;
+            }
+        }
+        fullfillments[nfts.length] = Fulfillment(
+            ethOfferComponents,
+            ethConsiderationComponents
+        );
+
+        // Build sweep floor order
+        OfferItem[] memory fulfillerOfferItems = new OfferItem[](1);
+        fulfillerOfferItems[0] = OfferItem(
+            ItemType.NATIVE,
+            address(0),
+            0,
+            sumEthAmount,
+            sumEthAmount
+        );
+        orders[nfts.length] = buildOrder(
+            contexts[0].fulfiller,
+            fulfillerOfferItems,
+            fulfillerConsiderationItems
+        );
+
+        execution.executeOrder = TestCallParameters(
+            address(seaport),
+            sumEthAmount,
+            abi.encodeWithSelector(
+                ISeaport.matchOrders.selector,
+                orders,
+                fullfillments
+            )
         );
     }
 }
