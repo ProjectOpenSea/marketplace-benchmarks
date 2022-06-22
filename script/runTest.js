@@ -7,9 +7,6 @@ const RPC = process.argv[2];
 
 if (RPC === undefined || RPC == "") throw Error("RPC not set");
 
-/// {market:{testName:{actionName:{gas,direct}}}}
-var tests = {};
-
 // Execute forge tests and capture `stdout`
 exec(
     `forge clean && forge test --fork-url ${RPC} -vv`,
@@ -17,17 +14,36 @@ exec(
         if (error) {
             throw Error("Forge test failed");
         }
-        parseOutput(stdout);
-        const latex = generateLatex();
-        fs.writeFileSync("./results/results.tex", latex);
+
+        /// {market:{testName:{actionName:{gas,direct}}}}
+        let eoaTests = {};
+        eoaTests.results = {};
+        parseOutput(eoaTests, stdout, false);
+        const eoaLatex = generateLatex(
+            eoaTests.results,
+            "Benchmark Tests (EOA)"
+        );
+        fs.writeFileSync("./results/results.tex", eoaLatex);
+
+        /// {market:{testName:{actionName:{gas,direct}}}}
+        let directTests = {};
+        directTests.results = {};
+        parseOutput(directTests, stdout, true);
+        const directLatex = generateLatex(
+            directTests.results,
+            "Benchmark Tests (Direct)"
+        );
+        fs.writeFileSync("./results/results-direct.tex", directLatex);
     }
 );
 
 /**
- * Parses the entire `stdout` from forge. Sets the values in `tests` global dictionary
+ * Parses the entire `stdout` from forge. Sets the values in `tests`
+ * @param {*} tests The variable which holds test results
  * @param {*} stdout The output from running forge on the market-benchmark tests
+ * @param {*} showDirect Show direct contract interactions (as opposed to EOA)
  */
-function parseOutput(stdout) {
+function parseOutput(tests, stdout, showDirect = false) {
     const outputLines = stdout.split("\n");
     let doNextLine = false;
     for (let outputLine of outputLines) {
@@ -36,7 +52,7 @@ function parseOutput(stdout) {
         if (outputLine == "") {
             doNextLine = false;
         } else if (doNextLine) {
-            parseTestLine(outputLine);
+            parseTestLine(tests, outputLine, showDirect);
         } else if (outputLine.includes("Logs:")) {
             doNextLine = true;
         }
@@ -44,10 +60,9 @@ function parseOutput(stdout) {
 }
 
 /**
- * Parses a line of text from the forge output. Sets corresponding keys in `tests` global dictionary
- * @param {*} testLine line of output from forge
+ * Parses a line of text from the forge output. Sets corresponding keys in `tests`
  */
-function parseTestLine(testLine, showDirect = false) {
+function parseTestLine(tests, testLine, showDirect) {
     const marketName = testLine.split("]")[0].substring(1);
     const testName = testLine.split(")")[0].split("(")[1];
     const actionName = testLine
@@ -60,26 +75,29 @@ function parseTestLine(testLine, showDirect = false) {
         testLine.split("gas:").length > 1
             ? testLine.split("gas:")[1].trim()
             : 0;
-
-    if (showDirect && !direct) return; // Skip EOA calls if want to show direct
-    addTestResults(marketName, testName, actionName, direct, gasUsage);
+    if (
+        (showDirect && !direct && gasUsage != 0) ||
+        (!showDirect && direct && gasUsage != 0)
+    )
+        return; // Skip unwanted results
+    addTestResults(tests, marketName, testName, actionName, gasUsage);
 }
 
-function addTestResults(market, testName, actionName, direct, gasUsage) {
-    if (!tests.hasOwnProperty(market)) {
-        tests[market] = {};
+function addTestResults(tests, market, testName, actionName, gasUsage) {
+    if (!tests.results.hasOwnProperty(market)) {
+        tests.results[market] = {};
     }
-    if (!tests[market].hasOwnProperty(testName)) {
-        tests[market][testName] = {};
+    if (!tests.results[market].hasOwnProperty(testName)) {
+        tests.results[market][testName] = {};
     }
-    tests[market][testName][actionName] = { gasUsage, direct };
+    tests.results[market][testName][actionName] = { gasUsage };
 }
 
 /**
  * Generates the latex from the global dictionary `tests`
  * @returns String containing latex
  */
-function generateLatex() {
+function generateLatex(tests, title) {
     let latex = "";
     const markets = Object.keys(tests);
     const testNames = Object.keys(tests[markets[0]]);
@@ -90,7 +108,7 @@ function generateLatex() {
             markets.length
         )} } \n\\hline\n\\multicolumn{${
             2 + markets.length
-        }}{|c|}{Benchmark Tests} \\\\ \n` +
+        }}{|c|}{${title}} \\\\ \n` +
         "\\hline \n Test Name & Action Name ";
 
     for (const market of markets) {
