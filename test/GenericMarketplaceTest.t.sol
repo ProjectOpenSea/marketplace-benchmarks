@@ -868,21 +868,16 @@ contract GenericMarketplaceTest is BaseOrderTest {
     ) internal prepareTest(config) {
         string memory testLabel = "(ERC721x10 -> ETH Distinct Orders)";
 
-        test721_1.mint(alice, 1);
-        test721_1.mint(cal, 2);
+        TestOrderContext[] memory contexts = new TestOrderContext[](10);
+        TestItem721[] memory nfts = new TestItem721[](10);
+        uint256[] memory ethAmounts = new uint256[](10);
 
-        TestOrderContext[] memory contexts = new TestOrderContext[](2);
-        TestItem721[] memory nfts = new TestItem721[](2);
-        uint256[] memory ethAmounts = new uint256[](2);
-
-        contexts[0] = TestOrderContext(false, alice, bob);
-        contexts[1] = TestOrderContext(false, cal, bob);
-
-        nfts[0] = TestItem721(address(test721_1), 1);
-        nfts[1] = TestItem721(address(test721_1), 2);
-
-        ethAmounts[0] = 100;
-        ethAmounts[1] = 1000;
+        for (uint256 i = 0; i < 10; i++) {
+            test721_1.mint(alice, i + 1);
+            nfts[i] = TestItem721(address(test721_1), i + 1);
+            contexts[i] = TestOrderContext(false, alice, bob);
+            ethAmounts[i] = 100 + i;
+        }
 
         try
             config.getPayload_BuyOfferedManyERC721WithEtherDistinctOrders(
@@ -891,12 +886,20 @@ contract GenericMarketplaceTest is BaseOrderTest {
                 ethAmounts
             )
         returns (TestOrderPayload memory payload) {
+            for (uint256 i = 1; i <= 10; i++) {
+                assertEq(test721_1.ownerOf(i), alice);
+            }
+
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill /w Sigs")),
                 bob,
                 payload.executeOrder
             );
+
+            for (uint256 i = 1; i <= 10; i++) {
+                assertEq(test721_1.ownerOf(i), bob);
+            }
         } catch {
             _logNotSupported(config.name(), testLabel);
         }

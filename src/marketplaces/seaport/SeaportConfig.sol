@@ -709,18 +709,19 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 nfts.length
             );
 
-        Fulfillment[] memory fullfillments = new Fulfillment[](nfts.length * 2);
+        Fulfillment[] memory fullfillments = new Fulfillment[](nfts.length + 1);
         uint256 sumEthAmount = 0;
 
         for (uint256 i = 0; i < nfts.length; i++) {
             {
+                // Sum eth amount
                 sumEthAmount += ethAmounts[i];
             }
 
+            // Build offer orders
             OfferItem[] memory offerItems = new OfferItem[](1);
             ConsiderationItem[]
                 memory considerationItems = new ConsiderationItem[](1);
-
             {
                 offerItems[0] = OfferItem(
                     ItemType.ERC721,
@@ -747,7 +748,6 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                     considerationItems
                 );
             }
-
             {
                 fulfillerConsiderationItems[i] = ConsiderationItem(
                     ItemType.ERC721,
@@ -758,8 +758,8 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                     payable(contexts[i].fulfiller)
                 );
             }
-
             {
+                // Add fulfillment components for each NFT
                 FulfillmentComponent
                     memory nftConsiderationComponent = FulfillmentComponent(
                         nfts.length,
@@ -782,6 +782,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             }
         }
 
+        // Build single eth fulfillment
         FulfillmentComponent memory ethOfferComponent = FulfillmentComponent(
             nfts.length,
             0
@@ -789,28 +790,27 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         FulfillmentComponent[]
             memory ethOfferComponents = new FulfillmentComponent[](1);
         ethOfferComponents[0] = ethOfferComponent;
-
+        FulfillmentComponent[]
+            memory ethConsiderationComponents = new FulfillmentComponent[](
+                nfts.length
+            );
         for (uint256 i = 0; i < nfts.length; i++) {
-            FulfillmentComponent[]
-                memory ethConsiderationComponents = new FulfillmentComponent[](
-                    1
-                );
             {
                 FulfillmentComponent
                     memory ethConsiderationComponent = FulfillmentComponent(
                         i,
                         0
                     );
-                ethConsiderationComponents[0] = ethConsiderationComponent;
+                ethConsiderationComponents[i] = ethConsiderationComponent;
             }
-
-            fullfillments[nfts.length + i] = Fulfillment(
-                ethOfferComponents,
-                ethConsiderationComponents
-            );
         }
-        OfferItem[] memory fulfillerOfferItems = new OfferItem[](1);
+        fullfillments[nfts.length] = Fulfillment(
+            ethOfferComponents,
+            ethConsiderationComponents
+        );
 
+        // Build sweep floor order
+        OfferItem[] memory fulfillerOfferItems = new OfferItem[](1);
         fulfillerOfferItems[0] = OfferItem(
             ItemType.NATIVE,
             address(0),
@@ -818,7 +818,6 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             sumEthAmount,
             sumEthAmount
         );
-
         orders[nfts.length] = buildOrder(
             contexts[0].fulfiller,
             fulfillerOfferItems,
