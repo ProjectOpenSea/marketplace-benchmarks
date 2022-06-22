@@ -253,6 +253,14 @@ abstract contract BaseMarketConfig {
         _notImplemented();
     }
 
+    /**
+     * @dev Get call parameters to execute an order "sweeping the floor" buy filling 10 distinct
+     *   ERC-721->ETH orders at once. Same seller on each order. If the market does not support the
+     *   order type, must revert with NotImplemented.
+     * @param contexts Array of contexts for each order
+     * @param nfts Array of NFTs for each order
+     * @param ethAmounts Array of Ether emounts to be received for the NFTs in each order
+     */
     function getPayload_BuyOfferedManyERC721WithEtherDistinctOrders(
         TestOrderContext[] calldata contexts,
         TestItem721[] calldata nfts,
