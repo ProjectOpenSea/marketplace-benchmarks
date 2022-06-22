@@ -90,6 +90,7 @@ function addTestResults(tests, market, testName, actionName, gasUsage) {
     if (!tests.results[market].hasOwnProperty(testName)) {
         tests.results[market][testName] = {};
     }
+    if (actionName == "") return;
     tests.results[market][testName][actionName] = { gasUsage };
 }
 
