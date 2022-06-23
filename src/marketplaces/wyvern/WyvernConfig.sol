@@ -83,154 +83,6 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
     }
 
     function encodeERC721AtomicMatch(
-        Order memory order,
-        Sig memory signature,
-        TestItem721 memory nft
-    ) internal pure returns (bytes memory) {
-        if (uint8(order.side) == 1) {
-            // Filling an existing sell order
-            return
-                abi.encodeWithSelector(
-                    IWyvern.atomicMatch_.selector,
-                    [
-                        order.exchange,
-                        order.taker,
-                        order.maker,
-                        NULL_ADDRESS,
-                        order.target,
-                        NULL_ADDRESS,
-                        order.paymentToken,
-                        order.exchange,
-                        order.maker,
-                        order.taker,
-                        order.feeRecipient,
-                        order.target,
-                        NULL_ADDRESS,
-                        order.paymentToken
-                    ],
-                    [
-                        order.makerRelayerFee,
-                        0,
-                        0,
-                        0,
-                        order.basePrice,
-                        0,
-                        order.listingTime,
-                        order.expirationTime,
-                        order.salt,
-                        order.makerRelayerFee,
-                        0,
-                        0,
-                        0,
-                        order.basePrice,
-                        0,
-                        order.listingTime,
-                        order.expirationTime,
-                        order.salt
-                    ],
-                    [
-                        uint8(1),
-                        uint8(0),
-                        uint8(0),
-                        uint8(0),
-                        uint8(order.feeMethod),
-                        uint8(order.side),
-                        uint8(order.saleKind),
-                        uint8(order.howToCall)
-                    ],
-                    encodeERC721TransferFrom(
-                        NULL_ADDRESS,
-                        order.taker,
-                        nft.identifier
-                    ),
-                    order._calldata,
-                    encodeERC721ReplacementPatternBuy(),
-                    order.replacementPattern,
-                    EMPTY_BYTES,
-                    EMPTY_BYTES,
-                    [0, uint8(signature.v)],
-                    [
-                        bytes32(0),
-                        bytes32(0),
-                        signature.r,
-                        signature.s,
-                        bytes32(0)
-                    ]
-                );
-        }
-
-        // Filling an existing buy order
-        return
-            abi.encodeWithSelector(
-                IWyvern.atomicMatch_.selector,
-                [
-                    order.exchange,
-                    order.maker,
-                    order.taker,
-                    order.feeRecipient,
-                    order.target,
-                    NULL_ADDRESS,
-                    order.paymentToken,
-                    order.exchange,
-                    order.taker,
-                    order.maker,
-                    NULL_ADDRESS,
-                    order.target,
-                    NULL_ADDRESS,
-                    order.paymentToken
-                ],
-                [
-                    order.makerRelayerFee,
-                    0,
-                    0,
-                    0,
-                    order.basePrice,
-                    0,
-                    order.listingTime,
-                    order.expirationTime,
-                    order.salt,
-                    order.makerRelayerFee,
-                    0,
-                    0,
-                    0,
-                    order.basePrice,
-                    0,
-                    order.listingTime,
-                    order.expirationTime,
-                    order.salt
-                ],
-                [
-                    uint8(order.feeMethod),
-                    uint8(order.side),
-                    uint8(order.saleKind),
-                    uint8(order.howToCall),
-                    uint8(1),
-                    uint8(1),
-                    uint8(0),
-                    uint8(0)
-                ],
-                order._calldata,
-                encodeERC721TransferFrom(
-                    order.taker,
-                    NULL_ADDRESS,
-                    nft.identifier
-                ),
-                order.replacementPattern,
-                encodeERC721ReplacementPatternSell(),
-                EMPTY_BYTES,
-                EMPTY_BYTES,
-                [uint8(signature.v), 0],
-                [
-                    signature.r,
-                    signature.s,
-                    bytes32(0),
-                    bytes32(0),
-                    0x0000000000000000000000000000000000000000000000000000000000000000
-                ]
-            );
-    }
-
-    function encodeERC721AtomicMatch(
         Order memory buyOrder,
         Order memory sellOrder,
         Sig memory buySignature,
@@ -243,7 +95,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
                     buyOrder.exchange,
                     buyOrder.maker,
                     buyOrder.taker,
-                    NULL_ADDRESS,
+                    buyOrder.feeRecipient,
                     buyOrder.target,
                     NULL_ADDRESS,
                     buyOrder.paymentToken,
@@ -350,10 +202,6 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         address feeRecipient,
         uint256 fee
     ) internal view returns (Order memory order, Sig memory signature) {
-        require(
-            feeRecipient != address(0),
-            "WyvernConfig::buildERC721SellOrder: fee recipient must not be null address"
-        );
         order.exchange = address(wyvern);
         order.maker = maker;
         order.taker = taker;
@@ -385,10 +233,6 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         address feeRecipient,
         uint256 fee
     ) internal view returns (Order memory order, Sig memory signature) {
-        require(
-            feeRecipient != address(0),
-            "WyvernConfig::buildERC721BuyOrder: fee recipient must not be null address"
-        );
         order.exchange = address(wyvern);
         order.maker = maker;
         order.taker = taker;
@@ -796,7 +640,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             0x0000000000000000000000000000000000000000,
             ethAmount,
             nft,
-            DEFAULT_FEE_RECIPIENT,
+            NULL_ADDRESS,
             0
         );
         if (context.listOnChain) {
@@ -872,7 +716,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             erc20.token,
             erc20.amount,
             nft,
-            DEFAULT_FEE_RECIPIENT,
+            NULL_ADDRESS,
             0
         );
         if (context.listOnChain) {
@@ -931,29 +775,43 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestItem20 calldata erc20,
         TestItem721 calldata nft
     ) external view override returns (TestOrderPayload memory execution) {
-        (Order memory order, Sig memory signature) = buildERC721BuyOrder(
+        (Order memory buyOrder, Sig memory buySignature) = buildERC721BuyOrder(
             context.offerer,
-            context.fulfiller,
+            NULL_ADDRESS,
             erc20.token,
             erc20.amount,
             nft,
             DEFAULT_FEE_RECIPIENT,
             0
         );
+        (Order memory sellOrder, ) = buildERC721SellOrder(
+            context.fulfiller,
+            NULL_ADDRESS,
+            erc20.token,
+            erc20.amount,
+            nft,
+            NULL_ADDRESS,
+            0
+        );
+
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
                 address(wyvern),
                 0,
-                encodeERC721ApproveOrder(order)
+                encodeERC721ApproveOrder(buyOrder)
             );
-            signature.v = 0;
-            signature.r = 0;
-            signature.s = 0;
+            buySignature = EMPTY_SIG;
         }
+
         execution.executeOrder = TestCallParameters(
             address(wyvern),
             0,
-            encodeERC721AtomicMatch(order, signature, nft)
+            encodeERC721AtomicMatch(
+                buyOrder,
+                sellOrder,
+                buySignature,
+                EMPTY_SIG
+            )
         );
     }
 
@@ -995,29 +853,42 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         address feeRecipient,
         uint256 feeEthAmount
     ) external view override returns (TestOrderPayload memory execution) {
-        (Order memory order, Sig memory signature) = buildERC721SellOrder(
+        (Order memory sellOrder, Sig memory sellSignature) = buildERC721SellOrder(
             context.offerer,
-            context.fulfiller,
+            NULL_ADDRESS,
             0x0000000000000000000000000000000000000000,
             priceEthAmount + feeEthAmount,
             nft,
             feeRecipient,
             (feeEthAmount * 10000) / (priceEthAmount + feeEthAmount) + 1 // Calculate fee percentage
         );
+        (Order memory buyOrder, ) = buildERC721BuyOrder(
+            context.fulfiller,
+            NULL_ADDRESS,
+            0x0000000000000000000000000000000000000000,
+            priceEthAmount + feeEthAmount,
+            nft,
+            NULL_ADDRESS,
+            (feeEthAmount * 10000) / (priceEthAmount + feeEthAmount) + 1 // Calculate fee percentage
+        );
+
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
                 address(wyvern),
                 0,
-                encodeERC721ApproveOrder(order)
+                encodeERC721ApproveOrder(sellOrder)
             );
-            signature.v = 0;
-            signature.r = 0;
-            signature.s = 0;
+            sellSignature = EMPTY_SIG;
         }
         execution.executeOrder = TestCallParameters(
             address(wyvern),
             priceEthAmount + feeEthAmount,
-            encodeERC721AtomicMatch(order, signature, nft)
+            encodeERC721AtomicMatch(
+                buyOrder,
+                sellOrder,
+                EMPTY_SIG,
+                sellSignature
+            )
         );
     }
 }
