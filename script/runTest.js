@@ -125,6 +125,9 @@ function generateLatex(tests, title) {
             if (actionNames.length < tempActionNames.length)
                 actionNames = tempActionNames;
         }
+        if (actionNames.length == 0) {
+            actionNames = [""];
+        }
 
         latex += `\\multirow{${actionNames.length}}{18em}{${testName}}`;
         for (const actionName of actionNames) {
