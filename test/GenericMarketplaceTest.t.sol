@@ -3,6 +3,7 @@ pragma solidity 0.8.14;
 
 import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
 import { SeaportConfig } from "../src/marketplaces/seaport/SeaportConfig.sol";
+import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
 import { BaseMarketConfig } from "../src/BaseMarketConfig.sol";
 
 import { SetupCall, TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "../src/Types.sol";
@@ -15,10 +16,12 @@ import "./utils/BaseOrderTest.sol";
 contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig seaportConfig;
     BaseMarketConfig wyvernConfig;
+    BaseMarketConfig foundationConfig;    
 
     constructor() {
         seaportConfig = BaseMarketConfig(new SeaportConfig());
         wyvernConfig = BaseMarketConfig(new WyvernConfig());
+        foundationConfig = BaseMarketConfig(new FoundationConfig());
     }
 
     function testSeaport() external {
@@ -27,6 +30,10 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
     function testWyvern() external {
         benchmarkMarket(wyvernConfig);
+    }
+
+    function testFoundation() external {
+        benchmarkMarket(foundationConfig);
     }
 
     function benchmarkMarket(BaseMarketConfig config) public {
@@ -95,7 +102,8 @@ contract GenericMarketplaceTest is BaseOrderTest {
                 payload.submitOrder
             );
 
-            assertEq(test721_1.ownerOf(1), alice);
+            // Allow the market to escrow after listing
+            assert(test721_1.ownerOf(1) == alice || test721_1.ownerOf(1) == config.market());
 
             _benchmarkCallWithParams(
                 config.name(),
@@ -642,7 +650,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
             config.getPayload_BuyOfferedERC721WithEtherOneFeeRecipient(
                 TestOrderContext(true, alice, bob),
                 TestItem721(address(test721_1), 1),
-                100,
+                500, // increased so that the fee recipient recieves 1%
                 feeReciever1,
                 5
             )
@@ -654,7 +662,8 @@ contract GenericMarketplaceTest is BaseOrderTest {
                 payload.submitOrder
             );
 
-            assertEq(test721_1.ownerOf(1), alice);
+            // Allow the market to escrow after listing
+            assert(test721_1.ownerOf(1) == alice || test721_1.ownerOf(1) == config.market());
             assertEq(feeReciever1.balance, 0);
 
             _benchmarkCallWithParams(
