@@ -21,9 +21,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         wyvernConfig = BaseMarketConfig(new WyvernConfig());
     }
 
-    function testSeaport() external {
-        benchmarkMarket(seaportConfig);
-    }
+    // function testSeaport() external {
+    //     benchmarkMarket(seaportConfig);
+    // }
 
     function testWyvern() external {
         benchmarkMarket(wyvernConfig);
@@ -31,29 +31,29 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
     function benchmarkMarket(BaseMarketConfig config) public {
         beforeAllPrepareMarketplaceTest(config);
-        benchmark_BuyOfferedERC721WithEther_ListOnChain(config);
-        benchmark_BuyOfferedERC721WithEther(config);
+        // benchmark_BuyOfferedERC721WithEther_ListOnChain(config);
+        // benchmark_BuyOfferedERC721WithEther(config);
         benchmark_BuyOfferedERC1155WithEther_ListOnChain(config);
         benchmark_BuyOfferedERC1155WithEther(config);
-        benchmark_BuyOfferedERC721WithERC20_ListOnChain(config);
-        benchmark_BuyOfferedERC721WithERC20(config);
+        // benchmark_BuyOfferedERC721WithERC20_ListOnChain(config);
+        // benchmark_BuyOfferedERC721WithERC20(config);
         benchmark_BuyOfferedERC1155WithERC20_ListOnChain(config);
         benchmark_BuyOfferedERC1155WithERC20(config);
-        benchmark_BuyOfferedERC20WithERC721_ListOnChain(config);
-        benchmark_BuyOfferedERC20WithERC721(config);
+        // benchmark_BuyOfferedERC20WithERC721_ListOnChain(config);
+        // benchmark_BuyOfferedERC20WithERC721(config);
         benchmark_BuyOfferedERC20WithERC1155_ListOnChain(config);
         benchmark_BuyOfferedERC20WithERC1155(config);
-        benchmark_BuyOfferedERC721WithERC1155_ListOnChain(config);
-        benchmark_BuyOfferedERC721WithERC1155(config);
-        benchmark_BuyOfferedERC1155WithERC721_ListOnChain(config);
-        benchmark_BuyOfferedERC1155WithERC721(config);
-        benchmark_BuyOfferedERC721WithEtherFee_ListOnChain(config);
-        benchmark_BuyOfferedERC721WithEtherFee(config);
-        benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients_ListOnChain(config);
-        benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients(config);
-        benchmark_BuyTenOfferedERC721WithEther_ListOnChain(config);
-        benchmark_BuyTenOfferedERC721WithEther(config);
-        benchmark_BuyTenOfferedERC721WithEtherDistinctOrders(config);
+        // benchmark_BuyOfferedERC721WithERC1155_ListOnChain(config);
+        // benchmark_BuyOfferedERC721WithERC1155(config);
+        // benchmark_BuyOfferedERC1155WithERC721_ListOnChain(config);
+        // benchmark_BuyOfferedERC1155WithERC721(config);
+        // benchmark_BuyOfferedERC721WithEtherFee_ListOnChain(config);
+        // benchmark_BuyOfferedERC721WithEtherFee(config);
+        // benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients_ListOnChain(config);
+        // benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients(config);
+        // benchmark_BuyTenOfferedERC721WithEther_ListOnChain(config);
+        // benchmark_BuyTenOfferedERC721WithEther(config);
+        // benchmark_BuyTenOfferedERC721WithEtherDistinctOrders(config);
     }
 
     function beforeAllPrepareMarketplaceTest(BaseMarketConfig config) internal {

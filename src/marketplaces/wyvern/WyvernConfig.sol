@@ -516,10 +516,6 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         address feeRecipient,
         uint256 feeAmount
     ) internal view returns (Order memory order, Sig memory signature) {
-        require(
-            feeRecipient != address(0),
-            "WyvernConfig::buildERC1155SellOrder: fee recipient must not be null address"
-        );
         order.exchange = address(wyvern);
         order.maker = maker;
         order.taker = taker;
@@ -552,10 +548,6 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         address feeRecipient,
         uint256 feeAmount
     ) internal view returns (Order memory order, Sig memory signature) {
-        require(
-            feeRecipient != address(0),
-            "WyvernConfig::buildERC1155BuyOrder: fee recipient must not be null address"
-        );
         order.exchange = address(wyvern);
         order.maker = maker;
         order.taker = taker;
@@ -670,26 +662,44 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestItem1155 memory nft,
         uint256 ethAmount
     ) external view override returns (TestOrderPayload memory execution) {
-        (Order memory order, Sig memory signature) = buildERC1155SellOrder(
-            context.offerer,
+        (
+            Order memory sellOrder,
+            Sig memory sellSignature
+        ) = buildERC1155SellOrder(
+                context.offerer,
+                NULL_ADDRESS,
+                0x0000000000000000000000000000000000000000,
+                ethAmount,
+                nft,
+                DEFAULT_FEE_RECIPIENT,
+                0
+            );
+        (Order memory buyOrder, ) = buildERC1155BuyOrder(
             context.fulfiller,
+            NULL_ADDRESS,
             0x0000000000000000000000000000000000000000,
             ethAmount,
             nft,
-            DEFAULT_FEE_RECIPIENT,
+            NULL_ADDRESS,
             0
         );
+
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
                 address(wyvern),
                 0,
-                encodeERC1155ApproveOrder(order)
+                encodeERC1155ApproveOrder(sellOrder)
             );
         }
         execution.executeOrder = TestCallParameters(
             address(wyvern),
             ethAmount,
-            encodeERC1155AtomicMatch(order, signature, nft)
+            encodeERC721AtomicMatch(
+                buyOrder,
+                sellOrder,
+                EMPTY_SIG,
+                sellSignature
+            )
         );
     }
 
@@ -744,29 +754,45 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestItem1155 calldata nft,
         TestItem20 memory erc20
     ) external view override returns (TestOrderPayload memory execution) {
-        (Order memory order, Sig memory signature) = buildERC1155SellOrder(
-            context.offerer,
+        (
+            Order memory sellOrder,
+            Sig memory sellSignature
+        ) = buildERC1155SellOrder(
+                context.offerer,
+                NULL_ADDRESS,
+                erc20.token,
+                erc20.amount,
+                nft,
+                DEFAULT_FEE_RECIPIENT,
+                0
+            );
+        (Order memory buyOrder, ) = buildERC1155BuyOrder(
             context.fulfiller,
+            NULL_ADDRESS,
             erc20.token,
             erc20.amount,
             nft,
-            DEFAULT_FEE_RECIPIENT,
+            NULL_ADDRESS,
             0
         );
+
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
                 address(wyvern),
                 0,
-                encodeERC1155ApproveOrder(order)
+                encodeERC1155ApproveOrder(sellOrder)
             );
-            signature.v = 0;
-            signature.r = 0;
-            signature.s = 0;
+            sellSignature = EMPTY_SIG;
         }
         execution.executeOrder = TestCallParameters(
             address(wyvern),
             0,
-            encodeERC1155AtomicMatch(order, signature, nft)
+            encodeERC721AtomicMatch(
+                buyOrder,
+                sellOrder,
+                EMPTY_SIG,
+                sellSignature
+            )
         );
     }
 
@@ -820,29 +846,42 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestItem20 calldata erc20,
         TestItem1155 calldata nft
     ) external view override returns (TestOrderPayload memory execution) {
-        (Order memory order, Sig memory signature) = buildERC1155BuyOrder(
+        (Order memory buyOrder, Sig memory buySignature) = buildERC1155BuyOrder(
             context.offerer,
-            context.fulfiller,
+            NULL_ADDRESS,
             erc20.token,
             erc20.amount,
             nft,
             DEFAULT_FEE_RECIPIENT,
             0
         );
+        (Order memory sellOrder, ) = buildERC1155SellOrder(
+            context.fulfiller,
+            NULL_ADDRESS,
+            erc20.token,
+            erc20.amount,
+            nft,
+            NULL_ADDRESS,
+            0
+        );
+
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
                 address(wyvern),
                 0,
-                encodeERC1155ApproveOrder(order)
+                encodeERC1155ApproveOrder(buyOrder)
             );
-            signature.v = 0;
-            signature.r = 0;
-            signature.s = 0;
+            buySignature = EMPTY_SIG;
         }
         execution.executeOrder = TestCallParameters(
             address(wyvern),
             0,
-            encodeERC1155AtomicMatch(order, signature, nft)
+            encodeERC721AtomicMatch(
+                buyOrder,
+                sellOrder,
+                buySignature,
+                EMPTY_SIG
+            )
         );
     }
 
