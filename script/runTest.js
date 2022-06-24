@@ -1,3 +1,5 @@
+// test
+
 const { exec } = require("child_process");
 const interpolate = require("color-interpolate");
 const parse = require("color-parse");
