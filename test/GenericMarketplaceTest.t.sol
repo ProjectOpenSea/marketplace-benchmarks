@@ -16,7 +16,7 @@ import "./utils/BaseOrderTest.sol";
 contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig seaportConfig;
     BaseMarketConfig wyvernConfig;
-    BaseMarketConfig foundationConfig;    
+    BaseMarketConfig foundationConfig;
 
     constructor() {
         seaportConfig = BaseMarketConfig(new SeaportConfig());
@@ -103,7 +103,10 @@ contract GenericMarketplaceTest is BaseOrderTest {
             );
 
             // Allow the market to escrow after listing
-            assert(test721_1.ownerOf(1) == alice || test721_1.ownerOf(1) == config.market());
+            assert(
+                test721_1.ownerOf(1) == alice ||
+                    test721_1.ownerOf(1) == config.market()
+            );
 
             _benchmarkCallWithParams(
                 config.name(),
@@ -663,7 +666,10 @@ contract GenericMarketplaceTest is BaseOrderTest {
             );
 
             // Allow the market to escrow after listing
-            assert(test721_1.ownerOf(1) == alice || test721_1.ownerOf(1) == config.market());
+            assert(
+                test721_1.ownerOf(1) == alice ||
+                    test721_1.ownerOf(1) == config.market()
+            );
             assertEq(feeReciever1.balance, 0);
 
             _benchmarkCallWithParams(
@@ -737,7 +743,10 @@ contract GenericMarketplaceTest is BaseOrderTest {
             );
 
             // Allow the market to escrow after listing
-            assert(test721_1.ownerOf(1) == alice || test721_1.ownerOf(1) == config.market());
+            assert(
+                test721_1.ownerOf(1) == alice ||
+                    test721_1.ownerOf(1) == config.market()
+            );
             assertEq(feeReciever1.balance, 0);
             assertEq(feeReciever2.balance, 0);
 

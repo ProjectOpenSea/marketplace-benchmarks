@@ -29,25 +29,33 @@ contract FoundationConfig is BaseMarketConfig {
         TestItem721 calldata nft,
         uint256 ethAmount
     ) external view override returns (TestOrderPayload memory execution) {
-        if(!context.listOnChain) {
+        if (!context.listOnChain) {
             _notImplemented();
         }
 
         execution.submitOrder = TestCallParameters(
             address(foundation),
             0,
-            abi.encodeWithSelector(IFoundation.setBuyPrice.selector, nft.token, nft.identifier, ethAmount)
+            abi.encodeWithSelector(
+                IFoundation.setBuyPrice.selector,
+                nft.token,
+                nft.identifier,
+                ethAmount
+            )
         );
         execution.executeOrder = TestCallParameters(
             address(foundation),
             ethAmount,
             abi.encodeWithSelector(
                 IFoundation.buyV2.selector,
-                nft.token, nft.identifier, ethAmount, address(0)
+                nft.token,
+                nft.identifier,
+                ethAmount,
+                address(0)
             )
         );
     }
-    
+
     function getPayload_BuyOfferedERC721WithEtherOneFeeRecipient(
         TestOrderContext calldata context,
         TestItem721 memory nft,
@@ -55,21 +63,29 @@ contract FoundationConfig is BaseMarketConfig {
         address feeRecipient,
         uint256 feeEthAmount
     ) external view override returns (TestOrderPayload memory execution) {
-        if(!context.listOnChain) {
+        if (!context.listOnChain) {
             _notImplemented();
         }
 
         execution.submitOrder = TestCallParameters(
             address(foundation),
             0,
-            abi.encodeWithSelector(IFoundation.setBuyPrice.selector, nft.token, nft.identifier, priceEthAmount)
+            abi.encodeWithSelector(
+                IFoundation.setBuyPrice.selector,
+                nft.token,
+                nft.identifier,
+                priceEthAmount
+            )
         );
         execution.executeOrder = TestCallParameters(
             address(foundation),
             priceEthAmount,
             abi.encodeWithSelector(
                 IFoundation.buyV2.selector,
-                nft.token, nft.identifier, priceEthAmount, feeRecipient
+                nft.token,
+                nft.identifier,
+                priceEthAmount,
+                feeRecipient
             )
         );
     }
@@ -83,7 +99,7 @@ contract FoundationConfig is BaseMarketConfig {
         address feeRecipient2,
         uint256 feeEthAmount2
     ) external view override returns (TestOrderPayload memory execution) {
-        if(!context.listOnChain) {
+        if (!context.listOnChain) {
             _notImplemented();
         }
 
