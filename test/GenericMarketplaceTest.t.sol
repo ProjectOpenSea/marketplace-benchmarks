@@ -736,7 +736,8 @@ contract GenericMarketplaceTest is BaseOrderTest {
                 payload.submitOrder
             );
 
-            assertEq(test721_1.ownerOf(1), alice);
+            // Allow the market to escrow after listing
+            assert(test721_1.ownerOf(1) == alice || test721_1.ownerOf(1) == config.market());
             assertEq(feeReciever1.balance, 0);
             assertEq(feeReciever2.balance, 0);
 
