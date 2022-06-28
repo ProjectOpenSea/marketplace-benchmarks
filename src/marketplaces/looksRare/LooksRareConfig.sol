@@ -16,6 +16,8 @@ contract LooksRareConfig is BaseMarketConfig, LooksRareTypeHashes {
         return address(looksRare);
     }
 
+    address internal constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    
     ILooksRareExchange internal constant looksRare =
         ILooksRareExchange(0x59728544B08AB483533076417FbBB2fD0B17CE3a);
     address internal constant looksRareOwner =
@@ -24,51 +26,14 @@ contract LooksRareConfig is BaseMarketConfig, LooksRareTypeHashes {
     address internal constant fixedPriceStrategy =
         0x56244Bb70CbD3EA9Dc8007399F61dFC065190031;
 
-    address internal constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-
-    address internal constant currencyManagerOwner =
-        0xAa27e4FCCcBF24B1f745cf5b2ECee018E91a5e5e;
     ICurrencyManager internal constant currencyManager =
         ICurrencyManager(0xC881ADdf409eE2C4b6bBc8B607c2C5CAFaB93d25);
+        address internal constant currencyManagerOwner =
+        0xAa27e4FCCcBF24B1f745cf5b2ECee018E91a5e5e;
 
-    function beforeAllPrepareMarketplace(address, address) external override {
-        buyerNftApprovalTarget = sellerNftApprovalTarget = 0xf42aa99F011A1fA7CDA90E5E98b277E306BcA83e; // ERC721 transfer manager
-        buyerErc1155ApprovalTarget = sellerErc1155ApprovalTarget = 0xFED24eC7E22f573c2e08AEF55aA6797Ca2b3A051; // ERC1155 transfer manager
-        buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(
-            looksRare
-        );
-    }
-
-    function beforeAllPrepareMarketplaceCall(
-        address,
-        address,
-        address[] calldata erc20Tokens
-    ) external pure override returns (SetupCall[] memory) {
-        SetupCall[] memory setupCalls = new SetupCall[](erc20Tokens.length + 1);
-        for (uint256 i = 0; i < erc20Tokens.length; i++) {
-            // Whitelist necessary ERC-20 tokens
-            setupCalls[i] = SetupCall(
-                currencyManagerOwner,
-                address(currencyManager),
-                abi.encodeWithSelector(
-                    ICurrencyManager.addCurrency.selector,
-                    erc20Tokens[i]
-                )
-            );
-        }
-
-        // Remove protocol fee
-        setupCalls[erc20Tokens.length] = SetupCall(
-            looksRareOwner,
-            address(looksRare),
-            abi.encodeWithSelector(
-                ILooksRareExchange.updateProtocolFeeRecipient.selector,
-                address(0)
-            )
-        );
-
-        return setupCalls;
-    }
+    /*//////////////////////////////////////////////////////////////
+                            Generic Helpers
+    //////////////////////////////////////////////////////////////*/
 
     function buildMakerOrder(
         bool isOrderAsk,
@@ -120,6 +85,53 @@ contract LooksRareConfig is BaseMarketConfig, LooksRareTypeHashes {
                 ""
             );
     }
+
+    /*//////////////////////////////////////////////////////////////
+                            Setup
+    //////////////////////////////////////////////////////////////*/
+
+    function beforeAllPrepareMarketplace(address, address) external override {
+        buyerNftApprovalTarget = sellerNftApprovalTarget = 0xf42aa99F011A1fA7CDA90E5E98b277E306BcA83e; // ERC721 transfer manager
+        buyerErc1155ApprovalTarget = sellerErc1155ApprovalTarget = 0xFED24eC7E22f573c2e08AEF55aA6797Ca2b3A051; // ERC1155 transfer manager
+        buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(
+            looksRare
+        );
+    }
+
+    function beforeAllPrepareMarketplaceCall(
+        address,
+        address,
+        address[] calldata erc20Tokens
+    ) external pure override returns (SetupCall[] memory) {
+        SetupCall[] memory setupCalls = new SetupCall[](erc20Tokens.length + 1);
+        for (uint256 i = 0; i < erc20Tokens.length; i++) {
+            // Whitelist necessary ERC-20 tokens
+            setupCalls[i] = SetupCall(
+                currencyManagerOwner,
+                address(currencyManager),
+                abi.encodeWithSelector(
+                    ICurrencyManager.addCurrency.selector,
+                    erc20Tokens[i]
+                )
+            );
+        }
+
+        // Remove protocol fee
+        setupCalls[erc20Tokens.length] = SetupCall(
+            looksRareOwner,
+            address(looksRare),
+            abi.encodeWithSelector(
+                ILooksRareExchange.updateProtocolFeeRecipient.selector,
+                address(0)
+            )
+        );
+
+        return setupCalls;
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                        Test Payload Calls
+    //////////////////////////////////////////////////////////////*/
 
     function getPayload_BuyOfferedERC721WithEther(
         TestOrderContext calldata context,
