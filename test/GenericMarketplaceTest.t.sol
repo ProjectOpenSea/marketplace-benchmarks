@@ -5,6 +5,7 @@ import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
 import { SeaportConfig } from "../src/marketplaces/seaport/SeaportConfig.sol";
 import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
 import { X2Y2Config } from "../src/marketplaces/X2Y2/X2Y2Config.sol";
+import { LooksRareConfig } from "../src/marketplaces/looksRare/LooksRareConfig.sol";
 import { BaseMarketConfig } from "../src/BaseMarketConfig.sol";
 
 import { SetupCall, TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "../src/Types.sol";
@@ -19,12 +20,14 @@ contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig wyvernConfig;
     BaseMarketConfig foundationConfig;
     BaseMarketConfig x2y2Config;
+    BaseMarketConfig looksRareConfig;
 
     constructor() {
         seaportConfig = BaseMarketConfig(new SeaportConfig());
         wyvernConfig = BaseMarketConfig(new WyvernConfig());
         foundationConfig = BaseMarketConfig(new FoundationConfig());
         x2y2Config = BaseMarketConfig(new X2Y2Config());
+        looksRareConfig = BaseMarketConfig(new LooksRareConfig());
     }
 
     function testSeaport() external {
@@ -41,6 +44,10 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
     function testX2Y2() external {
         benchmarkMarket(x2y2Config);
+    }
+
+    function testLooksRare() external {
+        benchmarkMarket(looksRareConfig);
     }
 
     function benchmarkMarket(BaseMarketConfig config) public {
@@ -74,7 +81,8 @@ contract GenericMarketplaceTest is BaseOrderTest {
         // Get requested call from marketplace. Needed by Wyvern to deploy proxy
         SetupCall[] memory setupCalls = config.beforeAllPrepareMarketplaceCall(
             alice,
-            bob
+            bob,
+            erc20Addresses
         );
         for (uint256 i = 0; i < setupCalls.length; i++) {
             hevm.startPrank(setupCalls[i].sender);
@@ -951,17 +959,20 @@ contract GenericMarketplaceTest is BaseOrderTest {
         _setApprovals(
             alice,
             config.sellerErc20ApprovalTarget(),
-            config.sellerNftApprovalTarget()
+            config.sellerNftApprovalTarget(),
+            config.sellerErc1155ApprovalTarget()
         );
         _setApprovals(
             cal,
             config.sellerErc20ApprovalTarget(),
-            config.sellerNftApprovalTarget()
+            config.sellerNftApprovalTarget(),
+            config.sellerErc1155ApprovalTarget()
         );
         _setApprovals(
             bob,
             config.buyerErc20ApprovalTarget(),
-            config.buyerNftApprovalTarget()
+            config.buyerNftApprovalTarget(),
+            config.buyerErc1155ApprovalTarget()
         );
         _;
     }

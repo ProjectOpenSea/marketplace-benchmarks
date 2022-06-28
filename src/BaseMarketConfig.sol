@@ -19,6 +19,13 @@ abstract contract BaseMarketConfig {
     address public buyerNftApprovalTarget;
 
     /**
+     * @dev Address that should be approved for ERC1155 tokens. Only set if
+     *   different than ERC721 which is defined above. Set during `beforeAllPrepareMarketplace`.
+     */
+    address public sellerErc1155ApprovalTarget;
+    address public buyerErc1155ApprovalTarget;
+
+    /**
      * @dev Address that should be approved for erc20 tokens.
      *   Should be set during `beforeAllPrepareMarketplace`.
      */
@@ -32,11 +39,11 @@ abstract contract BaseMarketConfig {
      * @param buyer The buyer address used for testing the marketplace
      * @return From address, to address, and calldata
      */
-    function beforeAllPrepareMarketplaceCall(address seller, address buyer)
-        external
-        virtual
-        returns (SetupCall[] memory)
-    {
+    function beforeAllPrepareMarketplaceCall(
+        address seller,
+        address buyer,
+        address[] calldata erc20Tokens
+    ) external virtual returns (SetupCall[] memory) {
         SetupCall[] memory empty = new SetupCall[](0);
         return empty;
     }
