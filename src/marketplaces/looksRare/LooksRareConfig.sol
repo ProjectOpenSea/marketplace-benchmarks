@@ -17,7 +17,7 @@ contract LooksRareConfig is BaseMarketConfig, LooksRareTypeHashes {
     }
 
     address internal constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-    
+
     ILooksRareExchange internal constant looksRare =
         ILooksRareExchange(0x59728544B08AB483533076417FbBB2fD0B17CE3a);
     address internal constant looksRareOwner =
@@ -28,7 +28,7 @@ contract LooksRareConfig is BaseMarketConfig, LooksRareTypeHashes {
 
     ICurrencyManager internal constant currencyManager =
         ICurrencyManager(0xC881ADdf409eE2C4b6bBc8B607c2C5CAFaB93d25);
-        address internal constant currencyManagerOwner =
+    address internal constant currencyManagerOwner =
         0xAa27e4FCCcBF24B1f745cf5b2ECee018E91a5e5e;
 
     /*//////////////////////////////////////////////////////////////

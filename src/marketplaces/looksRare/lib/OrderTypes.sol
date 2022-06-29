@@ -7,7 +7,8 @@ pragma solidity ^0.8.0;
  */
 library OrderTypes {
     // keccak256("MakerOrder(bool isOrderAsk,address signer,address collection,uint256 price,uint256 tokenId,uint256 amount,address strategy,address currency,uint256 nonce,uint256 startTime,uint256 endTime,uint256 minPercentageToAsk,bytes params)")
-    bytes32 internal constant MAKER_ORDER_HASH = 0x40261ade532fa1d2c7293df30aaadb9b3c616fae525a0b56d3d411c841a85028;
+    bytes32 internal constant MAKER_ORDER_HASH =
+        0x40261ade532fa1d2c7293df30aaadb9b3c616fae525a0b56d3d411c841a85028;
 
     struct MakerOrder {
         bool isOrderAsk; // true --> ask / false --> bid
@@ -37,7 +38,11 @@ library OrderTypes {
         bytes params; // other params (e.g., tokenId)
     }
 
-    function hash(MakerOrder memory makerOrder) internal pure returns (bytes32) {
+    function hash(MakerOrder memory makerOrder)
+        internal
+        pure
+        returns (bytes32)
+    {
         return
             keccak256(
                 abi.encode(
