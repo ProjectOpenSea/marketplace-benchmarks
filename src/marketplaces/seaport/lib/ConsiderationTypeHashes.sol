@@ -21,11 +21,10 @@ contract ConsiderationTypeHashes {
     bytes32 internal immutable _CONSIDERATION_ITEM_TYPEHASH;
     bytes32 internal immutable _ORDER_TYPEHASH;
     bytes32 internal immutable _DOMAIN_SEPARATOR;
-    address internal constant seaportAddress = address(
-        0x00000000006c3852cbEf3e08E8dF289169EdE581
-    );
+    address internal constant seaportAddress =
+        address(0x00000000006c3852cbEf3e08E8dF289169EdE581);
 
-    constructor () {
+    constructor() {
         // Derive hash of the name of the contract.
         _NAME_HASH = keccak256(bytes("Seaport"));
 
@@ -34,11 +33,11 @@ contract ConsiderationTypeHashes {
 
         bytes memory offerItemTypeString = abi.encodePacked(
             "OfferItem(",
-                "uint8 itemType,",
-                "address token,",
-                "uint256 identifierOrCriteria,",
-                "uint256 startAmount,",
-                "uint256 endAmount",
+            "uint8 itemType,",
+            "address token,",
+            "uint256 identifierOrCriteria,",
+            "uint256 startAmount,",
+            "uint256 endAmount",
             ")"
         );
 
@@ -76,7 +75,9 @@ contract ConsiderationTypeHashes {
         bytes32 offerItemTypehash = keccak256(offerItemTypeString);
 
         // Derive ConsiderationItem type hash using corresponding type string.
-        bytes32 considerationItemTypehash = keccak256(considerationItemTypeString);
+        bytes32 considerationItemTypehash = keccak256(
+            considerationItemTypeString
+        );
 
         // Construct the primary EIP-712 domain type string.
         // prettier-ignore
@@ -160,7 +161,7 @@ contract ConsiderationTypeHashes {
         }
     }
 
-        /**
+    /**
      * @dev Internal view function to derive the EIP-712 hash for an offer item.
      *
      * @param offerItem The offered item to hash.
