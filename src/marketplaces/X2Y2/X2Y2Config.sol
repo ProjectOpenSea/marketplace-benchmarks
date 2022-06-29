@@ -166,7 +166,7 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
         orders[0].signVersion = Market.SIGN_V1;
 
         input.orders = orders;
-        
+
         Market.SettleDetail[] memory details = new Market.SettleDetail[](1);
         details[0].op = intent == Market.INTENT_SELL
             ? Market.Op.COMPLETE_SELL_OFFER
