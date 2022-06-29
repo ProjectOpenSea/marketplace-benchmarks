@@ -83,7 +83,8 @@ contract GenericMarketplaceTest is BaseOrderTest {
         SetupCall[] memory setupCalls = config.beforeAllPrepareMarketplaceCall(
             alice,
             bob,
-            erc20Addresses
+            erc20Addresses,
+            erc721Addresses
         );
         for (uint256 i = 0; i < setupCalls.length; i++) {
             hevm.startPrank(setupCalls[i].sender);

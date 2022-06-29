@@ -42,7 +42,8 @@ abstract contract BaseMarketConfig {
     function beforeAllPrepareMarketplaceCall(
         address seller,
         address buyer,
-        address[] calldata erc20Tokens
+        address[] calldata erc20Tokens,
+        address[] calldata erc721Tokens
     ) external virtual returns (SetupCall[] memory) {
         SetupCall[] memory empty = new SetupCall[](0);
         return empty;

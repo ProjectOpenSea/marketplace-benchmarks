@@ -101,7 +101,8 @@ contract LooksRareConfig is BaseMarketConfig, LooksRareTypeHashes {
     function beforeAllPrepareMarketplaceCall(
         address,
         address,
-        address[] calldata erc20Tokens
+        address[] calldata erc20Tokens,
+        address[] calldata
     ) external pure override returns (SetupCall[] memory) {
         SetupCall[] memory setupCalls = new SetupCall[](erc20Tokens.length + 1);
         for (uint256 i = 0; i < erc20Tokens.length; i++) {

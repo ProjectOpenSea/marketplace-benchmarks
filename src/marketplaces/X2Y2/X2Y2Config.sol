@@ -34,6 +34,7 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
     function beforeAllPrepareMarketplaceCall(
         address seller,
         address,
+        address[] calldata,
         address[] calldata
     ) external override returns (SetupCall[] memory) {
         SetupCall[] memory setupCalls = new SetupCall[](1);
@@ -42,7 +43,7 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
         address[] memory addSigners = new address[](1);
         addSigners[0] = seller;
 
-        // Set seller as a signer for D2Y2
+        // Set seller as a signer for X2Y2
         setupCalls[0] = SetupCall(
             X2Y2Owner,
             address(X2Y2),
