@@ -76,6 +76,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmark_BuyTenOfferedERC721WithEther(config);
         benchmark_BuyTenOfferedERC721WithEtherDistinctOrders(config);
         benchmark_BuyTenOfferedERC721WithErc20DistinctOrders(config);
+        benchmark_MatchOrders_ABCA(config);
     }
 
     function beforeAllPrepareMarketplaceTest(BaseMarketConfig config) internal {
@@ -980,6 +981,49 @@ contract GenericMarketplaceTest is BaseOrderTest {
                 assertEq(test721_1.ownerOf(i), bob);
             }
             assertEq(token1.balanceOf(alice), 1045);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_MatchOrders_ABCA(BaseMarketConfig config)
+        internal
+        prepareTest(config)
+    {
+        string memory testLabel = "(ERC721 A -> B -> C -> A)";
+
+        test721_1.mint(alice, 1);
+        test721_1.mint(cal, 2);
+        test721_1.mint(bob, 3);
+
+        TestOrderContext[] memory contexts = new TestOrderContext[](3);
+        TestItem721[] memory nfts = new TestItem721[](3);
+
+        contexts[0] = TestOrderContext(false, alice, address(0));
+        contexts[1] = TestOrderContext(false, cal, address(0));
+        contexts[2] = TestOrderContext(false, bob, address(0));
+
+        nfts[0] = TestItem721(address(test721_1), 1);
+        nfts[1] = TestItem721(address(test721_1), 2);
+        nfts[2] = TestItem721(address(test721_1), 3);
+
+        try config.getPayload_MatchOrders_ABCA(contexts, nfts) returns (
+            TestOrderPayload memory payload
+        ) {
+            assertEq(test721_1.ownerOf(1), alice);
+            assertEq(test721_1.ownerOf(2), cal);
+            assertEq(test721_1.ownerOf(3), bob);
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill /w Sigs")),
+                bob,
+                payload.executeOrder
+            );
+
+            assertEq(test721_1.ownerOf(1), bob);
+            assertEq(test721_1.ownerOf(2), alice);
+            assertEq(test721_1.ownerOf(3), cal);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }

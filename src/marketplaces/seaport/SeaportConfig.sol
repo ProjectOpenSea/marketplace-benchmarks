@@ -905,4 +905,79 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             )
         );
     }
+
+    function getPayload_MatchOrders_ABCA(
+        TestOrderContext[] calldata contexts,
+        TestItem721[] calldata nfts
+    ) external view override returns (TestOrderPayload memory execution) {
+        require(contexts.length == nfts.length, "invalid input");
+
+        Order[] memory orders = new Order[](contexts.length);
+        Fulfillment[] memory fullfillments = new Fulfillment[](nfts.length);
+
+        for (uint256 i = 0; i < nfts.length; i++) {
+            uint256 wrappedIndex = i + 1 == nfts.length ? 0 : i + 1; // wrap around back to 0
+            {
+                OfferItem[] memory offerItems = new OfferItem[](1);
+                offerItems[0] = OfferItem(
+                    ItemType.ERC721,
+                    nfts[i].token,
+                    nfts[i].identifier,
+                    1,
+                    1
+                );
+
+                ConsiderationItem[]
+                    memory considerationItems = new ConsiderationItem[](1);
+                considerationItems[0] = ConsiderationItem(
+                    ItemType.ERC721,
+                    nfts[wrappedIndex].token,
+                    nfts[wrappedIndex].identifier,
+                    1,
+                    1,
+                    payable(contexts[i].offerer)
+                );
+                orders[i] = buildOrder(
+                    contexts[i].offerer,
+                    offerItems,
+                    considerationItems
+                );
+            }
+            // Set fulfillment
+            {
+                FulfillmentComponent
+                    memory nftConsiderationComponent = FulfillmentComponent(
+                        i,
+                        0
+                    );
+                FulfillmentComponent
+                    memory nftOfferComponent = FulfillmentComponent(
+                        wrappedIndex,
+                        0
+                    );
+                FulfillmentComponent[]
+                    memory nftOfferComponents = new FulfillmentComponent[](1);
+                nftOfferComponents[0] = nftOfferComponent;
+                FulfillmentComponent[]
+                    memory nftConsiderationComponents = new FulfillmentComponent[](
+                        1
+                    );
+                nftConsiderationComponents[0] = nftConsiderationComponent;
+                fullfillments[i] = Fulfillment(
+                    nftOfferComponents,
+                    nftConsiderationComponents
+                );
+            }
+        }
+
+        execution.executeOrder = TestCallParameters(
+            address(seaport),
+            0,
+            abi.encodeWithSelector(
+                ISeaport.matchOrders.selector,
+                orders,
+                fullfillments
+            )
+        );
+    }
 }
