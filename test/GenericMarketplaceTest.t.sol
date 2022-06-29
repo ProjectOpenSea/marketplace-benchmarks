@@ -990,7 +990,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         internal
         prepareTest(config)
     {
-        string memory testLabel = "(A -> B -> C -> A)";
+        string memory testLabel = "(ERC721 A -> B -> C -> A)";
 
         test721_1.mint(alice, 1);
         test721_1.mint(cal, 2);
