@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import { IX2Y2Marketplace } from "./interfaces/IX2Y2Marketplace.sol";

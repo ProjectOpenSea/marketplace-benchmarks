@@ -236,7 +236,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         address maker,
         address taker,
         TestItem721[] memory nfts
-    ) internal view returns (bytes memory) {
+    ) internal pure returns (bytes memory) {
         address[] memory targets = new address[](nfts.length);
         uint256[] memory values = new uint256[](nfts.length);
         bytes[] memory calldatas = new bytes[](nfts.length);
