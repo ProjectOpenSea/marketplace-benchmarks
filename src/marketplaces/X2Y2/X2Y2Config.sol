@@ -31,11 +31,11 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
         buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(X2Y2);
     }
 
-    function beforeAllPrepareMarketplaceCall(address seller, address)
-        external
-        override
-        returns (SetupCall[] memory)
-    {
+    function beforeAllPrepareMarketplaceCall(
+        address seller,
+        address,
+        address[] calldata
+    ) external override returns (SetupCall[] memory) {
         SetupCall[] memory setupCalls = new SetupCall[](1);
 
         address[] memory removeSigners = new address[](0);

@@ -37,6 +37,7 @@ contract BaseOrderTest is DSTestPlus {
 
     address[] allTokens;
     TestERC20[] erc20s;
+    address[] erc20Addresses;
     TestERC721[] erc721s;
     TestERC1155[] erc1155s;
     address[] accounts;
@@ -72,6 +73,7 @@ contract BaseOrderTest is DSTestPlus {
         _deployTestTokenContracts();
         accounts = [alice, bob, cal, address(this)];
         erc20s = [token1, token2, token3];
+        erc20Addresses = [address(token1), address(token2), address(token3)];
         erc721s = [test721_1, test721_2, test721_3];
         erc1155s = [test1155_1, test1155_2, test1155_3];
         allTokens = [
@@ -110,17 +112,21 @@ contract BaseOrderTest is DSTestPlus {
     function _setApprovals(
         address _owner,
         address _erc20Target,
-        address _nftTarget
+        address _erc721Target,
+        address _erc1155Target
     ) internal {
         hevm.startPrank(_owner);
         for (uint256 i = 0; i < erc20s.length; i++) {
             erc20s[i].approve(_erc20Target, MAX_INT);
         }
         for (uint256 i = 0; i < erc721s.length; i++) {
-            erc721s[i].setApprovalForAll(_nftTarget, true);
+            erc721s[i].setApprovalForAll(_erc721Target, true);
         }
         for (uint256 i = 0; i < erc1155s.length; i++) {
-            erc1155s[i].setApprovalForAll(_nftTarget, true);
+            erc1155s[i].setApprovalForAll(
+                _erc1155Target != address(0) ? _erc1155Target : _erc721Target,
+                true
+            );
         }
 
         hevm.stopPrank();
