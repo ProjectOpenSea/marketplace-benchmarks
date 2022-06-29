@@ -22,13 +22,13 @@ struct Order {
     /* Order taker address, if specified. */
     address taker;
     /* Maker relayer fee of the order, unused for taker order. */
-    uint makerRelayerFee;
+    uint256 makerRelayerFee;
     /* Taker relayer fee of the order, or maximum taker fee for a taker order. */
-    uint takerRelayerFee;
+    uint256 takerRelayerFee;
     /* Maker protocol fee of the order, unused for taker order. */
-    uint makerProtocolFee;
+    uint256 makerProtocolFee;
     /* Taker protocol fee of the order, or maximum taker fee for a taker order. */
-    uint takerProtocolFee;
+    uint256 takerProtocolFee;
     /* Order fee recipient or zero address for taker order. */
     address feeRecipient;
     /* Fee method (protocol token or split fee). */
@@ -52,14 +52,14 @@ struct Order {
     /* Token used to pay for the order, or the zero-address as a sentinel value for Ether. */
     address paymentToken;
     /* Base price of the order (in paymentTokens). */
-    uint basePrice;
+    uint256 basePrice;
     /* Auction extra parameter - minimum bid increment for English auctions, starting/ending price difference. */
-    uint extra;
+    uint256 extra;
     /* Listing timestamp. */
-    uint listingTime;
+    uint256 listingTime;
     /* Expiration timestamp - 0 for no expiry. */
-    uint expirationTime;
+    uint256 expirationTime;
     /* Order salt, used to prevent duplicate hashes. */
-    uint salt;
+    uint256 salt;
     /* NOTE: uint counter is an additional component of the order but is read from storage */
 }

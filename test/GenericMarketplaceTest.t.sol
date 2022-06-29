@@ -4,6 +4,7 @@ pragma solidity 0.8.14;
 import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
 import { SeaportConfig } from "../src/marketplaces/seaport/SeaportConfig.sol";
 import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
+import { X2Y2Config } from "../src/marketplaces/X2Y2/X2Y2Config.sol";
 import { BaseMarketConfig } from "../src/BaseMarketConfig.sol";
 
 import { SetupCall, TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "../src/Types.sol";
@@ -17,11 +18,13 @@ contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig seaportConfig;
     BaseMarketConfig wyvernConfig;
     BaseMarketConfig foundationConfig;
+    BaseMarketConfig x2y2Config;
 
     constructor() {
         seaportConfig = BaseMarketConfig(new SeaportConfig());
         wyvernConfig = BaseMarketConfig(new WyvernConfig());
         foundationConfig = BaseMarketConfig(new FoundationConfig());
+        x2y2Config = BaseMarketConfig(new X2Y2Config());
     }
 
     function testSeaport() external {
@@ -34,6 +37,10 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
     function testFoundation() external {
         benchmarkMarket(foundationConfig);
+    }
+
+    function testX2Y2() external {
+        benchmarkMarket(x2y2Config);
     }
 
     function benchmarkMarket(BaseMarketConfig config) public {

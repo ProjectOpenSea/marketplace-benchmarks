@@ -12,16 +12,20 @@ uint256 constant EIP_712_PREFIX = (
     0x1901000000000000000000000000000000000000000000000000000000000000
 );
 
-
 contract WyvernTypeHashes {
-    bytes32 internal constant _NAME_HASH = 0x9a2ed463836165738cfa54208ff6e7847fd08cbaac309aac057086cb0a144d13;
-    bytes32 internal constant _VERSION_HASH = 0xe2fd538c762ee69cab09ccd70e2438075b7004dd87577dc3937e9fcc8174bb64;
-    bytes32 internal constant _EIP_712_DOMAIN_TYPEHASH = 0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f;
-    bytes32 internal constant _ORDER_TYPEHASH = 0xdba08a88a748f356e8faf8578488343eab21b1741728779c9dcfdc782bc800f8;
+    bytes32 internal constant _NAME_HASH =
+        0x9a2ed463836165738cfa54208ff6e7847fd08cbaac309aac057086cb0a144d13;
+    bytes32 internal constant _VERSION_HASH =
+        0xe2fd538c762ee69cab09ccd70e2438075b7004dd87577dc3937e9fcc8174bb64;
+    bytes32 internal constant _EIP_712_DOMAIN_TYPEHASH =
+        0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f;
+    bytes32 internal constant _ORDER_TYPEHASH =
+        0xdba08a88a748f356e8faf8578488343eab21b1741728779c9dcfdc782bc800f8;
     bytes32 internal immutable _DOMAIN_SEPARATOR;
-    address internal constant wyvernAddress = 0x7f268357A8c2552623316e2562D90e642bB538E5;
+    address internal constant wyvernAddress =
+        0x7f268357A8c2552623316e2562D90e642bB538E5;
 
-    constructor () {
+    constructor() {
         _DOMAIN_SEPARATOR = _deriveDomainSeparator();
     }
 
@@ -30,15 +34,16 @@ contract WyvernTypeHashes {
      * @return The domain separator.
      */
     function _deriveDomainSeparator() internal pure returns (bytes32) {
-        return keccak256(
-            abi.encode(
-                _EIP_712_DOMAIN_TYPEHASH, 
-                _NAME_HASH, 
-                _VERSION_HASH, 
-                1,
-                wyvernAddress
-            )
-        );
+        return
+            keccak256(
+                abi.encode(
+                    _EIP_712_DOMAIN_TYPEHASH,
+                    _NAME_HASH,
+                    _VERSION_HASH,
+                    1,
+                    wyvernAddress
+                )
+            );
     }
 
     function _deriveEIP712Digest(bytes32 orderHash)
@@ -69,15 +74,15 @@ contract WyvernTypeHashes {
         }
     }
 
-    function hashOrder(Order memory order, uint counter)
+    function hashOrder(Order memory order, uint256 counter)
         internal
         pure
         returns (bytes32 hash)
     {
         /* Unfortunately abi.encodePacked doesn't work here, stack size constraints. */
-        uint size = 800;
+        uint256 size = 800;
         bytes memory array = new bytes(size);
-        uint index;
+        uint256 index;
         assembly {
             index := add(array, 0x20)
         }
@@ -95,10 +100,19 @@ contract WyvernTypeHashes {
         index = ArrayUtils.unsafeWriteUint8Word(index, uint8(order.saleKind));
         index = ArrayUtils.unsafeWriteAddressWord(index, order.target);
         index = ArrayUtils.unsafeWriteUint8Word(index, uint8(order.howToCall));
-        index = ArrayUtils.unsafeWriteBytes32(index, keccak256(order._calldata));
-        index = ArrayUtils.unsafeWriteBytes32(index, keccak256(order.replacementPattern));
+        index = ArrayUtils.unsafeWriteBytes32(
+            index,
+            keccak256(order._calldata)
+        );
+        index = ArrayUtils.unsafeWriteBytes32(
+            index,
+            keccak256(order.replacementPattern)
+        );
         index = ArrayUtils.unsafeWriteAddressWord(index, order.staticTarget);
-        index = ArrayUtils.unsafeWriteBytes32(index, keccak256(order.staticExtradata));
+        index = ArrayUtils.unsafeWriteBytes32(
+            index,
+            keccak256(order.staticExtradata)
+        );
         index = ArrayUtils.unsafeWriteAddressWord(index, order.paymentToken);
         index = ArrayUtils.unsafeWriteUint(index, order.basePrice);
         index = ArrayUtils.unsafeWriteUint(index, order.extra);
@@ -111,6 +125,4 @@ contract WyvernTypeHashes {
         }
         return hash;
     }
-
-
 }
