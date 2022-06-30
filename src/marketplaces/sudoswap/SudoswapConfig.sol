@@ -43,13 +43,24 @@ contract SudoswapConfig is BaseMarketConfig {
 
     function beforeAllPrepareMarketplaceCall(
         address seller,
-        address buyer,
+        address,
         address[] calldata erc20Addresses,
         address[] calldata erc721Addresses
-    ) external override returns (SetupCall[] memory) {
+    ) external override returns (SetupCall[] memory setupCalls) {
         // record tokens
         erc20Address = erc20Addresses[0];
         erc721Address = erc721Addresses[0];
+
+        // set protocol fee to zero
+        setupCalls = new SetupCall[](1);
+        setupCalls[0] = SetupCall({
+            sender: PAIR_FACTORY.owner(),
+            target: address(PAIR_FACTORY),
+            data: abi.encodeWithSelector(
+                IPairFactory.changeProtocolFeeMultiplier.selector,
+                0
+            )
+        });
 
         // deploy pools
         uint256[] memory empty;

@@ -36,4 +36,9 @@ interface IPairFactory {
     function createPairERC20(CreateERC20PairParams calldata params)
         external
         returns (IPair pair);
+
+    function owner() external view returns (address);
+
+    function changeProtocolFeeMultiplier(uint256 _protocolFeeMultiplier)
+        external;
 }
