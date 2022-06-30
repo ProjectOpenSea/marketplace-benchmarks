@@ -6,6 +6,7 @@ import { SeaportConfig } from "../src/marketplaces/seaport/SeaportConfig.sol";
 import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
 import { X2Y2Config } from "../src/marketplaces/X2Y2/X2Y2Config.sol";
 import { LooksRareConfig } from "../src/marketplaces/looksRare/LooksRareConfig.sol";
+import { SudoswapConfig } from "../src/marketplaces/sudoswap/SudoswapConfig.sol";
 import { BaseMarketConfig } from "../src/BaseMarketConfig.sol";
 
 import { SetupCall, TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "../src/Types.sol";
@@ -21,6 +22,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig foundationConfig;
     BaseMarketConfig x2y2Config;
     BaseMarketConfig looksRareConfig;
+    BaseMarketConfig sudoswapConfig;
 
     constructor() {
         seaportConfig = BaseMarketConfig(new SeaportConfig());
@@ -28,6 +30,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         foundationConfig = BaseMarketConfig(new FoundationConfig());
         x2y2Config = BaseMarketConfig(new X2Y2Config());
         looksRareConfig = BaseMarketConfig(new LooksRareConfig());
+        sudoswapConfig = BaseMarketConfig(new SudoswapConfig());
     }
 
     function testSeaport() external {
@@ -48,6 +51,10 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
     function testLooksRare() external {
         benchmarkMarket(looksRareConfig);
+    }
+
+    function testSudoswap() external {
+        benchmarkMarket(sudoswapConfig);
     }
 
     function benchmarkMarket(BaseMarketConfig config) public {
@@ -250,7 +257,11 @@ contract GenericMarketplaceTest is BaseOrderTest {
                 payload.submitOrder
             );
 
-            assertEq(test721_1.ownerOf(1), alice);
+            // Allow the market to escrow after listing
+            assert(
+                test721_1.ownerOf(1) == alice ||
+                    test721_1.ownerOf(1) == config.market()
+            );
             assertEq(token1.balanceOf(alice), 0);
             assertEq(token1.balanceOf(bob), 100);
 
@@ -395,7 +406,11 @@ contract GenericMarketplaceTest is BaseOrderTest {
             );
 
             assertEq(test721_1.ownerOf(1), bob);
-            assertEq(token1.balanceOf(alice), 100);
+            // Allow the market to escrow after listing
+            assert(
+                token1.balanceOf(alice) == 100 ||
+                    token1.balanceOf(config.market()) == 100
+            );
             assertEq(token1.balanceOf(bob), 0);
 
             _benchmarkCallWithParams(

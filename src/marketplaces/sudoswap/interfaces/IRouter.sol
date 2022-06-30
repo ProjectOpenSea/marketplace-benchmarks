@@ -25,5 +25,5 @@ interface IRouter {
         uint256 minOutput,
         address tokenRecipient,
         uint256 deadline
-    ) external returns (uint256 outputAmount)
+    ) external returns (uint256 outputAmount);
 }

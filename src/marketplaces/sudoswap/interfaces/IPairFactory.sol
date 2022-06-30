@@ -2,7 +2,7 @@ pragma solidity ^0.8.0;
 
 import { IPair } from "./IPair.sol";
 
-interface IPairFactoryLike {
+interface IPairFactory {
     enum PoolType {
         TOKEN,
         NFT,

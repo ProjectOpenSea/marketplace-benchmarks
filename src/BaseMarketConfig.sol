@@ -9,7 +9,7 @@ abstract contract BaseMarketConfig {
      */
     function name() external pure virtual returns (string memory);
 
-    function market() public pure virtual returns (address);
+    function market() public view virtual returns (address);
 
     /**
      * @dev Address that should be approved for nft tokens
@@ -75,7 +75,7 @@ abstract contract BaseMarketConfig {
         TestOrderContext calldata context,
         TestItem721 calldata nft,
         uint256 ethAmount
-    ) external view virtual returns (TestOrderPayload memory execution) {
+    ) external virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
 
@@ -109,7 +109,7 @@ abstract contract BaseMarketConfig {
         TestOrderContext calldata context,
         TestItem721 calldata nft,
         TestItem20 calldata erc20
-    ) external view virtual returns (TestOrderPayload memory execution) {
+    ) external virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
 
@@ -143,7 +143,7 @@ abstract contract BaseMarketConfig {
         TestOrderContext calldata context,
         TestItem20 calldata erc20,
         TestItem721 calldata nft
-    ) external view virtual returns (TestOrderPayload memory execution) {
+    ) external virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
 
@@ -257,7 +257,7 @@ abstract contract BaseMarketConfig {
         TestOrderContext calldata context,
         TestItem721[] calldata nfts,
         uint256 ethAmount
-    ) external view virtual returns (TestOrderPayload memory execution) {
+    ) external virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
 
