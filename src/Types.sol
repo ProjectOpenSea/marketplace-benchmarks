@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.7;
 
-type TestItemETH is uint256;
-
 struct TestItem721 {
     address token;
     uint256 identifier;

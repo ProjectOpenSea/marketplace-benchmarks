@@ -81,7 +81,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients(config);
         benchmark_BuyTenOfferedERC721WithEther_ListOnChain(config);
         benchmark_BuyTenOfferedERC721WithEther(config);
-        benchmark_BuyTenOfferedERC721WithEtherDistinctOrders_ListOnChain(config);
+        benchmark_BuyTenOfferedERC721WithEtherDistinctOrders_ListOnChain(
+            config
+        );
         benchmark_BuyTenOfferedERC721WithEtherDistinctOrders(config);
         benchmark_BuyTenOfferedERC721WithErc20DistinctOrders(config);
         benchmark_MatchOrders_ABCA(config);
@@ -965,7 +967,8 @@ contract GenericMarketplaceTest is BaseOrderTest {
     function benchmark_BuyTenOfferedERC721WithEtherDistinctOrders_ListOnChain(
         BaseMarketConfig config
     ) internal prepareTest(config) {
-        string memory testLabel = "(ERC721x10 -> ETH Distinct Orders List-On-Chain)";
+        string
+            memory testLabel = "(ERC721x10 -> ETH Distinct Orders List-On-Chain)";
 
         TestOrderContext[] memory contexts = new TestOrderContext[](10);
         TestItem721[] memory nfts = new TestItem721[](10);
@@ -985,7 +988,6 @@ contract GenericMarketplaceTest is BaseOrderTest {
                 ethAmounts
             )
         returns (TestOrderPayload memory payload) {
-
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " List")),

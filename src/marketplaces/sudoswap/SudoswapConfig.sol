@@ -207,6 +207,7 @@ contract SudoswapConfig is BaseMarketConfig {
         // fulfiller calls router
         uint256[] memory nftIds = new uint256[](1);
         nftIds[0] = nft.identifier;
+
         IRouter.PairSwapSpecific[]
             memory swapList = new IRouter.PairSwapSpecific[](1);
         swapList[0] = IRouter.PairSwapSpecific({
@@ -257,6 +258,7 @@ contract SudoswapConfig is BaseMarketConfig {
         // fulfiller calls router
         uint256[] memory nftIds = new uint256[](1);
         nftIds[0] = nft.identifier;
+
         IRouter.PairSwapSpecific[]
             memory swapList = new IRouter.PairSwapSpecific[](1);
         swapList[0] = IRouter.PairSwapSpecific({
@@ -327,15 +329,14 @@ contract SudoswapConfig is BaseMarketConfig {
         TestItem721[] calldata nfts,
         uint256[] calldata ethAmounts
     ) external view override returns (TestOrderPayload memory execution) {
-
         if (!contexts[0].listOnChain) _notImplemented();
 
         address[] memory pools = new address[](nfts.length);
         uint256[] memory ids = new uint256[](nfts.length);
 
         for (uint256 i = 0; i < nfts.length; i++) {
-          pools[i] = address(ethNftPoolsForDistinct[i]);
-          ids[i] = nfts[i].identifier;
+            pools[i] = address(ethNftPoolsForDistinct[i]);
+            ids[i] = nfts[i].identifier;
         }
 
         execution.submitOrder = TestCallParameters({
@@ -351,21 +352,22 @@ contract SudoswapConfig is BaseMarketConfig {
 
         // construct executeOrder payload
         // fulfiller calls router
+
         IRouter.PairSwapSpecific[]
             memory swapList = new IRouter.PairSwapSpecific[](nfts.length);
 
         for (uint256 i = 0; i < nfts.length; i++) {
-          uint256[] memory singleId = new uint256[](1);
-          singleId[0] = nfts[i].identifier;
-          swapList[i] = IRouter.PairSwapSpecific({
-            pair: address(ethNftPoolsForDistinct[i]),
-            nftIds: singleId
-          });
+            uint256[] memory singleId = new uint256[](1);
+            singleId[0] = nfts[i].identifier;
+            swapList[i] = IRouter.PairSwapSpecific({
+                pair: address(ethNftPoolsForDistinct[i]),
+                nftIds: singleId
+            });
         }
 
         uint256 totalEthAmount = 0;
         for (uint256 i = 0; i < ethAmounts.length; i++) {
-          totalEthAmount += ethAmounts[i];
+            totalEthAmount += ethAmounts[i];
         }
 
         execution.executeOrder = TestCallParameters({

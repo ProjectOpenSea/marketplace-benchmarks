@@ -183,6 +183,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         for (uint256 i = 0; i < nfts.length; i++) {
             // Build offer orders
             OfferItem[] memory offerItems = new OfferItem[](1);
+
             ConsiderationItem[]
                 memory considerationItems = new ConsiderationItem[](1);
             {
@@ -225,16 +226,20 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             }
             {
                 // Add fulfillment components for each NFT
+
                 FulfillmentComponent
                     memory nftConsiderationComponent = FulfillmentComponent(
                         nfts.length,
                         i
                     );
+
                 FulfillmentComponent
                     memory nftOfferComponent = FulfillmentComponent(i, 0);
+
                 FulfillmentComponent[]
                     memory nftOfferComponents = new FulfillmentComponent[](1);
                 nftOfferComponents[0] = nftOfferComponent;
+
                 FulfillmentComponent[]
                     memory nftConsiderationComponents = new FulfillmentComponent[](
                         1
@@ -259,11 +264,13 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                     nfts.length,
                     0
                 );
+
             FulfillmentComponent[]
                 memory paymentTokenOfferComponents = new FulfillmentComponent[](
                     1
                 );
             paymentTokenOfferComponents[0] = paymentTokenOfferComponent;
+
             FulfillmentComponent[]
                 memory paymentTokenConsiderationComponents = new FulfillmentComponent[](
                     nfts.length
@@ -862,6 +869,15 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 ethAmounts
             );
 
+        // Validate all for simplicity for now, could make this combination of on-chain and not
+        if (contexts[0].listOnChain) {
+            execution.submitOrder = TestCallParameters(
+                address(seaport),
+                0,
+                abi.encodeWithSelector(ISeaport.validate.selector, orders)
+            );
+        }
+
         execution.executeOrder = TestCallParameters(
             address(seaport),
             sumEthAmount,
@@ -950,14 +966,17 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                         i,
                         0
                     );
+
                 FulfillmentComponent
                     memory nftOfferComponent = FulfillmentComponent(
                         wrappedIndex,
                         0
                     );
+
                 FulfillmentComponent[]
                     memory nftOfferComponents = new FulfillmentComponent[](1);
                 nftOfferComponents[0] = nftOfferComponent;
+
                 FulfillmentComponent[]
                     memory nftConsiderationComponents = new FulfillmentComponent[](
                         1
