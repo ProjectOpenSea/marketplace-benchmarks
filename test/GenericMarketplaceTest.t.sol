@@ -6,6 +6,7 @@ import { SeaportConfig } from "../src/marketplaces/seaport/SeaportConfig.sol";
 import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
 import { X2Y2Config } from "../src/marketplaces/X2Y2/X2Y2Config.sol";
 import { LooksRareConfig } from "../src/marketplaces/looksRare/LooksRareConfig.sol";
+import { SudoswapConfig } from "../src/marketplaces/sudoswap/SudoswapConfig.sol";
 import { BaseMarketConfig } from "../src/BaseMarketConfig.sol";
 
 import { SetupCall, TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "../src/Types.sol";
@@ -21,6 +22,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig foundationConfig;
     BaseMarketConfig x2y2Config;
     BaseMarketConfig looksRareConfig;
+    BaseMarketConfig sudoswapConfig;
 
     constructor() {
         seaportConfig = BaseMarketConfig(new SeaportConfig());
@@ -28,6 +30,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         foundationConfig = BaseMarketConfig(new FoundationConfig());
         x2y2Config = BaseMarketConfig(new X2Y2Config());
         looksRareConfig = BaseMarketConfig(new LooksRareConfig());
+        sudoswapConfig = BaseMarketConfig(new SudoswapConfig());
     }
 
     function testSeaport() external {
@@ -48,6 +51,10 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
     function testLooksRare() external {
         benchmarkMarket(looksRareConfig);
+    }
+
+    function testSudoswap() external {
+        benchmarkMarket(sudoswapConfig);
     }
 
     function benchmarkMarket(BaseMarketConfig config) public {
@@ -74,6 +81,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients(config);
         benchmark_BuyTenOfferedERC721WithEther_ListOnChain(config);
         benchmark_BuyTenOfferedERC721WithEther(config);
+        benchmark_BuyTenOfferedERC721WithEtherDistinctOrders_ListOnChain(config);
         benchmark_BuyTenOfferedERC721WithEtherDistinctOrders(config);
         benchmark_BuyTenOfferedERC721WithErc20DistinctOrders(config);
         benchmark_MatchOrders_ABCA(config);
@@ -84,7 +92,8 @@ contract GenericMarketplaceTest is BaseOrderTest {
         SetupCall[] memory setupCalls = config.beforeAllPrepareMarketplaceCall(
             alice,
             bob,
-            erc20Addresses
+            erc20Addresses,
+            erc721Addresses
         );
         for (uint256 i = 0; i < setupCalls.length; i++) {
             hevm.startPrank(setupCalls[i].sender);
@@ -250,7 +259,11 @@ contract GenericMarketplaceTest is BaseOrderTest {
                 payload.submitOrder
             );
 
-            assertEq(test721_1.ownerOf(1), alice);
+            // Allow the market to escrow after listing
+            assert(
+                test721_1.ownerOf(1) == alice ||
+                    test721_1.ownerOf(1) == config.market()
+            );
             assertEq(token1.balanceOf(alice), 0);
             assertEq(token1.balanceOf(bob), 100);
 
@@ -395,7 +408,11 @@ contract GenericMarketplaceTest is BaseOrderTest {
             );
 
             assertEq(test721_1.ownerOf(1), bob);
-            assertEq(token1.balanceOf(alice), 100);
+            // Allow the market to escrow after listing
+            assert(
+                token1.balanceOf(alice) == 100 ||
+                    token1.balanceOf(config.market()) == 100
+            );
             assertEq(token1.balanceOf(bob), 0);
 
             _benchmarkCallWithParams(
@@ -843,7 +860,11 @@ contract GenericMarketplaceTest is BaseOrderTest {
             );
 
             for (uint256 i = 0; i < 10; i++) {
-                assertEq(test721_1.ownerOf(i + 1), alice);
+                assertTrue(
+                    test721_1.ownerOf(i + 1) == alice ||
+                        test721_1.ownerOf(i + 1) == config.market(),
+                    "Not owner"
+                );
             }
 
             _benchmarkCallWithParams(
@@ -929,6 +950,54 @@ contract GenericMarketplaceTest is BaseOrderTest {
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill /w Sigs")),
+                bob,
+                payload.executeOrder
+            );
+
+            for (uint256 i = 1; i <= 10; i++) {
+                assertEq(test721_1.ownerOf(i), bob);
+            }
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyTenOfferedERC721WithEtherDistinctOrders_ListOnChain(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string memory testLabel = "(ERC721x10 -> ETH Distinct Orders List-On-Chain)";
+
+        TestOrderContext[] memory contexts = new TestOrderContext[](10);
+        TestItem721[] memory nfts = new TestItem721[](10);
+        uint256[] memory ethAmounts = new uint256[](10);
+
+        for (uint256 i = 0; i < 10; i++) {
+            test721_1.mint(alice, i + 1);
+            nfts[i] = TestItem721(address(test721_1), i + 1);
+            contexts[i] = TestOrderContext(true, alice, bob);
+            ethAmounts[i] = 100 + i;
+        }
+
+        try
+            config.getPayload_BuyOfferedManyERC721WithEtherDistinctOrders(
+                contexts,
+                nfts,
+                ethAmounts
+            )
+        returns (TestOrderPayload memory payload) {
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " List")),
+                alice,
+                payload.submitOrder
+            );
+
+            // @dev checking ownership here (when nfts are escrowed in different contracts) is messy so we skip it for now
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill")),
                 bob,
                 payload.executeOrder
             );

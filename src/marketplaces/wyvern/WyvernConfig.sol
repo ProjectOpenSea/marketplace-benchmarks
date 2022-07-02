@@ -535,6 +535,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
     function beforeAllPrepareMarketplaceCall(
         address seller,
         address buyer,
+        address[] calldata,
         address[] calldata
     ) external pure override returns (SetupCall[] memory) {
         SetupCall[] memory setupCalls = new SetupCall[](2);
