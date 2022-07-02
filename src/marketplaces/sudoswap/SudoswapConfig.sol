@@ -12,7 +12,7 @@ contract SudoswapConfig is BaseMarketConfig {
     IPairFactory constant PAIR_FACTORY =
         IPairFactory(0xb16c1342E617A5B6E4b631EB114483FDB289c0A4);
     IRouter constant ROUTER =
-        IRouter(0x2B2e8cDA09bBA9660dCA5cB6233787738Ad68329);
+        IRouter(0x77f4DF87F1908Bd48Ec71bF0579c446B76a416C2);
     address constant LINEAR_CURVE = 0x5B6aC51d9B1CeDE0068a1B26533CAce807f883Ee;
 
     uint128 constant DELTA = 1;
@@ -121,24 +121,19 @@ contract SudoswapConfig is BaseMarketConfig {
         });
 
         // construct executeOrder payload
-        // fulfiller calls router
+        // fulfiller calls pair directly to swap
         uint256[] memory nftIds = new uint256[](1);
         nftIds[0] = nft.identifier;
-        IRouter.PairSwapSpecific[]
-            memory swapList = new IRouter.PairSwapSpecific[](1);
-        swapList[0] = IRouter.PairSwapSpecific({
-            pair: address(ethNftPool),
-            nftIds: nftIds
-        });
         execution.executeOrder = TestCallParameters({
-            target: address(ROUTER),
+            target: address(ethNftPool),
             value: ethAmount,
             data: abi.encodeWithSelector(
-                IRouter.swapETHForSpecificNFTs.selector,
-                swapList,
+                IPair.swapTokenForSpecificNFTs.selector,
+                nftIds,
+                type(uint256).max,
                 context.fulfiller,
-                context.fulfiller,
-                type(uint256).max
+                false,
+                address(0)
             )
         });
     }
