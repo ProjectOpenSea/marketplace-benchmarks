@@ -1,7 +1,6 @@
 pragma solidity ^0.8.0;
 
 interface IPair {
-  
     function swapNFTsForToken(
         uint256[] calldata nftIds,
         uint256 minExpectedTokenOutput,

@@ -76,7 +76,11 @@ contract BaseOrderTest is DSTestPlus {
         erc20s = [token1, token2, token3];
         erc20Addresses = [address(token1), address(token2), address(token3)];
         erc721s = [test721_1, test721_2, test721_3];
-        erc721Addresses = [address(test721_1), address(test721_2), address(test721_3)];
+        erc721Addresses = [
+            address(test721_1),
+            address(test721_2),
+            address(test721_3)
+        ];
         erc1155s = [test1155_1, test1155_2, test1155_3];
         allTokens = [
             address(token1),

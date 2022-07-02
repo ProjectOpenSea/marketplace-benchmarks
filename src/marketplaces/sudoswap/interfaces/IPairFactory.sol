@@ -42,6 +42,5 @@ interface IPairFactory {
     function changeProtocolFeeMultiplier(uint256 _protocolFeeMultiplier)
         external;
 
-    function setRouterAllowed(address _router, bool isAllowed)
-        external;
+    function setRouterAllowed(address _router, bool isAllowed) external;
 }
