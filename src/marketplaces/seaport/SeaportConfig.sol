@@ -911,6 +911,15 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 erc20Amounts
             );
 
+        // Validate all for simplicity for now, could make this combination of on-chain and not
+        if (contexts[0].listOnChain) {
+            execution.submitOrder = TestCallParameters(
+                address(seaport),
+                0,
+                abi.encodeWithSelector(ISeaport.validate.selector, orders)
+            );
+        }
+
         execution.executeOrder = TestCallParameters(
             address(seaport),
             0,

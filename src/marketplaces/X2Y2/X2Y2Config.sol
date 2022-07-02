@@ -416,6 +416,10 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
         TestItem721[] calldata nfts,
         uint256[] calldata erc20Amounts
     ) external view override returns (TestOrderPayload memory execution) {
+        if (contexts[0].listOnChain) {
+            _notImplemented();
+        }
+
         (bytes memory payload, ) = encodeFillOrderDistinctOrders(
             contexts,
             nfts,
