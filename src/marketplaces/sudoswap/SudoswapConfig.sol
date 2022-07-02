@@ -12,7 +12,7 @@ contract SudoswapConfig is BaseMarketConfig {
     IPairFactory constant PAIR_FACTORY =
         IPairFactory(0xb16c1342E617A5B6E4b631EB114483FDB289c0A4);
     IRouter constant ROUTER =
-        IRouter(0x77f4DF87F1908Bd48Ec71bF0579c446B76a416C2);
+        IRouter(0x5ba23BEAb987463a64BD05575D3D4a947DfDe32E);
     address constant LINEAR_CURVE = 0x5B6aC51d9B1CeDE0068a1B26533CAce807f883Ee;
 
     uint128 constant DELTA = 1;
@@ -26,6 +26,8 @@ contract SudoswapConfig is BaseMarketConfig {
     address erc20Address;
     address erc721Address;
     address currentMarket; // the current address that stores the listed ERC721
+
+    IPair[10] ethNftPoolsForDistinct;
 
     function name() external pure override returns (string memory) {
         return "sudoswap";
@@ -52,13 +54,24 @@ contract SudoswapConfig is BaseMarketConfig {
         erc721Address = erc721Addresses[0];
 
         // set protocol fee to zero
-        setupCalls = new SetupCall[](1);
+        setupCalls = new SetupCall[](2);
         setupCalls[0] = SetupCall({
             sender: PAIR_FACTORY.owner(),
             target: address(PAIR_FACTORY),
             data: abi.encodeWithSelector(
                 IPairFactory.changeProtocolFeeMultiplier.selector,
                 0
+            )
+        });
+
+        // whitelist the new router
+        setupCalls[1] = SetupCall({
+            sender: PAIR_FACTORY.owner(),
+            target: address(PAIR_FACTORY),
+            data: abi.encodeWithSelector(
+                IPairFactory.setRouterAllowed.selector,
+                address(ROUTER),
+                true
             )
         });
 
@@ -90,6 +103,19 @@ contract SudoswapConfig is BaseMarketConfig {
             NFT_POOL_SPOT_PRICE,
             empty
         );
+
+        for (uint256 i = 0; i < 10; i++) {
+            ethNftPoolsForDistinct[i] = PAIR_FACTORY.createPairETH(
+                erc721Addresses[0],
+                LINEAR_CURVE,
+                payable(seller),
+                IPairFactory.PoolType.NFT,
+                DELTA,
+                0,
+                NFT_POOL_SPOT_PRICE + uint128(i),
+                empty
+            );
+        }
 
         erc20NftPool = PAIR_FACTORY.createPairERC20(
             IPairFactory.CreateERC20PairParams({
@@ -245,6 +271,111 @@ contract SudoswapConfig is BaseMarketConfig {
                 swapList,
                 0,
                 context.fulfiller,
+                type(uint256).max
+            )
+        });
+    }
+
+    function getPayload_BuyOfferedManyERC721WithEther(
+        TestOrderContext calldata context,
+        TestItem721[] calldata nfts,
+        uint256 ethAmount
+    ) external override returns (TestOrderPayload memory execution) {
+        if (!context.listOnChain) _notImplemented();
+
+        // update market address so tests know where the ERC721 will be escrowed
+        currentMarket = address(ethNftPool);
+
+        address nftAddress = nfts[0].token;
+
+        uint256[] memory ids = new uint256[](nfts.length);
+        for (uint256 i = 0; i < nfts.length; i++) {
+            ids[i] = nfts[i].identifier;
+        }
+
+        // construct submitOrder payload
+        // offerer transfers 10 ERC721s to ethNftPool
+        execution.submitOrder = TestCallParameters({
+            target: address(ROUTER),
+            value: 0,
+            data: abi.encodeWithSignature(
+                "depositNFTs(address,uint256[],address)",
+                nftAddress,
+                ids,
+                address(ethNftPool)
+            )
+        });
+
+        // construct executeOrder payload
+        // fulfiller calls pair directly to swap
+        execution.executeOrder = TestCallParameters({
+            target: address(ethNftPool),
+            value: ethAmount,
+            data: abi.encodeWithSelector(
+                IPair.swapTokenForSpecificNFTs.selector,
+                ids,
+                type(uint256).max,
+                context.fulfiller,
+                false,
+                address(0)
+            )
+        });
+    }
+
+    function getPayload_BuyOfferedManyERC721WithEtherDistinctOrders(
+        TestOrderContext[] calldata contexts,
+        TestItem721[] calldata nfts,
+        uint256[] calldata ethAmounts
+    ) external view override returns (TestOrderPayload memory execution) {
+
+        if (!contexts[0].listOnChain) _notImplemented();
+
+        address[] memory pools = new address[](nfts.length);
+        uint256[] memory ids = new uint256[](nfts.length);
+
+        for (uint256 i = 0; i < nfts.length; i++) {
+          pools[i] = address(ethNftPoolsForDistinct[i]);
+          ids[i] = nfts[i].identifier;
+        }
+
+        execution.submitOrder = TestCallParameters({
+            target: address(ROUTER),
+            value: 0,
+            data: abi.encodeWithSignature(
+                "depositNFTs(address,uint256[],address[])",
+                nfts[0].token,
+                ids,
+                pools
+            )
+        });
+
+        // construct executeOrder payload
+        // fulfiller calls router
+        IRouter.PairSwapSpecific[]
+            memory swapList = new IRouter.PairSwapSpecific[](nfts.length);
+
+        for (uint256 i = 0; i < nfts.length; i++) {
+          uint256[] memory singleId = new uint256[](1);
+          singleId[0] = nfts[i].identifier;
+          swapList[i] = IRouter.PairSwapSpecific({
+            pair: address(ethNftPoolsForDistinct[i]),
+            nftIds: singleId
+          });
+        }
+
+        uint256 totalEthAmount = 0;
+        for (uint256 i = 0; i < ethAmounts.length; i++) {
+          totalEthAmount += ethAmounts[i];
+        }
+
+        execution.executeOrder = TestCallParameters({
+            target: address(ROUTER),
+            value: totalEthAmount,
+            data: abi.encodeWithSelector(
+                IRouter.swapETHForSpecificNFTs.selector,
+                swapList,
+                contexts[0].offerer,
+                contexts[0].fulfiller,
                 type(uint256).max
             )
         });

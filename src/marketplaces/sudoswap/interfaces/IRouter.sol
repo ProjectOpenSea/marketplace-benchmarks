@@ -26,4 +26,16 @@ interface IRouter {
         address tokenRecipient,
         uint256 deadline
     ) external returns (uint256 outputAmount);
+
+    function depositNFTs(
+        address _nft,
+        uint256[] calldata ids,
+        address recipient
+    ) external;
+
+    function depositNFTs(
+        address _nft,
+        uint256[] calldata ids,
+        address[] calldata recipients
+    ) external;
 }

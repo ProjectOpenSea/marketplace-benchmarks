@@ -81,6 +81,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients(config);
         benchmark_BuyTenOfferedERC721WithEther_ListOnChain(config);
         benchmark_BuyTenOfferedERC721WithEther(config);
+        benchmark_BuyTenOfferedERC721WithEtherDistinctOrders_ListOnChain(config);
         benchmark_BuyTenOfferedERC721WithEtherDistinctOrders(config);
         benchmark_BuyTenOfferedERC721WithErc20DistinctOrders(config);
     }
@@ -858,7 +859,11 @@ contract GenericMarketplaceTest is BaseOrderTest {
             );
 
             for (uint256 i = 0; i < 10; i++) {
-                assertEq(test721_1.ownerOf(i + 1), alice);
+                assertTrue(
+                    test721_1.ownerOf(i + 1) == alice ||
+                        test721_1.ownerOf(i + 1) == config.market(),
+                    "Not owner"
+                );
             }
 
             _benchmarkCallWithParams(
@@ -944,6 +949,54 @@ contract GenericMarketplaceTest is BaseOrderTest {
             _benchmarkCallWithParams(
                 config.name(),
                 string(abi.encodePacked(testLabel, " Fulfill /w Sigs")),
+                bob,
+                payload.executeOrder
+            );
+
+            for (uint256 i = 1; i <= 10; i++) {
+                assertEq(test721_1.ownerOf(i), bob);
+            }
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyTenOfferedERC721WithEtherDistinctOrders_ListOnChain(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string memory testLabel = "(ERC721x10 -> ETH Distinct Orders List-On-Chain)";
+
+        TestOrderContext[] memory contexts = new TestOrderContext[](10);
+        TestItem721[] memory nfts = new TestItem721[](10);
+        uint256[] memory ethAmounts = new uint256[](10);
+
+        for (uint256 i = 0; i < 10; i++) {
+            test721_1.mint(alice, i + 1);
+            nfts[i] = TestItem721(address(test721_1), i + 1);
+            contexts[i] = TestOrderContext(true, alice, bob);
+            ethAmounts[i] = 100 + i;
+        }
+
+        try
+            config.getPayload_BuyOfferedManyERC721WithEtherDistinctOrders(
+                contexts,
+                nfts,
+                ethAmounts
+            )
+        returns (TestOrderPayload memory payload) {
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " List")),
+                alice,
+                payload.submitOrder
+            );
+
+            // @dev checking ownership here (when nfts are escrowed in different contracts) is messy so we skip it for now
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill")),
                 bob,
                 payload.executeOrder
             );
