@@ -309,6 +309,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             fulfillerOfferItems,
             fulfillerConsiderationItems
         );
+        orders[nfts.length].signature = ""; // Signature isn't needed since fulfiller is msg.sender
 
         return (orders, fullfillments, sumAmounts);
     }
@@ -341,6 +342,9 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 )
             );
         if (context.listOnChain) {
+            order.signature = "";
+            basicComponents.signature = "";
+
             Order[] memory orders = new Order[](1);
             orders[0] = order;
             execution.submitOrder = TestCallParameters(
@@ -348,7 +352,6 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
-            basicComponents.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -388,6 +391,9 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 )
             );
         if (context.listOnChain) {
+            order.signature = "";
+            basicComponents.signature = "";
+
             Order[] memory orders = new Order[](1);
             orders[0] = order;
             execution.submitOrder = TestCallParameters(
@@ -395,7 +401,6 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
-            basicComponents.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -429,6 +434,9 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 )
             );
         if (context.listOnChain) {
+            order.signature = "";
+            basicComponents.signature = "";
+
             Order[] memory orders = new Order[](1);
             orders[0] = order;
             execution.submitOrder = TestCallParameters(
@@ -436,7 +444,6 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
-            basicComponents.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -476,6 +483,9 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 )
             );
         if (context.listOnChain) {
+            order.signature = "";
+            basicComponents.signature = "";
+
             Order[] memory orders = new Order[](1);
             orders[0] = order;
             execution.submitOrder = TestCallParameters(
@@ -483,7 +493,6 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
-            basicComponents.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -523,6 +532,9 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 )
             );
         if (context.listOnChain) {
+            order.signature = "";
+            basicComponents.signature = "";
+
             Order[] memory orders = new Order[](1);
             orders[0] = order;
             execution.submitOrder = TestCallParameters(
@@ -530,7 +542,6 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
-            basicComponents.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -570,6 +581,9 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 )
             );
         if (context.listOnChain) {
+            order.signature = "";
+            basicComponents.signature = "";
+
             Order[] memory orders = new Order[](1);
             orders[0] = order;
             execution.submitOrder = TestCallParameters(
@@ -577,7 +591,6 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
-            basicComponents.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -622,6 +635,8 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         );
 
         if (context.listOnChain) {
+            order.signature = "";
+
             Order[] memory orders = new Order[](1);
             orders[0] = order;
             execution.submitOrder = TestCallParameters(
@@ -629,7 +644,6 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
-            order.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -671,6 +685,8 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         );
 
         if (context.listOnChain) {
+            order.signature = "";
+
             Order[] memory orders = new Order[](1);
             orders[0] = order;
             execution.submitOrder = TestCallParameters(
@@ -678,7 +694,6 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
-            order.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -718,6 +733,9 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 additionalRecipients
             );
         if (context.listOnChain) {
+            order.signature = "";
+            basicComponents.signature = "";
+
             Order[] memory orders = new Order[](1);
             orders[0] = order;
             execution.submitOrder = TestCallParameters(
@@ -725,7 +743,6 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
-            basicComponents.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -776,6 +793,9 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 additionalRecipients
             );
         if (context.listOnChain) {
+            order.signature = "";
+            basicComponents.signature = "";
+
             Order[] memory orders = new Order[](1);
             orders[0] = order;
             execution.submitOrder = TestCallParameters(
@@ -783,7 +803,6 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
-            basicComponents.signature = "";
         }
         execution.executeOrder = TestCallParameters(
             address(seaport),
@@ -832,6 +851,8 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         );
 
         if (context.listOnChain) {
+            order.signature = "";
+
             Order[] memory orders = new Order[](1);
             orders[0] = order;
             execution.submitOrder = TestCallParameters(
@@ -839,8 +860,8 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
                 0,
                 abi.encodeWithSelector(ISeaport.validate.selector, orders)
             );
-            order.signature = "";
         }
+
         execution.executeOrder = TestCallParameters(
             address(seaport),
             ethAmount,
@@ -871,10 +892,19 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
 
         // Validate all for simplicity for now, could make this combination of on-chain and not
         if (contexts[0].listOnChain) {
+            Order[] memory ordersToValidate = new Order[](orders.length - 1); // Last order is fulfiller order
+            for (uint256 i = 0; i < orders.length - 1; i++) {
+                orders[i].signature = "";
+                ordersToValidate[i] = orders[i];
+            }
+
             execution.submitOrder = TestCallParameters(
                 address(seaport),
                 0,
-                abi.encodeWithSelector(ISeaport.validate.selector, orders)
+                abi.encodeWithSelector(
+                    ISeaport.validate.selector,
+                    ordersToValidate
+                )
             );
         }
 
@@ -913,10 +943,19 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
 
         // Validate all for simplicity for now, could make this combination of on-chain and not
         if (contexts[0].listOnChain) {
+            Order[] memory ordersToValidate = new Order[](orders.length - 1); // Last order is fulfiller order
+            for (uint256 i = 0; i < orders.length - 1; i++) {
+                orders[i].signature = "";
+                ordersToValidate[i] = orders[i];
+            }
+
             execution.submitOrder = TestCallParameters(
                 address(seaport),
                 0,
-                abi.encodeWithSelector(ISeaport.validate.selector, orders)
+                abi.encodeWithSelector(
+                    ISeaport.validate.selector,
+                    ordersToValidate
+                )
             );
         }
 
