@@ -152,11 +152,11 @@ function generateLatex(tests, title) {
                     latex += `& \\emoji{cross-mark} `;
                 } else {
                     const percentChange = Math.round(
-                        ((gasValue - maxGas) * 100.0) / maxGas
+                        ((gasValue - minGas) * 100.0) / minGas
                     );
                     latex +=
                         `& \\color[RGB]{${color.values[0]},${color.values[1]},${color.values[2]}} ${gasValue}` +
-                        (percentChange != 0 ? `(${percentChange}\\%)` : ``); // Only show percent change if not 0
+                        (percentChange != 0 ? `(+${percentChange}\\%)` : ``); // Only show percent change if not 0
                 }
             }
 
