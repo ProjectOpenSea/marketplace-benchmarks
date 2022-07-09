@@ -7,6 +7,7 @@ import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfi
 import { X2Y2Config } from "../src/marketplaces/X2Y2/X2Y2Config.sol";
 import { LooksRareConfig } from "../src/marketplaces/looksRare/LooksRareConfig.sol";
 import { SudoswapConfig } from "../src/marketplaces/sudoswap/SudoswapConfig.sol";
+import { ZeroExConfig } from "../src/marketplaces/zeroEx/ZeroExConfig.sol";
 import { BaseMarketConfig } from "../src/BaseMarketConfig.sol";
 
 import { SetupCall, TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "../src/Types.sol";
@@ -23,6 +24,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig x2y2Config;
     BaseMarketConfig looksRareConfig;
     BaseMarketConfig sudoswapConfig;
+    BaseMarketConfig zeroExConfig;
 
     constructor() {
         seaportConfig = BaseMarketConfig(new SeaportConfig());
@@ -31,6 +33,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         x2y2Config = BaseMarketConfig(new X2Y2Config());
         looksRareConfig = BaseMarketConfig(new LooksRareConfig());
         sudoswapConfig = BaseMarketConfig(new SudoswapConfig());
+        zeroExConfig = BaseMarketConfig(new ZeroExConfig());
     }
 
     function testSeaport() external {
@@ -55,6 +58,10 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
     function testSudoswap() external {
         benchmarkMarket(sudoswapConfig);
+    }
+
+    function testZeroEx() external {
+        benchmarkMarket(zeroExConfig);
     }
 
     function benchmarkMarket(BaseMarketConfig config) public {
