@@ -108,7 +108,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
             maker: context.offerer,
             taker: context.fulfiller,
             expiry: block.timestamp + 120,
-            nonce: testNonce, // TODO - there exists a significant gas optimization that can be done with careful selection of the nonce
+            nonce: testNonce,
             erc20Token: NATIVE_TOKEN_ADDRESS, // 0x orders are able to be "bought" with the native token using this sentinel value
             erc20TokenAmount: ethAmount,
             fees: new LibNFTOrder.Fee[](0),
