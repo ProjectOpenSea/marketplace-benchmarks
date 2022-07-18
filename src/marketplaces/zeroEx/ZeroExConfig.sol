@@ -13,7 +13,6 @@ contract ZeroExConfig is BaseMarketConfig, Test {
 
     IZeroEx constant zeroEx = IZeroEx(0xDef1C0ded9bec7F1a1670819833240f027b25EfF);
     address constant NATIVE_TOKEN_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-    address constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     // Note: in order to take advantage of a gas optimization, first create a "used" nonce
     uint256 usedNonce = uint256(0x1010101000000000);
     uint256 testNonce = uint256(0x1010101000000001);
