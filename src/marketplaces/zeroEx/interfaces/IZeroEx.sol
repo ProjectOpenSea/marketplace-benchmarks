@@ -5,7 +5,6 @@ import "../lib/LibNFTOrder.sol";
 import "../lib/LibSignature.sol";
 
 interface IZeroEx {
-
     /// IERC721OrdersFeature
 
     /// @dev Sells an ERC721 asset to fill the given order.
@@ -28,8 +27,7 @@ interface IZeroEx {
         uint256 erc721TokenId,
         bool unwrapNativeToken,
         bytes calldata callbackData
-    )
-        external;
+    ) external;
 
     /// @dev Buys an ERC721 asset by filling the given order.
     /// @param sellOrder The ERC721 sell order.
@@ -44,25 +42,21 @@ interface IZeroEx {
         LibNFTOrder.ERC721Order calldata sellOrder,
         LibSignature.Signature calldata signature,
         bytes calldata callbackData
-    )
-        external
-        payable;
+    ) external payable;
 
     /// @dev Cancel a single ERC721 order by its nonce. The caller
     ///      should be the maker of the order. Silently succeeds if
     ///      an order with the same nonce has already been filled or
     ///      cancelled.
     /// @param orderNonce The order nonce.
-    function cancelERC721Order(uint256 orderNonce)
-        external;
+    function cancelERC721Order(uint256 orderNonce) external;
 
     /// @dev Cancel multiple ERC721 orders by their nonces. The caller
     ///      should be the maker of the orders. Silently succeeds if
     ///      an order with the same nonce has already been filled or
     ///      cancelled.
     /// @param orderNonces The order nonces.
-    function batchCancelERC721Orders(uint256[] calldata orderNonces)
-        external;
+    function batchCancelERC721Orders(uint256[] calldata orderNonces) external;
 
     /// @dev Buys multiple ERC721 assets by filling the
     ///      given orders.
@@ -80,10 +74,7 @@ interface IZeroEx {
         LibSignature.Signature[] calldata signatures,
         bytes[] calldata callbackData,
         bool revertIfIncomplete
-    )
-        external
-        payable
-        returns (bool[] memory successes);
+    ) external payable returns (bool[] memory successes);
 
     /// @dev Matches a pair of complementary orders that have
     ///      a non-negative spread. Each order is filled at
@@ -101,9 +92,7 @@ interface IZeroEx {
         LibNFTOrder.ERC721Order calldata buyOrder,
         LibSignature.Signature calldata sellOrderSignature,
         LibSignature.Signature calldata buyOrderSignature
-    )
-        external
-        returns (uint256 profit);
+    ) external returns (uint256 profit);
 
     /// @dev Matches pairs of complementary orders that have
     ///      non-negative spreads. Each order is filled at
@@ -123,9 +112,7 @@ interface IZeroEx {
         LibNFTOrder.ERC721Order[] calldata buyOrders,
         LibSignature.Signature[] calldata sellOrderSignatures,
         LibSignature.Signature[] calldata buyOrderSignatures
-    )
-        external
-        returns (uint256[] memory profits, bool[] memory successes);
+    ) external returns (uint256[] memory profits, bool[] memory successes);
 
     /// @dev Callback for the ERC721 `safeTransferFrom` function.
     ///      This callback can be used to sell an ERC721 asset if
@@ -146,9 +133,7 @@ interface IZeroEx {
         address from,
         uint256 tokenId,
         bytes calldata data
-    )
-        external
-        returns (bytes4 success);
+    ) external returns (bytes4 success);
 
     /// @dev Approves an ERC721 order on-chain. After pre-signing
     ///      the order, the `PRESIGNED` signature type will become
@@ -164,9 +149,7 @@ interface IZeroEx {
     function validateERC721OrderSignature(
         LibNFTOrder.ERC721Order calldata order,
         LibSignature.Signature calldata signature
-    )
-        external
-        view;
+    ) external view;
 
     /// @dev If the given order is buying an ERC721 asset, checks
     ///      whether or not the given token ID satisfies the required
@@ -180,9 +163,7 @@ interface IZeroEx {
     function validateERC721OrderProperties(
         LibNFTOrder.ERC721Order calldata order,
         uint256 erc721TokenId
-    )
-        external
-        view;
+    ) external view;
 
     /// @dev Get the current status of an ERC721 order.
     /// @param order The ERC721 order.
@@ -214,8 +195,6 @@ interface IZeroEx {
         view
         returns (uint256 bitVector);
 
-
-
     /// IERC1155OrdersFeature
 
     /// @dev Sells an ERC1155 asset to fill the given order.
@@ -241,8 +220,7 @@ interface IZeroEx {
         uint128 erc1155SellAmount,
         bool unwrapNativeToken,
         bytes calldata callbackData
-    )
-        external;
+    ) external;
 
     /// @dev Buys an ERC1155 asset by filling the given order.
     /// @param sellOrder The ERC1155 sell order.
@@ -260,25 +238,21 @@ interface IZeroEx {
         LibSignature.Signature calldata signature,
         uint128 erc1155BuyAmount,
         bytes calldata callbackData
-    )
-        external
-        payable;
+    ) external payable;
 
     /// @dev Cancel a single ERC1155 order by its nonce. The caller
     ///      should be the maker of the order. Silently succeeds if
     ///      an order with the same nonce has already been filled or
     ///      cancelled.
     /// @param orderNonce The order nonce.
-    function cancelERC1155Order(uint256 orderNonce)
-        external;
+    function cancelERC1155Order(uint256 orderNonce) external;
 
     /// @dev Cancel multiple ERC1155 orders by their nonces. The caller
     ///      should be the maker of the orders. Silently succeeds if
     ///      an order with the same nonce has already been filled or
     ///      cancelled.
     /// @param orderNonces The order nonces.
-    function batchCancelERC1155Orders(uint256[] calldata orderNonces)
-        external;
+    function batchCancelERC1155Orders(uint256[] calldata orderNonces) external;
 
     /// @dev Buys multiple ERC1155 assets by filling the
     ///      given orders.
@@ -299,10 +273,7 @@ interface IZeroEx {
         uint128[] calldata erc1155TokenAmounts,
         bytes[] calldata callbackData,
         bool revertIfIncomplete
-    )
-        external
-        payable
-        returns (bool[] memory successes);
+    ) external payable returns (bool[] memory successes);
 
     /// @dev Callback for the ERC1155 `safeTransferFrom` function.
     ///      This callback can be used to sell an ERC1155 asset if
@@ -325,9 +296,7 @@ interface IZeroEx {
         uint256 tokenId,
         uint256 value,
         bytes calldata data
-    )
-        external
-        returns (bytes4 success);
+    ) external returns (bytes4 success);
 
     /// @dev Approves an ERC1155 order on-chain. After pre-signing
     ///      the order, the `PRESIGNED` signature type will become
@@ -343,9 +312,7 @@ interface IZeroEx {
     function validateERC1155OrderSignature(
         LibNFTOrder.ERC1155Order calldata order,
         LibSignature.Signature calldata signature
-    )
-        external
-        view;
+    ) external view;
 
     /// @dev If the given order is buying an ERC1155 asset, checks
     ///      whether or not the given token ID satisfies the required
@@ -359,9 +326,7 @@ interface IZeroEx {
     function validateERC1155OrderProperties(
         LibNFTOrder.ERC1155Order calldata order,
         uint256 erc1155TokenId
-    )
-        external
-        view;
+    ) external view;
 
     /// @dev Get the order info for an ERC1155 order.
     /// @param order The ERC1155 order.

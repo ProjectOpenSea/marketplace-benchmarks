@@ -1,9 +1,7 @@
-
 pragma solidity ^0.8.0;
 
 /// @dev A library for common NFT order operations.
 library LibNFTOrder {
-
     enum OrderStatus {
         INVALID,
         FILLABLE,
@@ -86,5 +84,4 @@ library LibNFTOrder {
         // that can be filled for the order.
         uint128 remainingAmount;
     }
-
 }

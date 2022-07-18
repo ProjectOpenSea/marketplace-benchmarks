@@ -1,8 +1,6 @@
-
 pragma solidity ^0.8.0;
 
 library LibSignature {
-
     enum SignatureType {
         ILLEGAL,
         INVALID,
@@ -21,5 +19,4 @@ library LibSignature {
         // EC Signature data.
         bytes32 s;
     }
-
 }
