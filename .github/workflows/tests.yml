@@ -25,7 +25,7 @@ jobs:
         run: forge install
         
       - name: Run tests
-        run: forge test --fork-url ${{ env.ETH_RPC_URL }} -vv
+        run: forge test --fork-url ${{ secrets.ETH_RPC_URL }} -vv
   lint:
     name: Run Lint
     runs-on: ubuntu-latest
