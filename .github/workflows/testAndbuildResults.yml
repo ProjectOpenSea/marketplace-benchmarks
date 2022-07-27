@@ -8,6 +8,7 @@ jobs:
   tests:
     name: Run Tests
     runs-on: ubuntu-latest
+    environment: build
     steps:
       - uses: actions/checkout@v3
 
@@ -27,7 +28,7 @@ jobs:
       - run: yarn install --frozen-lockfile
         
       - name: Run tests
-        run: yarn test:generate ${{ secrets.ETH_RPC_URL }}
+        run: yarn test:generate ${{ env.ETH_RPC_URL }}
 
       - name: Process latex EOA
         uses: dante-ev/latex-action@latest
