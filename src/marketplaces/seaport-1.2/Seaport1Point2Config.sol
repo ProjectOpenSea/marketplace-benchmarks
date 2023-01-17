@@ -4,7 +4,7 @@ pragma solidity >=0.8.7;
 import { BaseMarketConfig } from "../../BaseMarketConfig.sol";
 import { TestCallParameters, TestOrderContext, TestOrderPayload, TestItem721, TestItem1155, TestItem20 } from "../../Types.sol";
 import "./lib/ConsiderationStructs.sol";
-import "./lib/ConsiderationTypeHashes.sol";
+import "./lib/ConsiderationAlphaTypeHashes.sol";
 import { ConsiderationInterface as ISeaport } from "./interfaces/ConsiderationInterface.sol";
 import "forge-std/console2.sol";
 
