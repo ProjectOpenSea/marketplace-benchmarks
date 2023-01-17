@@ -3,7 +3,7 @@ pragma solidity 0.8.14;
 
 import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
 import { SeaportConfig } from "../src/marketplaces/seaport/SeaportConfig.sol";
-import { Seaport1Point2Config } from "../src/marketplaces/seaport/Seaport1Point2Config.sol";
+import { Seaport1Point2Config } from "../src/marketplaces/seaport-1.2/Seaport1Point2Config.sol";
 import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
 import { X2Y2Config } from "../src/marketplaces/X2Y2/X2Y2Config.sol";
 import { LooksRareConfig } from "../src/marketplaces/looksRare/LooksRareConfig.sol";
