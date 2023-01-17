@@ -13,7 +13,7 @@ uint256 constant EIP_712_PREFIX = (
     0x1901000000000000000000000000000000000000000000000000000000000000
 );
 
-contract ConsiderationTypeHashes {
+contract ConsiderationAlphaTypeHashes {
     bytes32 internal immutable _NAME_HASH;
     bytes32 internal immutable _VERSION_HASH;
     bytes32 internal immutable _EIP_712_DOMAIN_TYPEHASH;
@@ -22,14 +22,14 @@ contract ConsiderationTypeHashes {
     bytes32 internal immutable _ORDER_TYPEHASH;
     bytes32 internal immutable _DOMAIN_SEPARATOR;
     address internal constant seaportAddress =
-        address(0x00000000006c3852cbEf3e08E8dF289169EdE581);
+        address(0x000000000090d2b159528c290616CF919B24e1d9);
 
     constructor() {
         // Derive hash of the name of the contract.
-        _NAME_HASH = keccak256(bytes("Seaport"));
+        _NAME_HASH = keccak256(bytes("Seaport-alpha"));
 
         // Derive hash of the version string of the contract.
-        _VERSION_HASH = keccak256(bytes("1.1"));
+        _VERSION_HASH = keccak256(bytes("1.2"));
 
         bytes memory offerItemTypeString = abi.encodePacked(
             "OfferItem(",
