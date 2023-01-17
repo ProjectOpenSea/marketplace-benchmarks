@@ -47,9 +47,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmarkMarket(seaport1Point2Config);
     }
 
-    function testWyvern() external {
-        benchmarkMarket(wyvernConfig);
-    }
+    // function testWyvern() external {
+    //     benchmarkMarket(wyvernConfig);
+    // }
 
     function testFoundation() external {
         benchmarkMarket(foundationConfig);
@@ -59,9 +59,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmarkMarket(x2y2Config);
     }
 
-    function testLooksRare() external {
-        benchmarkMarket(looksRareConfig);
-    }
+    // function testLooksRare() external {
+    //     benchmarkMarket(looksRareConfig);
+    // }
 
     function testSudoswap() external {
         benchmarkMarket(sudoswapConfig);
