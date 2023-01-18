@@ -1,4 +1,4 @@
-[default]
+[profile.default]
 solc = "0.8.14"
 bytecode_hash = "none"
 optimizer_runs = 1000000

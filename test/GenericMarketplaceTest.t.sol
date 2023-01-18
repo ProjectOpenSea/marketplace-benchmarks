@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.14;
 
-import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
-import { SeaportConfig } from "../src/marketplaces/seaport/SeaportConfig.sol";
-import { Seaport1Point2Config } from "../src/marketplaces/seaport-1.2/Seaport1Point2Config.sol";
-import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
-import { X2Y2Config } from "../src/marketplaces/X2Y2/X2Y2Config.sol";
-import { LooksRareConfig } from "../src/marketplaces/looksRare/LooksRareConfig.sol";
-import { SudoswapConfig } from "../src/marketplaces/sudoswap/SudoswapConfig.sol";
-import { ZeroExConfig } from "../src/marketplaces/zeroEx/ZeroExConfig.sol";
 import { BaseMarketConfig } from "../src/BaseMarketConfig.sol";
+import { BlurConfig } from "../src/marketplaces/blur/BlurConfig.sol";
+import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
+import { LooksRareConfig } from "../src/marketplaces/looksRare/LooksRareConfig.sol";
+import { Seaport1Point2Config } from "../src/marketplaces/seaport-1.2/Seaport1Point2Config.sol";
+import { SeaportConfig } from "../src/marketplaces/seaport/SeaportConfig.sol";
+import { SudoswapConfig } from "../src/marketplaces/sudoswap/SudoswapConfig.sol";
+import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
+import { X2Y2Config } from "../src/marketplaces/X2Y2/X2Y2Config.sol";
+import { ZeroExConfig } from "../src/marketplaces/zeroEx/ZeroExConfig.sol";
 
 import { SetupCall, TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "../src/Types.sol";
 
@@ -19,23 +20,25 @@ import "./tokens/TestERC1155.sol";
 import "./utils/BaseOrderTest.sol";
 
 contract GenericMarketplaceTest is BaseOrderTest {
-    BaseMarketConfig seaportConfig;
-    BaseMarketConfig seaport1Point2Config;
-    BaseMarketConfig wyvernConfig;
+    BaseMarketConfig blurConfig;
     BaseMarketConfig foundationConfig;
-    BaseMarketConfig x2y2Config;
     BaseMarketConfig looksRareConfig;
+    BaseMarketConfig seaport1Point2Config;
+    BaseMarketConfig seaportConfig;
     BaseMarketConfig sudoswapConfig;
+    BaseMarketConfig wyvernConfig;
+    BaseMarketConfig x2y2Config;
     BaseMarketConfig zeroExConfig;
 
     constructor() {
-        seaportConfig = BaseMarketConfig(new SeaportConfig());
-        seaport1Point2Config = BaseMarketConfig(new Seaport1Point2Config());
-        wyvernConfig = BaseMarketConfig(new WyvernConfig());
+        blurConfig = BaseMarketConfig(new BlurConfig());
         foundationConfig = BaseMarketConfig(new FoundationConfig());
-        x2y2Config = BaseMarketConfig(new X2Y2Config());
         looksRareConfig = BaseMarketConfig(new LooksRareConfig());
+        seaport1Point2Config = BaseMarketConfig(new Seaport1Point2Config());
+        seaportConfig = BaseMarketConfig(new SeaportConfig());
         sudoswapConfig = BaseMarketConfig(new SudoswapConfig());
+        wyvernConfig = BaseMarketConfig(new WyvernConfig());
+        x2y2Config = BaseMarketConfig(new X2Y2Config());
         zeroExConfig = BaseMarketConfig(new ZeroExConfig());
     }
 
@@ -69,6 +72,10 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
     function testZeroEx() external {
         benchmarkMarket(zeroExConfig);
+    }
+
+    function testBlur() external {
+        benchmarkMarket(blurConfig);
     }
 
     function benchmarkMarket(BaseMarketConfig config) public {
