@@ -59,9 +59,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmarkMarket(x2y2Config);
     }
 
-    // function testLooksRare() external {
-    //     benchmarkMarket(looksRareConfig);
-    // }
+    function testLooksRare() external {
+        benchmarkMarket(looksRareConfig);
+    }
 
     function testSudoswap() external {
         benchmarkMarket(sudoswapConfig);

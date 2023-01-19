@@ -23,6 +23,12 @@ exec(
             eoaTests.results,
             "Benchmark Tests (EOA)"
         );
+
+        // Create dir if needed
+        if(!fs.existsSync("./results")) {
+            fs.mkdirSync("./results");
+        }
+
         fs.writeFileSync("./results/results.tex", eoaLatex);
 
         /// {market:{testName:{actionName:{gas,direct}}}}
