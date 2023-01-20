@@ -25,7 +25,7 @@ exec(
         );
 
         // Create dir if needed
-        if(!fs.existsSync("./results")) {
+        if (!fs.existsSync("./results")) {
             fs.mkdirSync("./results");
         }
 
