@@ -225,23 +225,15 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //             )
     //         );
     //     if (context.listOnChain) {
-    //         order.signature = "";
-    //         basicComponents.signature = "";
-
-    //         Order[] memory orders = new Order[](1);
-    //         orders[0] = order;
-    //         execution.submitOrder = TestCallParameters(
-    //             address(blur),
-    //             0,
-    //             abi.encodeWithSelector(IBlurExchange.validate.selector, orders)
-    //         );
+    //         _notImplemented();
     //     }
     //     execution.executeOrder = TestCallParameters(
     //         address(blur),
     //         ethAmount,
     //         abi.encodeWithSelector(
     //             IBlurExchange.execute.selector,
-    //             basicComponents
+    //             makerInput,
+    //             takerInput
     //         )
     //     );
     // }
@@ -268,23 +260,15 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //             )
     //         );
     //     if (context.listOnChain) {
-    //         order.signature = "";
-    //         basicComponents.signature = "";
-
-    //         Order[] memory orders = new Order[](1);
-    //         orders[0] = order;
-    //         execution.submitOrder = TestCallParameters(
-    //             address(blur),
-    //             0,
-    //             abi.encodeWithSelector(IBlurExchange.validate.selector, orders)
-    //         );
+    //         _notImplemented();
     //     }
     //     execution.executeOrder = TestCallParameters(
     //         address(blur),
     //         0,
     //         abi.encodeWithSelector(
     //             IBlurExchange.execute.selector,
-    //             basicComponents
+    //             makerInput,
+    //             takerInput
     //         )
     //     );
     // }
@@ -317,23 +301,15 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //             )
     //         );
     //     if (context.listOnChain) {
-    //         order.signature = "";
-    //         basicComponents.signature = "";
-
-    //         Order[] memory orders = new Order[](1);
-    //         orders[0] = order;
-    //         execution.submitOrder = TestCallParameters(
-    //             address(blur),
-    //             0,
-    //             abi.encodeWithSelector(IBlurExchange.validate.selector, orders)
-    //         );
+    //         _notImplemented();
     //     }
     //     execution.executeOrder = TestCallParameters(
     //         address(blur),
     //         0,
     //         abi.encodeWithSelector(
     //             IBlurExchange.execute.selector,
-    //             basicComponents
+    //             makerInput,
+    //             takerInput
     //         )
     //     );
     // }
@@ -366,23 +342,15 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //             )
     //         );
     //     if (context.listOnChain) {
-    //         order.signature = "";
-    //         basicComponents.signature = "";
-
-    //         Order[] memory orders = new Order[](1);
-    //         orders[0] = order;
-    //         execution.submitOrder = TestCallParameters(
-    //             address(blur),
-    //             0,
-    //             abi.encodeWithSelector(IBlurExchange.validate.selector, orders)
-    //         );
+    //         _notImplemented();
     //     }
     //     execution.executeOrder = TestCallParameters(
     //         address(blur),
     //         0,
     //         abi.encodeWithSelector(
     //             IBlurExchange.execute.selector,
-    //             basicComponents
+    //             makerInput,
+    //             takerInput
     //         )
     //     );
     // }
@@ -415,23 +383,15 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //             )
     //         );
     //     if (context.listOnChain) {
-    //         order.signature = "";
-    //         basicComponents.signature = "";
-
-    //         Order[] memory orders = new Order[](1);
-    //         orders[0] = order;
-    //         execution.submitOrder = TestCallParameters(
-    //             address(blur),
-    //             0,
-    //             abi.encodeWithSelector(IBlurExchange.validate.selector, orders)
-    //         );
+    //         _notImplemented();
     //     }
     //     execution.executeOrder = TestCallParameters(
     //         address(blur),
     //         0,
     //         abi.encodeWithSelector(
     //             IBlurExchange.execute.selector,
-    //             basicComponents
+    //             makerInput,
+    //             takerInput
     //         )
     //     );
     // }
@@ -469,23 +429,15 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //     );
 
     //     if (context.listOnChain) {
-    //         order.signature = "";
-
-    //         Order[] memory orders = new Order[](1);
-    //         orders[0] = order;
-    //         execution.submitOrder = TestCallParameters(
-    //             address(blur),
-    //             0,
-    //             abi.encodeWithSelector(IBlurExchange.validate.selector, orders)
-    //         );
+    //         _notImplemented();
     //     }
     //     execution.executeOrder = TestCallParameters(
     //         address(blur),
     //         0,
     //         abi.encodeWithSelector(
-    //             IBlurExchange.fulfillOrder.selector,
-    //             order,
-    //             0
+    //             IBlurExchange.execute.selector,
+    //             makerInput,
+    //             takerInput
     //         )
     //     );
     // }
@@ -523,23 +475,15 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //     );
 
     //     if (context.listOnChain) {
-    //         order.signature = "";
-
-    //         Order[] memory orders = new Order[](1);
-    //         orders[0] = order;
-    //         execution.submitOrder = TestCallParameters(
-    //             address(blur),
-    //             0,
-    //             abi.encodeWithSelector(IBlurExchange.validate.selector, orders)
-    //         );
+    //         _notImplemented();
     //     }
     //     execution.executeOrder = TestCallParameters(
     //         address(blur),
     //         0,
     //         abi.encodeWithSelector(
-    //             IBlurExchange.fulfillOrder.selector,
-    //             order,
-    //             0
+    //             IBlurExchange.execute.selector,
+    //             makerInput,
+    //             takerInput
     //         )
     //     );
     // }
@@ -575,23 +519,15 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //             additionalRecipients
     //         );
     //     if (context.listOnChain) {
-    //         order.signature = "";
-    //         basicComponents.signature = "";
-
-    //         Order[] memory orders = new Order[](1);
-    //         orders[0] = order;
-    //         execution.submitOrder = TestCallParameters(
-    //             address(blur),
-    //             0,
-    //             abi.encodeWithSelector(IBlurExchange.validate.selector, orders)
-    //         );
+    //         _notImplemented();
     //     }
     //     execution.executeOrder = TestCallParameters(
     //         address(blur),
     //         priceEthAmount + feeEthAmount,
     //         abi.encodeWithSelector(
     //             IBlurExchange.execute.selector,
-    //             basicComponents
+    //             makerInput,
+    //             takerInput
     //         )
     //     );
     // }
@@ -635,23 +571,15 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //             additionalRecipients
     //         );
     //     if (context.listOnChain) {
-    //         order.signature = "";
-    //         basicComponents.signature = "";
-
-    //         Order[] memory orders = new Order[](1);
-    //         orders[0] = order;
-    //         execution.submitOrder = TestCallParameters(
-    //             address(blur),
-    //             0,
-    //             abi.encodeWithSelector(IBlurExchange.validate.selector, orders)
-    //         );
+    //         _notImplemented();
     //     }
     //     execution.executeOrder = TestCallParameters(
     //         address(blur),
     //         priceEthAmount + feeEthAmount1 + feeEthAmount2,
     //         abi.encodeWithSelector(
     //             IBlurExchange.execute.selector,
-    //             basicComponents
+    //             makerInput,
+    //             takerInput
     //         )
     //     );
     // }
@@ -693,24 +621,16 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //     );
 
     //     if (context.listOnChain) {
-    //         order.signature = "";
-
-    //         Order[] memory orders = new Order[](1);
-    //         orders[0] = order;
-    //         execution.submitOrder = TestCallParameters(
-    //             address(blur),
-    //             0,
-    //             abi.encodeWithSelector(IBlurExchange.validate.selector, orders)
-    //         );
+    //         _notImplemented();
     //     }
 
     //     execution.executeOrder = TestCallParameters(
     //         address(blur),
     //         ethAmount,
     //         abi.encodeWithSelector(
-    //             IBlurExchange.fulfillOrder.selector,
-    //             order,
-    //             0
+    //             IBlurExchange.execute.selector,
+    //             makerInput,
+    //             takerInput
     //         )
     //     );
     // }
@@ -747,10 +667,11 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //         execution.submitOrder = TestCallParameters(
     //             address(blur),
     //             0,
-    //             abi.encodeWithSelector(
-    //                 IBlurExchange.validate.selector,
-    //                 ordersToValidate
-    //             )
+    //         abi.encodeWithSelector(
+    //             IBlurExchange.execute.selector,
+    //             makerInput,
+    //             takerInput
+    //         )
     //         );
     //     }
 
@@ -758,9 +679,9 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //         address(blur),
     //         sumEthAmount,
     //         abi.encodeWithSelector(
-    //             IBlurExchange.matchOrders.selector,
-    //             orders,
-    //             fullfillments
+    //             IBlurExchange.execute.selector,
+    //             makerInput,
+    //             takerInput
     //         )
     //     );
     // }
@@ -809,9 +730,9 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //         address(blur),
     //         0,
     //         abi.encodeWithSelector(
-    //             IBlurExchange.matchOrders.selector,
-    //             orders,
-    //             fullfillments
+    //             IBlurExchange.execute.selector,
+    //             makerInput,
+    //             takerInput
     //         )
     //     );
     // }
@@ -887,9 +808,9 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //         address(blur),
     //         0,
     //         abi.encodeWithSelector(
-    //             IBlurExchange.matchOrders.selector,
-    //             orders,
-    //             fullfillments
+    //             IBlurExchange.execute.selector,
+    //             makerInput,
+    //             takerInput
     //         )
     //     );
     // }
