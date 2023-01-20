@@ -18,14 +18,18 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     }
 
     IBlurExchange internal constant blur =
-        IBlurExchange(0xb38827497dAf7f28261910e33e22219de087C8f5);
+        IBlurExchange(0x000000000000Ad05Ccc4F10045630fb830B95127);
+
+    // The "execution delegate" — functions similarly to a conduit
+    address internal constant approvalTarget =
+        0x00000000000111AbE46ff893f3B2fdF1F759a8A8;
 
     address internal constant BlurOwner =
         0x0000000000000000000000000000000000000000;
 
     function beforeAllPrepareMarketplace(address, address) external override {
         buyerNftApprovalTarget = sellerNftApprovalTarget = buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(
-            blur
+            approvalTarget
         );
     }
 
@@ -34,20 +38,18 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         address,
         address[] calldata,
         address[] calldata
-    ) external override pure returns (SetupCall[] memory) {
+    ) external pure override returns (SetupCall[] memory) {
         SetupCall[] memory setupCalls = new SetupCall[](1);
 
         // address[] memory removeSigners = new address[](0);
         // address[] memory addSigners = new address[](1);
         // addSigners[0] = seller;
 
-        // Set seller as a signer for X2Y2
+        // Set seller as a signer for blur
         setupCalls[0] = SetupCall(
             BlurOwner,
             address(blur),
-            abi.encodeWithSelector(
-                IBlurExchange.open.selector
-            )
+            abi.encodeWithSelector(IBlurExchange.open.selector)
         );
 
         return setupCalls;
@@ -68,13 +70,23 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     )
         internal
         view
-        returns (Order memory _order, uint8 _v, bytes32 _r, bytes32 _s)
+        returns (
+            Order memory _order,
+            uint8 _v,
+            bytes32 _r,
+            bytes32 _s
+        )
     {
         Order memory order;
 
         order.trader = creator;
         order.side = side;
-        order.matchingPolicy = address(0); // This might be a problem.
+
+        // see "policy manager" at 0x3a35A3102b5c6bD1e4d3237248Be071EF53C8331
+        order.matchingPolicy = address(
+            0x00000000006411739DA1c40B106F8511de5D1FAC
+        );
+
         order.collection = nftContractAddress;
         order.tokenId = nftTokenId;
         order.amount = nftAmount;
@@ -88,7 +100,13 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
 
         (uint8 v, bytes32 r, bytes32 s) = _sign(
             creator,
-            _hashOrder(order, 0) // Nonce management might be a pain.
+            keccak256(
+                abi.encodePacked(
+                    "\x19\x01",
+                    DOMAIN_SEPARATOR,
+                    _hashOrder(order, 0) // Nonce management might be a pain.
+                )
+            )
         );
 
         return (order, v, r, s);
@@ -114,10 +132,11 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         return input;
     }
 
-    function buildExecution(
-        Input memory sell,
-        Input memory buy
-    ) internal pure returns (Execution memory _execution) {
+    function buildExecution(Input memory sell, Input memory buy)
+        internal
+        pure
+        returns (Execution memory _execution)
+    {
         Execution memory execution;
 
         execution.sell = sell;

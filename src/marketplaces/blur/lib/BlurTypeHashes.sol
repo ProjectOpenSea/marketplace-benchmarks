@@ -7,11 +7,13 @@ contract BlurTypeHashes {
     bytes32 public constant DOMAIN_SEPARATOR =
         keccak256(
             abi.encode(
-                0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f, // keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)")
-                0x58d816c9a85614b94054cb3eeccd020294571df168df9965beaa8593282d04b7, // keccak256("BlurExchange")
-                0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6, // keccak256(bytes("1")) for versionId = 1
+                keccak256(
+                    "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+                ),
+                keccak256("Blur Exchange"),
+                keccak256("1.0"), // for versionId = 1
                 1,
-                0xb38827497dAf7f28261910e33e22219de087C8f5 // mainnet Blur exchange address
+                0x000000000000Ad05Ccc4F10045630fb830B95127 // mainnet Blur exchange address
             )
         );
 
@@ -35,10 +37,11 @@ contract BlurTypeHashes {
     bytes32 public constant FEE_TYPEHASH =
         keccak256("Fee(uint16 rate,address recipient)");
 
-    function _hashOrder(
-        Order memory order,
-        uint256 nonce
-    ) internal pure returns (bytes32) {
+    function _hashOrder(Order memory order, uint256 nonce)
+        internal
+        pure
+        returns (bytes32)
+    {
         return
             keccak256(
                 bytes.concat(
