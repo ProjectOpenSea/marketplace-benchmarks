@@ -114,6 +114,23 @@ abstract contract BaseMarketConfig {
     }
 
     /**
+     * @dev Get call parameters to execute an order selling a 721 token for an ERC20.
+     *   If `context.listOnChain` is true and marketplace does not support on-chain
+     *   listing, this function must revert with NotImplemented.
+     * @param context Order context, including the buyer and seller and whether the
+     *  order should be listed on chain.
+     * @param nft Address and ID of 721 token to be sold.
+     * @param erc20 Address and amount for ERC20 to be received for nft.
+     */
+    function getPayload_BuyOfferedERC721WithWETH(
+        TestOrderContext calldata context,
+        TestItem721 calldata nft,
+        TestItem20 calldata erc20
+    ) external virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
+
+    /**
      * @dev Get call parameters to execute an order selling an 1155 token for an ERC20.
      *   If `context.listOnChain` is true and marketplace does not support on-chain
      *   listing, this function must revert with NotImplemented.

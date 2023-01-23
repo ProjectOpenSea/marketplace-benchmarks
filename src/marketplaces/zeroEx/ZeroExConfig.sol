@@ -26,10 +26,10 @@ contract ZeroExConfig is BaseMarketConfig, Test {
         return address(zeroEx);
     }
 
-    function beforeAllPrepareMarketplace(address seller, address)
-        external
-        override
-    {
+    function beforeAllPrepareMarketplace(
+        address seller,
+        address
+    ) external override {
         buyerNftApprovalTarget = sellerNftApprovalTarget = buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(
             zeroEx
         );
@@ -169,6 +169,67 @@ contract ZeroExConfig is BaseMarketConfig, Test {
     }
 
     function getPayload_BuyOfferedERC721WithERC20(
+        TestOrderContext calldata context,
+        TestItem721 memory nft,
+        TestItem20 memory erc20
+    ) external view override returns (TestOrderPayload memory execution) {
+        // Prepare the order
+        LibNFTOrder.ERC721Order memory order = LibNFTOrder.ERC721Order({
+            direction: LibNFTOrder.TradeDirection.SELL_NFT,
+            maker: context.offerer,
+            taker: context.fulfiller,
+            expiry: block.timestamp + 120,
+            nonce: testNonce,
+            erc20Token: erc20.token,
+            erc20TokenAmount: erc20.amount,
+            fees: new LibNFTOrder.Fee[](0),
+            erc721Token: nft.token,
+            erc721TokenId: nft.identifier,
+            erc721TokenProperties: new LibNFTOrder.Property[](0)
+        });
+
+        // Sign the order
+        (uint8 v, bytes32 r, bytes32 s) = _sign(
+            order.maker,
+            zeroEx.getERC721OrderHash(order)
+        );
+
+        // Prepare the signature
+        LibSignature.Signature memory sig = LibSignature.Signature({
+            signatureType: LibSignature.SignatureType.EIP712,
+            v: v,
+            r: r,
+            s: s
+        });
+
+        // Handle special case if "listing on chain" or in the 0x parlance the order is "presigned"
+        if (context.listOnChain) {
+            sig = LibSignature.Signature({
+                signatureType: LibSignature.SignatureType.PRESIGNED,
+                v: 0,
+                r: 0,
+                s: 0
+            });
+
+            execution.submitOrder = TestCallParameters(
+                address(zeroEx),
+                0,
+                abi.encodeWithSelector(
+                    IZeroEx.preSignERC721Order.selector,
+                    order
+                )
+            );
+        }
+
+        // Execute the buy
+        execution.executeOrder = TestCallParameters(
+            address(zeroEx),
+            0,
+            abi.encodeWithSelector(IZeroEx.buyERC721.selector, order, sig, "")
+        );
+    }
+
+    function getPayload_BuyOfferedERC721WithWETH(
         TestOrderContext calldata context,
         TestItem721 memory nft,
         TestItem20 memory erc20

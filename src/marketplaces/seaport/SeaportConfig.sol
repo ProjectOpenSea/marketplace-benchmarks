@@ -455,6 +455,49 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         );
     }
 
+    function getPayload_BuyOfferedERC721WithWETH(
+        TestOrderContext calldata context,
+        TestItem721 memory nft,
+        TestItem20 memory erc20
+    ) external view override returns (TestOrderPayload memory execution) {
+        (
+            Order memory order,
+            BasicOrderParameters memory basicComponents
+        ) = buildBasicOrder(
+                BasicOrderRouteType.ERC20_TO_ERC721,
+                context.offerer,
+                OfferItem(ItemType.ERC721, nft.token, nft.identifier, 1, 1),
+                ConsiderationItem(
+                    ItemType.ERC20,
+                    erc20.token,
+                    0,
+                    erc20.amount,
+                    erc20.amount,
+                    payable(context.offerer)
+                )
+            );
+        if (context.listOnChain) {
+            order.signature = "";
+            basicComponents.signature = "";
+
+            Order[] memory orders = new Order[](1);
+            orders[0] = order;
+            execution.submitOrder = TestCallParameters(
+                address(seaport),
+                0,
+                abi.encodeWithSelector(ISeaport.validate.selector, orders)
+            );
+        }
+        execution.executeOrder = TestCallParameters(
+            address(seaport),
+            0,
+            abi.encodeWithSelector(
+                ISeaport.fulfillBasicOrder.selector,
+                basicComponents
+            )
+        );
+    }
+
     function getPayload_BuyOfferedERC1155WithERC20(
         TestOrderContext calldata context,
         TestItem1155 calldata nft,

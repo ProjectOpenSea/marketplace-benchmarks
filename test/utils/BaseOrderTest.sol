@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.14;
 import { DSTestPlus } from "solmate/test/utils/DSTestPlus.sol";
-import { stdStorage, StdStorage } from "forge-std/Test.sol";
+// import { stdStorage, StdStorage } from "forge-std/Test.sol";
+import "forge-std/Test.sol";
 import { TestERC1155 } from "../tokens/TestERC1155.sol";
 import { TestERC20 } from "../tokens/TestERC20.sol";
+import { WETH } from "../tokens/WETH.sol";
 import { TestERC721 } from "../tokens/TestERC721.sol";
 
 contract BaseOrderTest is DSTestPlus {
@@ -26,6 +28,9 @@ contract BaseOrderTest is DSTestPlus {
     TestERC20 internal token1;
     TestERC20 internal token2;
     TestERC20 internal token3;
+    // TestERC20 internal weth;
+    WETH internal constant weth =
+        WETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
 
     TestERC721 internal test721_1;
     TestERC721 internal test721_2;
@@ -74,7 +79,12 @@ contract BaseOrderTest is DSTestPlus {
         _deployTestTokenContracts();
         accounts = [alice, bob, cal, address(this)];
         erc20s = [token1, token2, token3];
-        erc20Addresses = [address(token1), address(token2), address(token3)];
+        erc20Addresses = [
+            address(token1),
+            address(token2),
+            address(token3),
+            address(weth)
+        ];
         erc721s = [test721_1, test721_2, test721_3];
         erc721Addresses = [
             address(test721_1),
@@ -86,6 +96,7 @@ contract BaseOrderTest is DSTestPlus {
             address(token1),
             address(token2),
             address(token3),
+            address(weth),
             address(test721_1),
             address(test721_2),
             address(test721_3),
@@ -109,6 +120,7 @@ contract BaseOrderTest is DSTestPlus {
         test1155_2 = new TestERC1155();
         test1155_3 = new TestERC1155();
         hevm.label(address(token1), "token1");
+        hevm.label(address(weth), "weth");
         hevm.label(address(test721_1), "test721_1");
         hevm.label(address(test1155_1), "test1155_1");
         hevm.label(address(feeReciever1), "feeReciever1");
@@ -125,6 +137,7 @@ contract BaseOrderTest is DSTestPlus {
         for (uint256 i = 0; i < erc20s.length; i++) {
             erc20s[i].approve(_erc20Target, MAX_INT);
         }
+        weth.approve(_erc20Target, MAX_INT);
         for (uint256 i = 0; i < erc721s.length; i++) {
             erc721s[i].setApprovalForAll(_erc721Target, true);
         }
@@ -139,8 +152,8 @@ contract BaseOrderTest is DSTestPlus {
     }
 
     /**
-     * @dev reset written token storage slots to 0 and reinitialize uint128(MAX_INT)
-     *   erc20 balances for 3 test accounts and this
+     * @dev reset written token storage slots to 0 and reinitialize
+     *      uint128(MAX_INT) erc20 balances for 3 test accounts and this.
      */
     function _resetStorageAndEth(address market) internal {
         _resetTokensStorage();
@@ -182,8 +195,10 @@ contract BaseOrderTest is DSTestPlus {
     }
 
     /**
-     * @dev reset all storage written at an address thus far to 0; will overwrite totalSupply()for ERC20s but that should be fine
-     *      with the goal of resetting the balances and owners of tokens - but note: should be careful about approvals, etc
+     * @dev reset all storage written at an address thus far to 0; will
+     *      overwrite totalSupply()for ERC20s but that should be fine with the
+     *      goal of resetting the balances and owners of tokens - but note:
+     *      should be careful about approvals, etc
      *
      *      note: must be called in conjunction with vm.record()
      */

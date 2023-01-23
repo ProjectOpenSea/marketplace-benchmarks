@@ -7,6 +7,7 @@ import "./lib/OrderStructs.sol";
 import "./lib/BlurTypeHashes.sol";
 import { IBlurExchange } from "./interfaces/IBlurExchange.sol";
 import "forge-std/console2.sol";
+import { TestERC20 } from "../../../test/tokens/TestERC20.sol";
 
 contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     function name() external pure override returns (string memory) {
@@ -20,12 +21,20 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     IBlurExchange internal constant blur =
         IBlurExchange(0x000000000000Ad05Ccc4F10045630fb830B95127);
 
-    // The "execution delegate" — functions similarly to a conduit
+    // The "execution delegate" — functions similarly to a conduit.
     address internal constant approvalTarget =
         0x00000000000111AbE46ff893f3B2fdF1F759a8A8;
 
+    // see "policy manager" at 0x3a35A3102b5c6bD1e4d3237248Be071EF53C8331
+    address internal constant matchingPolicy =
+        0x00000000006411739DA1c40B106F8511de5D1FAC;
+
     address internal constant BlurOwner =
         0x0000000000000000000000000000000000000000;
+
+    // address internal constant WETH_ADDRESS = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    TestERC20 internal constant weth =
+        TestERC20(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
 
     function beforeAllPrepareMarketplace(address, address) external override {
         buyerNftApprovalTarget = sellerNftApprovalTarget = buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(
@@ -34,30 +43,55 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     }
 
     function beforeAllPrepareMarketplaceCall(
-        address,
-        address,
+        address seller,
+        address buyer,
         address[] calldata,
         address[] calldata
     ) external pure override returns (SetupCall[] memory) {
-        SetupCall[] memory setupCalls = new SetupCall[](1);
+        SetupCall[] memory setupCalls = new SetupCall[](5);
 
-        // address[] memory removeSigners = new address[](0);
-        // address[] memory addSigners = new address[](1);
-        // addSigners[0] = seller;
-
-        // Set seller as a signer for blur
         setupCalls[0] = SetupCall(
             BlurOwner,
             address(blur),
             abi.encodeWithSelector(IBlurExchange.open.selector)
         );
 
+        setupCalls[1] = SetupCall(
+            buyer,
+            address(weth),
+            abi.encodeWithSelector(weth.mint.selector, buyer, type(uint256).max)
+        );
+
+        setupCalls[2] = SetupCall(
+            buyer,
+            address(weth),
+            abi.encodeWithSelector(
+                weth.approve.selector,
+                buyer,
+                approvalTarget,
+                type(uint256).max
+            )
+        );
+
+        setupCalls[3] = SetupCall(
+            seller,
+            address(weth),
+            abi.encodeWithSelector(weth.mint.selector, seller, type(uint256).max)
+        );
+
+        setupCalls[4] = SetupCall(
+            seller,
+            address(weth),
+            abi.encodeWithSelector(
+                weth.approve.selector,
+                seller,
+                approvalTarget,
+                type(uint256).max
+            )
+        );
+
         return setupCalls;
     }
-
-    ////////////////////////////////////////////////////////////
-    // require(_validateSignatures(sell, sellHash), "Sell failed authorization");
-    // [FAIL. Reason: Sell failed authorization] testBlur() (gas: 1940642)
 
     function buildOrder(
         address creator,
@@ -70,22 +104,14 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     )
         internal
         view
-        returns (
-            Order memory _order,
-            uint8 _v,
-            bytes32 _r,
-            bytes32 _s
-        )
+        returns (Order memory _order, uint8 _v, bytes32 _r, bytes32 _s)
     {
         Order memory order;
 
         order.trader = creator;
         order.side = side;
 
-        // see "policy manager" at 0x3a35A3102b5c6bD1e4d3237248Be071EF53C8331
-        order.matchingPolicy = address(
-            0x00000000006411739DA1c40B106F8511de5D1FAC
-        );
+        order.matchingPolicy = matchingPolicy;
 
         order.collection = nftContractAddress;
         order.tokenId = nftTokenId;
@@ -132,11 +158,10 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         return input;
     }
 
-    function buildExecution(Input memory sell, Input memory buy)
-        internal
-        pure
-        returns (Execution memory _execution)
-    {
+    function buildExecution(
+        Input memory sell,
+        Input memory buy
+    ) internal pure returns (Execution memory _execution) {
         Execution memory execution;
 
         execution.sell = sell;
@@ -205,6 +230,7 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         if (context.listOnChain) {
             _notImplemented();
         }
+
         execution.executeOrder = TestCallParameters(
             address(blur),
             ethAmount,
@@ -216,36 +242,31 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         );
     }
 
+    // The current matching policy at 0x0000...1FAC does not allow for 1155s to
+    // be sold.  This pattern should be close to viable when they update the
+    // policy.
+    //
+    // See https://etherscan.io/address/0xb38827497daf7f28261910e33e22219de087c8f5#code#F1#L521,
+    // https://etherscan.io/address/0x00000000006411739DA1c40B106F8511de5D1FAC#code#F1#L36.
     // function getPayload_BuyOfferedERC1155WithEther(
     //     TestOrderContext calldata context,
     //     TestItem1155 memory nft,
     //     uint256 ethAmount
     // ) external view override returns (TestOrderPayload memory execution) {
-    //     (
-    //         Order memory order,
-    //         BasicOrderParameters memory basicComponents
-    //     ) = buildBasicOrder(
-    //             BasicOrderRouteType.ETH_TO_ERC1155,
-    //             context.offerer,
-    //             OfferItem(
-    //                 ItemType.ERC1155,
-    //                 nft.token,
-    //                 nft.identifier,
-    //                 nft.amount,
-    //                 nft.amount
-    //             ),
-    //             ConsiderationItem(
-    //                 ItemType.NATIVE,
-    //                 address(0),
-    //                 0,
-    //                 ethAmount,
-    //                 ethAmount,
-    //                 payable(context.offerer)
-    //             )
-    //         );
+    //     (Input memory makerInput, Input memory takerInput) = buildInputPair(
+    //         context.offerer,
+    //         context.fulfiller,
+    //         nft.token,
+    //         nft.identifier,
+    //         nft.amount,
+    //         address(0),
+    //         ethAmount
+    //     );
+
     //     if (context.listOnChain) {
     //         _notImplemented();
     //     }
+
     //     execution.executeOrder = TestCallParameters(
     //         address(blur),
     //         ethAmount,
@@ -257,30 +278,56 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //     );
     // }
 
+    function getPayload_BuyOfferedERC721WithWETH(
+        TestOrderContext calldata context,
+        TestItem721 memory nft,
+        TestItem20 memory erc20
+    ) external view override returns (TestOrderPayload memory execution) {
+        (Input memory makerInput, Input memory takerInput) = buildInputPair(
+            context.offerer,
+            context.fulfiller,
+            nft.token,
+            nft.identifier,
+            1,
+            erc20.token,
+            erc20.amount
+        );
+
+        if (context.listOnChain) {
+            _notImplemented();
+        }
+
+        execution.executeOrder = TestCallParameters(
+            address(blur),
+            0,
+            abi.encodeWithSelector(
+                IBlurExchange.execute.selector,
+                makerInput,
+                takerInput
+            )
+        );
+    }
+
+    // // See https://etherscan.io/address/0xb38827497daf7f28261910e33e22219de087c8f5#code#F1#L594.
     // function getPayload_BuyOfferedERC721WithERC20(
     //     TestOrderContext calldata context,
     //     TestItem721 memory nft,
     //     TestItem20 memory erc20
     // ) external view override returns (TestOrderPayload memory execution) {
-    //     (
-    //         Order memory order,
-    //         BasicOrderParameters memory basicComponents
-    //     ) = buildBasicOrder(
-    //             BasicOrderRouteType.ERC20_TO_ERC721,
-    //             context.offerer,
-    //             OfferItem(ItemType.ERC721, nft.token, nft.identifier, 1, 1),
-    //             ConsiderationItem(
-    //                 ItemType.ERC20,
-    //                 erc20.token,
-    //                 0,
-    //                 erc20.amount,
-    //                 erc20.amount,
-    //                 payable(context.offerer)
-    //             )
-    //         );
+    //     (Input memory makerInput, Input memory takerInput) = buildInputPair(
+    //         context.offerer,
+    //         context.fulfiller,
+    //         nft.token,
+    //         nft.identifier,
+    //         1,
+    //         address(weth), // Use WETH because it's the only standard ERC20 permitted.
+    //         erc20.amount
+    //     );
+
     //     if (context.listOnChain) {
     //         _notImplemented();
     //     }
+
     //     execution.executeOrder = TestCallParameters(
     //         address(blur),
     //         0,
