@@ -177,7 +177,8 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         uint256 nftTokenId,
         uint256 nftAmount,
         address paymentToken,
-        uint256 paymentTokenAmount
+        uint256 paymentTokenAmount,
+        bool isOffer
     ) internal view returns (Input memory makerInput, Input memory takerInput) {
         Order memory makerOrder;
         Order memory takerOrder;
@@ -185,9 +186,11 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         bytes32 r;
         bytes32 s;
 
+        // If it's an offer of ERC20 for ERC721, then the maker is the buyer and
+        // the taker is the seller.
         (makerOrder, v, r, s) = buildOrder(
             maker,
-            Side.Sell, // Might want to make this a parameter.
+            isOffer ? Side.Buy : Side.Sell,
             nftContractAddress,
             nftTokenId,
             nftAmount,
@@ -199,7 +202,7 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
 
         (takerOrder, v, r, s) = buildOrder(
             taker,
-            Side.Buy, // Might want to make this a parameter.
+            isOffer ? Side.Sell : Side.Buy,
             nftContractAddress,
             nftTokenId,
             nftAmount,
@@ -224,7 +227,8 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
             nft.identifier,
             1,
             address(0),
-            ethAmount
+            ethAmount,
+            false
         );
 
         if (context.listOnChain) {
@@ -278,6 +282,9 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //     );
     // }
 
+    // It's not possible to purchase NFTs with tokens other than ETH, WETH, or
+    // Blur's proprietary version of WETH.
+    // See https://etherscan.io/address/0xb38827497daf7f28261910e33e22219de087c8f5#code#F1#L594.
     function getPayload_BuyOfferedERC721WithWETH(
         TestOrderContext calldata context,
         TestItem721 memory nft,
@@ -290,7 +297,8 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
             nft.identifier,
             1,
             erc20.token,
-            erc20.amount
+            erc20.amount,
+            false
         );
 
         if (context.listOnChain) {
@@ -308,252 +316,38 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         );
     }
 
-    // // See https://etherscan.io/address/0xb38827497daf7f28261910e33e22219de087c8f5#code#F1#L594.
-    // function getPayload_BuyOfferedERC721WithERC20(
-    //     TestOrderContext calldata context,
-    //     TestItem721 memory nft,
-    //     TestItem20 memory erc20
-    // ) external view override returns (TestOrderPayload memory execution) {
-    //     (Input memory makerInput, Input memory takerInput) = buildInputPair(
-    //         context.offerer,
-    //         context.fulfiller,
-    //         nft.token,
-    //         nft.identifier,
-    //         1,
-    //         address(weth), // Use WETH because it's the only standard ERC20 permitted.
-    //         erc20.amount
-    //     );
+    function getPayload_BuyOfferedWETHWithERC721(
+        TestOrderContext calldata context,
+        TestItem20 memory erc20,
+        TestItem721 memory nft
+    ) external view override returns (TestOrderPayload memory execution) {
+        (Input memory makerInput, Input memory takerInput) = buildInputPair(
+            context.offerer,
+            context.fulfiller,
+            nft.token,
+            nft.identifier,
+            1,
+            erc20.token,
+            erc20.amount,
+            true
+        );
 
-    //     if (context.listOnChain) {
-    //         _notImplemented();
-    //     }
+        if (context.listOnChain) {
+            _notImplemented();
+        }
 
-    //     execution.executeOrder = TestCallParameters(
-    //         address(blur),
-    //         0,
-    //         abi.encodeWithSelector(
-    //             IBlurExchange.execute.selector,
-    //             makerInput,
-    //             takerInput
-    //         )
-    //     );
-    // }
+        execution.executeOrder = TestCallParameters(
+            address(blur),
+            0,
+            abi.encodeWithSelector(
+                IBlurExchange.execute.selector,
+                takerInput,
+                makerInput
+            )
+        );
+    }
 
-    // function getPayload_BuyOfferedERC1155WithERC20(
-    //     TestOrderContext calldata context,
-    //     TestItem1155 calldata nft,
-    //     TestItem20 memory erc20
-    // ) external view override returns (TestOrderPayload memory execution) {
-    //     (
-    //         Order memory order,
-    //         BasicOrderParameters memory basicComponents
-    //     ) = buildBasicOrder(
-    //             BasicOrderRouteType.ERC20_TO_ERC1155,
-    //             context.offerer,
-    //             OfferItem(
-    //                 ItemType.ERC1155,
-    //                 nft.token,
-    //                 nft.identifier,
-    //                 nft.amount,
-    //                 nft.amount
-    //             ),
-    //             ConsiderationItem(
-    //                 ItemType.ERC20,
-    //                 erc20.token,
-    //                 0,
-    //                 erc20.amount,
-    //                 erc20.amount,
-    //                 payable(context.offerer)
-    //             )
-    //         );
-    //     if (context.listOnChain) {
-    //         _notImplemented();
-    //     }
-    //     execution.executeOrder = TestCallParameters(
-    //         address(blur),
-    //         0,
-    //         abi.encodeWithSelector(
-    //             IBlurExchange.execute.selector,
-    //             makerInput,
-    //             takerInput
-    //         )
-    //     );
-    // }
-
-    // function getPayload_BuyOfferedERC20WithERC721(
-    //     TestOrderContext calldata context,
-    //     TestItem20 memory erc20,
-    //     TestItem721 memory nft
-    // ) external view override returns (TestOrderPayload memory execution) {
-    //     (
-    //         Order memory order,
-    //         BasicOrderParameters memory basicComponents
-    //     ) = buildBasicOrder(
-    //             BasicOrderRouteType.ERC721_TO_ERC20,
-    //             context.offerer,
-    //             OfferItem(
-    //                 ItemType.ERC20,
-    //                 erc20.token,
-    //                 0,
-    //                 erc20.amount,
-    //                 erc20.amount
-    //             ),
-    //             ConsiderationItem(
-    //                 ItemType.ERC721,
-    //                 nft.token,
-    //                 nft.identifier,
-    //                 1,
-    //                 1,
-    //                 payable(context.offerer)
-    //             )
-    //         );
-    //     if (context.listOnChain) {
-    //         _notImplemented();
-    //     }
-    //     execution.executeOrder = TestCallParameters(
-    //         address(blur),
-    //         0,
-    //         abi.encodeWithSelector(
-    //             IBlurExchange.execute.selector,
-    //             makerInput,
-    //             takerInput
-    //         )
-    //     );
-    // }
-
-    // function getPayload_BuyOfferedERC20WithERC1155(
-    //     TestOrderContext calldata context,
-    //     TestItem20 memory erc20,
-    //     TestItem1155 calldata nft
-    // ) external view override returns (TestOrderPayload memory execution) {
-    //     (
-    //         Order memory order,
-    //         BasicOrderParameters memory basicComponents
-    //     ) = buildBasicOrder(
-    //             BasicOrderRouteType.ERC1155_TO_ERC20,
-    //             context.offerer,
-    //             OfferItem(
-    //                 ItemType.ERC20,
-    //                 erc20.token,
-    //                 0,
-    //                 erc20.amount,
-    //                 erc20.amount
-    //             ),
-    //             ConsiderationItem(
-    //                 ItemType.ERC1155,
-    //                 nft.token,
-    //                 nft.identifier,
-    //                 nft.amount,
-    //                 nft.amount,
-    //                 payable(context.offerer)
-    //             )
-    //         );
-    //     if (context.listOnChain) {
-    //         _notImplemented();
-    //     }
-    //     execution.executeOrder = TestCallParameters(
-    //         address(blur),
-    //         0,
-    //         abi.encodeWithSelector(
-    //             IBlurExchange.execute.selector,
-    //             makerInput,
-    //             takerInput
-    //         )
-    //     );
-    // }
-
-    // function getPayload_BuyOfferedERC721WithERC1155(
-    //     TestOrderContext calldata context,
-    //     TestItem721 memory sellNft,
-    //     TestItem1155 calldata buyNft
-    // ) external view override returns (TestOrderPayload memory execution) {
-    //     OfferItem[] memory offerItems = new OfferItem[](1);
-    //     ConsiderationItem[] memory considerationItems = new ConsiderationItem[](
-    //         1
-    //     );
-
-    //     offerItems[0] = OfferItem(
-    //         ItemType.ERC721,
-    //         sellNft.token,
-    //         sellNft.identifier,
-    //         1,
-    //         1
-    //     );
-    //     considerationItems[0] = ConsiderationItem(
-    //         ItemType.ERC1155,
-    //         buyNft.token,
-    //         buyNft.identifier,
-    //         buyNft.amount,
-    //         buyNft.amount,
-    //         payable(context.offerer)
-    //     );
-
-    //     Order memory order = buildOrder(
-    //         context.offerer,
-    //         offerItems,
-    //         considerationItems
-    //     );
-
-    //     if (context.listOnChain) {
-    //         _notImplemented();
-    //     }
-    //     execution.executeOrder = TestCallParameters(
-    //         address(blur),
-    //         0,
-    //         abi.encodeWithSelector(
-    //             IBlurExchange.execute.selector,
-    //             makerInput,
-    //             takerInput
-    //         )
-    //     );
-    // }
-
-    // function getPayload_BuyOfferedERC1155WithERC721(
-    //     TestOrderContext calldata context,
-    //     TestItem1155 memory sellNft,
-    //     TestItem721 calldata buyNft
-    // ) external view override returns (TestOrderPayload memory execution) {
-    //     OfferItem[] memory offerItems = new OfferItem[](1);
-    //     ConsiderationItem[] memory considerationItems = new ConsiderationItem[](
-    //         1
-    //     );
-
-    //     offerItems[0] = OfferItem(
-    //         ItemType.ERC1155,
-    //         sellNft.token,
-    //         sellNft.identifier,
-    //         sellNft.amount,
-    //         sellNft.amount
-    //     );
-    //     considerationItems[0] = ConsiderationItem(
-    //         ItemType.ERC721,
-    //         buyNft.token,
-    //         buyNft.identifier,
-    //         1,
-    //         1,
-    //         payable(context.offerer)
-    //     );
-
-    //     Order memory order = buildOrder(
-    //         context.offerer,
-    //         offerItems,
-    //         considerationItems
-    //     );
-
-    //     if (context.listOnChain) {
-    //         _notImplemented();
-    //     }
-    //     execution.executeOrder = TestCallParameters(
-    //         address(blur),
-    //         0,
-    //         abi.encodeWithSelector(
-    //             IBlurExchange.execute.selector,
-    //             makerInput,
-    //             takerInput
-    //         )
-    //     );
-    // }
-
+    // TODO: Think about fee recipients.
     // function getPayload_BuyOfferedERC721WithEtherOneFeeRecipient(
     //     TestOrderContext calldata context,
     //     TestItem721 memory nft,

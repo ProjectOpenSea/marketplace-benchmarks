@@ -337,6 +337,40 @@ contract LooksRareConfig is BaseMarketConfig, LooksRareTypeHashes {
         );
     }
 
+    function getPayload_BuyOfferedWETHWithERC721(
+        TestOrderContext calldata context,
+        TestItem20 calldata erc20,
+        TestItem721 calldata nft
+    ) external view override returns (TestOrderPayload memory execution) {
+        OrderTypes.MakerOrder memory makerOrder = buildMakerOrder(
+            false,
+            context.offerer,
+            erc20.token,
+            erc20.amount,
+            nft.token,
+            1,
+            nft.identifier
+        );
+        OrderTypes.TakerOrder memory takerOrder = buildTakerOrder(
+            context.fulfiller,
+            makerOrder
+        );
+
+        if (context.listOnChain) {
+            _notImplemented();
+        }
+
+        execution.executeOrder = TestCallParameters(
+            address(looksRare),
+            0,
+            abi.encodeWithSelector(
+                ILooksRareExchange.matchBidWithTakerAsk.selector,
+                takerOrder,
+                makerOrder
+            )
+        );
+    }
+
     function getPayload_BuyOfferedERC20WithERC1155(
         TestOrderContext calldata context,
         TestItem20 calldata erc20,

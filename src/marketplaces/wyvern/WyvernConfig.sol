@@ -812,6 +812,46 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         );
     }
 
+    function getPayload_BuyOfferedWETHWithERC721(
+        TestOrderContext calldata context,
+        TestItem20 calldata erc20,
+        TestItem721 calldata nft
+    ) external view override returns (TestOrderPayload memory execution) {
+        (Order memory buyOrder, Sig memory buySignature) = buildERC721BuyOrder(
+            context.offerer,
+            NULL_ADDRESS,
+            erc20.token,
+            erc20.amount,
+            nft,
+            DEFAULT_FEE_RECIPIENT,
+            0
+        );
+        (Order memory sellOrder, ) = buildERC721SellOrder(
+            context.fulfiller,
+            NULL_ADDRESS,
+            erc20.token,
+            erc20.amount,
+            nft,
+            NULL_ADDRESS,
+            0
+        );
+
+        if (context.listOnChain) {
+            execution.submitOrder = TestCallParameters(
+                address(wyvern),
+                0,
+                encodeApproveOrder(buyOrder)
+            );
+            buySignature = EMPTY_SIG;
+        }
+
+        execution.executeOrder = TestCallParameters(
+            address(wyvern),
+            0,
+            encodeAtomicMatch(buyOrder, sellOrder, buySignature, EMPTY_SIG)
+        );
+    }
+
     function getPayload_BuyOfferedERC20WithERC1155(
         TestOrderContext calldata context,
         TestItem20 calldata erc20,

@@ -92,6 +92,8 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmark_BuyOfferedERC1155WithERC20(config);
         benchmark_BuyOfferedERC20WithERC721_ListOnChain(config);
         benchmark_BuyOfferedERC20WithERC721(config);
+        benchmark_BuyOfferedWETHWithERC721_ListOnChain(config);
+        benchmark_BuyOfferedWETHWithERC721(config);
         benchmark_BuyOfferedERC20WithERC1155_ListOnChain(config);
         benchmark_BuyOfferedERC20WithERC1155(config);
         benchmark_BuyOfferedERC721WithERC1155_ListOnChain(config);
@@ -567,6 +569,86 @@ contract GenericMarketplaceTest is BaseOrderTest {
             assertEq(test721_1.ownerOf(1), alice);
             assertEq(token1.balanceOf(alice), 0);
             assertEq(token1.balanceOf(bob), 100);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyOfferedWETHWithERC721_ListOnChain(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string memory testLabel = "(WETH -> ERC721 List-On-Chain)";
+        hevm.deal(alice, 100);
+        hevm.prank(alice);
+        weth.deposit{value: 100}();
+        test721_1.mint(bob, 1);
+        try
+            config.getPayload_BuyOfferedWETHWithERC721(
+                TestOrderContext(true, alice, bob),
+                TestItem20(address(weth), 100),
+                TestItem721(address(test721_1), 1)
+            )
+        returns (TestOrderPayload memory payload) {
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " List")),
+                alice,
+                payload.submitOrder
+            );
+
+            assertEq(test721_1.ownerOf(1), bob);
+            // Allow the market to escrow after listing
+            assert(
+                weth.balanceOf(alice) == 100 ||
+                    weth.balanceOf(config.market()) == 100
+            );
+            assertEq(weth.balanceOf(bob), 0);
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill")),
+                bob,
+                payload.executeOrder
+            );
+
+            assertEq(test721_1.ownerOf(1), alice);
+            assertEq(weth.balanceOf(alice), 0);
+            assertEq(weth.balanceOf(bob), 100);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyOfferedWETHWithERC721(BaseMarketConfig config)
+        internal
+        prepareTest(config)
+    {
+        string memory testLabel = "(WETH -> ERC721)";
+        hevm.deal(alice, 100);
+        hevm.prank(alice);
+        weth.deposit{value: 100}();
+        test721_1.mint(bob, 1);
+        try
+            config.getPayload_BuyOfferedWETHWithERC721(
+                TestOrderContext(false, alice, bob),
+                TestItem20(address(weth), 100),
+                TestItem721(address(test721_1), 1)
+            )
+        returns (TestOrderPayload memory payload) {
+            assertEq(test721_1.ownerOf(1), bob);
+            assertEq(weth.balanceOf(alice), 100);
+            assertEq(weth.balanceOf(bob), 0);
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill w/ Sig")),
+                bob,
+                payload.executeOrder
+            );
+
+            assertEq(test721_1.ownerOf(1), alice);
+            assertEq(weth.balanceOf(alice), 0);
+            assertEq(weth.balanceOf(bob), 100);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }

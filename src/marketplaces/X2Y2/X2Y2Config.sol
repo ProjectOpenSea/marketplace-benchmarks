@@ -301,6 +301,33 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
         execution.executeOrder = TestCallParameters(address(X2Y2), 0, payload);
     }
 
+    function getPayload_BuyOfferedWETHWithERC721(
+        TestOrderContext calldata context,
+        TestItem20 calldata erc20,
+        TestItem721 calldata nft
+    ) external view override returns (TestOrderPayload memory execution) {
+        if (context.listOnChain) {
+            _notImplemented();
+        }
+
+        TestItem721[] memory nfts = new TestItem721[](1);
+        nfts[0] = nft;
+
+        Market.Fee[] memory fees = new Market.Fee[](0);
+
+        bytes memory payload = encodeFillOrder(
+            context.offerer,
+            context.fulfiller,
+            nfts,
+            erc20.amount,
+            erc20.token,
+            Market.INTENT_BUY,
+            fees
+        );
+
+        execution.executeOrder = TestCallParameters(address(X2Y2), 0, payload);
+    }
+
     function getPayload_BuyOfferedERC721WithEtherOneFeeRecipient(
         TestOrderContext calldata context,
         TestItem721 memory nft,
