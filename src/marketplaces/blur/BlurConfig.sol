@@ -102,10 +102,9 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         Side side,
         address nftContractAddress,
         uint256 nftTokenId,
-        uint256 nftAmount,
         address paymentToken,
         uint256 paymentTokenAmount,
-        address feeRecipient
+        Fee[] memory fee
     )
         internal
         view
@@ -120,18 +119,19 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
 
         order.collection = nftContractAddress;
         order.tokenId = nftTokenId;
-        order.amount = nftAmount;
+        order.amount = 1; // TODO: Add suppport for amounts other than 1.
         order.paymentToken = paymentToken;
         order.price = paymentTokenAmount;
         order.listingTime = 0;
         order.expirationTime = block.timestamp + 1;
-        // Pass in an address other than the null address to set a fee recipient.
-        if (feeRecipient == address(0)) {
-            order.fees = new Fee[](0);
-        } else {
-            order.fees = new Fee[](1);
-            order.fees[0] = Fee({ recipient: payable(feeRecipient), rate: 1 });
-        }
+        // // Pass in an address other than the null address to set a fee recipient.
+        // if (fee.recipient == address(0)) {
+        //     order.fees = new Fee[](0);
+        // } else {
+        //     order.fees = new Fee[](1);
+        //     order.fees[0] = Fee({ recipient: payable(feeRecipient), rate: (feeEthAmount * 10000) / (paymentTokenAmount + feeEthAmount) + 1 });
+        // }
+        order.fees = fee;
         order.salt = 0;
         order.extraParams = new bytes(0);
 
@@ -169,27 +169,14 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         return input;
     }
 
-    function buildExecution(
-        Input memory sell,
-        Input memory buy
-    ) internal pure returns (Execution memory _execution) {
-        Execution memory execution;
-
-        execution.sell = sell;
-        execution.buy = buy;
-
-        return execution;
-    }
-
     function buildInputPair(
         address maker,
         address taker,
         address nftContractAddress,
         uint256 nftTokenId,
-        uint256 nftAmount,
         address paymentToken,
         uint256 paymentTokenAmount,
-        address feeRecipient,
+        Fee[] memory fee,
         bool isOffer
     ) internal view returns (Input memory makerInput, Input memory takerInput) {
         Order memory makerOrder;
@@ -205,10 +192,9 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
             isOffer ? Side.Buy : Side.Sell,
             nftContractAddress,
             nftTokenId,
-            nftAmount,
             paymentToken,
             paymentTokenAmount,
-            feeRecipient
+            fee
         );
 
         makerInput = buildInput(makerOrder, v, r, s, SignatureVersion.Single);
@@ -218,10 +204,9 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
             isOffer ? Side.Sell : Side.Buy,
             nftContractAddress,
             nftTokenId,
-            nftAmount,
             paymentToken,
             paymentTokenAmount,
-            feeRecipient
+            fee
         );
 
         takerInput = buildInput(takerOrder, v, r, s, SignatureVersion.Single);
@@ -239,10 +224,9 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
             context.fulfiller,
             nft.token,
             nft.identifier,
-            1,
             address(0),
             ethAmount,
-            address(0),
+            new Fee[](0),
             false
         );
 
@@ -277,7 +261,6 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     //         context.fulfiller,
     //         nft.token,
     //         nft.identifier,
-    //         nft.amount,
     //         address(0),
     //         ethAmount
     //     );
@@ -310,10 +293,9 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
             context.fulfiller,
             nft.token,
             nft.identifier,
-            1,
             erc20.token,
             erc20.amount,
-            address(0),
+            new Fee[](0),
             false
         );
 
@@ -342,10 +324,9 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
             context.fulfiller,
             nft.token,
             nft.identifier,
-            1,
             erc20.token,
             erc20.amount,
-            address(0),
+            new Fee[](0),
             true
         );
 
@@ -364,6 +345,10 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         );
     }
 
+    function convert(uint256 val) pure internal returns (uint16) {
+        return uint16(val);
+    }
+
     function getPayload_BuyOfferedERC721WithEtherOneFeeRecipient(
         TestOrderContext calldata context,
         TestItem721 memory nft,
@@ -371,15 +356,20 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         address feeRecipient,
         uint256 feeEthAmount
     ) external view override returns (TestOrderPayload memory execution) {
+        Fee[] memory fees = new Fee[](1);
+        uint256 rate;
+        rate = (feeEthAmount * 10000) / (priceEthAmount) + 1;
+        uint16 convertedRate;
+        convertedRate = convert(rate);
+        fees[0] = Fee({ recipient: payable(feeRecipient), rate: convertedRate });
         (Input memory makerInput, Input memory takerInput) = buildInputPair(
             context.offerer,
             context.fulfiller,
             nft.token,
             nft.identifier,
-            1,
             address(0),
             priceEthAmount,
-            feeRecipient,
+            fees,
             false
         );
 
@@ -398,57 +388,46 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         );
     }
 
-    // function getPayload_BuyOfferedERC721WithEtherTwoFeeRecipient(
-    //     TestOrderContext calldata context,
-    //     TestItem721 memory nft,
-    //     uint256 priceEthAmount,
-    //     address feeRecipient1,
-    //     uint256 feeEthAmount1,
-    //     address feeRecipient2,
-    //     uint256 feeEthAmount2
-    // ) external view override returns (TestOrderPayload memory execution) {
-    //     AdditionalRecipient[]
-    //         memory additionalRecipients = new AdditionalRecipient[](2);
+    function getPayload_BuyOfferedERC721WithEtherTwoFeeRecipient(
+        TestOrderContext calldata context,
+        TestItem721 memory nft,
+        uint256 priceEthAmount,
+        address feeRecipient1,
+        uint256 feeEthAmount1,
+        address feeRecipient2,
+        uint256 feeEthAmount2
+    ) external view override returns (TestOrderPayload memory execution) {
+        Fee[] memory fees = new Fee[](2);
+        uint256 rate;
+        rate = (feeEthAmount1 * 10000) / (priceEthAmount) + 1;
+        fees[0] = Fee({ recipient: payable(feeRecipient1), rate: convert(rate) });
+        rate = (feeEthAmount2 * 10000) / (priceEthAmount) + 1;
+        fees[1] = Fee({ recipient: payable(feeRecipient2), rate: convert(rate) });
+        (Input memory makerInput, Input memory takerInput) = buildInputPair(
+            context.offerer,
+            context.fulfiller,
+            nft.token,
+            nft.identifier,
+            address(0),
+            priceEthAmount,
+            fees,
+            false
+        );
 
-    //     additionalRecipients[0] = AdditionalRecipient(
-    //         feeEthAmount1,
-    //         payable(feeRecipient1)
-    //     );
-    //     additionalRecipients[1] = AdditionalRecipient(
-    //         feeEthAmount2,
-    //         payable(feeRecipient2)
-    //     );
-    //     ConsiderationItem memory consideration = ConsiderationItem(
-    //         ItemType.NATIVE,
-    //         address(0),
-    //         0,
-    //         priceEthAmount,
-    //         priceEthAmount,
-    //         payable(context.offerer)
-    //     );
-    //     (
-    //         Order memory order,
-    //         BasicOrderParameters memory basicComponents
-    //     ) = buildBasicOrder(
-    //             BasicOrderRouteType.ETH_TO_ERC721,
-    //             context.offerer,
-    //             OfferItem(ItemType.ERC721, nft.token, nft.identifier, 1, 1),
-    //             consideration,
-    //             additionalRecipients
-    //         );
-    //     if (context.listOnChain) {
-    //         _notImplemented();
-    //     }
-    //     execution.executeOrder = TestCallParameters(
-    //         address(blur),
-    //         priceEthAmount + feeEthAmount1 + feeEthAmount2,
-    //         abi.encodeWithSelector(
-    //             IBlurExchange.execute.selector,
-    //             makerInput,
-    //             takerInput
-    //         )
-    //     );
-    // }
+        if (context.listOnChain) {
+            _notImplemented();
+        }
+
+        execution.executeOrder = TestCallParameters(
+            address(blur),
+            priceEthAmount + feeEthAmount1 + feeEthAmount2,
+            abi.encodeWithSelector(
+                IBlurExchange.execute.selector,
+                makerInput,
+                takerInput
+            )
+        );
+    }
 
     // function getPayload_BuyOfferedManyERC721WithEther(
     //     TestOrderContext calldata context,
