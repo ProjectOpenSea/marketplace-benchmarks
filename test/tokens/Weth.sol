@@ -4,13 +4,8 @@ pragma solidity ^0.8.14;
 import { TestERC20 } from "./TestERC20.sol";
 
 contract WETH is TestERC20 {
-    // uint8 public decimals = 18; might need to keep this, not sure.
-
     event Deposit(address indexed dst, uint wad);
     event Withdrawal(address indexed src, uint wad);
-
-    // mapping(address => uint) public override balanceOf;
-    // mapping(address => mapping(address => uint)) public override allowance;
 
     function deposit() public payable {
         balanceOf[msg.sender] += msg.value;

@@ -43,55 +43,17 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     }
 
     function beforeAllPrepareMarketplaceCall(
-        address seller,
-        address buyer,
+        address,
+        address,
         address[] calldata,
         address[] calldata
     ) external pure override returns (SetupCall[] memory) {
-        SetupCall[] memory setupCalls = new SetupCall[](5);
+        SetupCall[] memory setupCalls = new SetupCall[](1);
 
         setupCalls[0] = SetupCall(
             BlurOwner,
             address(blur),
             abi.encodeWithSelector(IBlurExchange.open.selector)
-        );
-
-        setupCalls[1] = SetupCall(
-            buyer,
-            address(weth),
-            abi.encodeWithSelector(weth.mint.selector, buyer, type(uint256).max)
-        );
-
-        setupCalls[2] = SetupCall(
-            buyer,
-            address(weth),
-            abi.encodeWithSelector(
-                weth.approve.selector,
-                buyer,
-                approvalTarget,
-                type(uint256).max
-            )
-        );
-
-        setupCalls[3] = SetupCall(
-            seller,
-            address(weth),
-            abi.encodeWithSelector(
-                weth.mint.selector,
-                seller,
-                type(uint256).max
-            )
-        );
-
-        setupCalls[4] = SetupCall(
-            seller,
-            address(weth),
-            abi.encodeWithSelector(
-                weth.approve.selector,
-                seller,
-                approvalTarget,
-                type(uint256).max
-            )
         );
 
         return setupCalls;
@@ -124,13 +86,6 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         order.price = paymentTokenAmount;
         order.listingTime = 0;
         order.expirationTime = block.timestamp + 1;
-        // // Pass in an address other than the null address to set a fee recipient.
-        // if (fee.recipient == address(0)) {
-        //     order.fees = new Fee[](0);
-        // } else {
-        //     order.fees = new Fee[](1);
-        //     order.fees[0] = Fee({ recipient: payable(feeRecipient), rate: (feeEthAmount * 10000) / (paymentTokenAmount + feeEthAmount) + 1 });
-        // }
         order.fees = fee;
         order.salt = 0;
         order.extraParams = new bytes(0);

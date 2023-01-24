@@ -114,13 +114,13 @@ abstract contract BaseMarketConfig {
     }
 
     /**
-     * @dev Get call parameters to execute an order selling a 721 token for an ERC20.
+     * @dev Get call parameters to execute an order selling a 721 token for WETH.
      *   If `context.listOnChain` is true and marketplace does not support on-chain
      *   listing, this function must revert with NotImplemented.
      * @param context Order context, including the buyer and seller and whether the
      *  order should be listed on chain.
      * @param nft Address and ID of 721 token to be sold.
-     * @param erc20 Address and amount for ERC20 to be received for nft.
+     * @param erc20 Address and amount for WETH to be received for nft.
      */
     function getPayload_BuyOfferedERC721WithWETH(
         TestOrderContext calldata context,
@@ -165,13 +165,13 @@ abstract contract BaseMarketConfig {
     }
 
         /**
-     * @dev Get call parameters to execute an order selling an ERC20 token for an ERC721.
+     * @dev Get call parameters to execute an order selling WETH for an ERC721.
      *   If `context.listOnChain` is true and marketplace does not support on-chain
      *   listing, this function must revert with NotImplemented.
      * @param context Order context, including the buyer and seller and whether the
      *  order should be listed on chain.
-     * @param erc20 Address and amount for ERC20 to be sold.
-     * @param nft Address and ID for 721 token to be received for ERC20.
+     * @param erc20 Address and amount of WETH to be sold.
+     * @param nft Address and ID for 721 token to be received for WETH.
      */
     function getPayload_BuyOfferedWETHWithERC721(
         TestOrderContext calldata context,
@@ -331,12 +331,12 @@ abstract contract BaseMarketConfig {
 
     /**
      * @dev Get call parameters to execute an order "sweeping the floor" buy filling 10 distinct
-     *   ERC-721->ERC-20 orders at once. Same seller on each order. If the market does not support the
+     *   ERC-721->WETH orders at once. Same seller on each order. If the market does not support the
      *   order type, must revert with NotImplemented.
      * @param contexts Array of contexts for each order
-     * @param erc20Address The erc20 address to use across orders
+     * @param erc20Address The WETH address to use across orders
      * @param nfts Array of NFTs for each order
-     * @param erc20Amounts Array of Erc20 amounts to be received for the NFTs in each order
+     * @param erc20Amounts Array of WETH amounts to be received for the NFTs in each order
      */
     function getPayload_BuyOfferedManyERC721WithWETHDistinctOrders(
         TestOrderContext[] calldata contexts,
