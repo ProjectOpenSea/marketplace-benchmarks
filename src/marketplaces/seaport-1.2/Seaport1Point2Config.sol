@@ -165,7 +165,15 @@ contract Seaport1Point2Config is
         address paymentTokenAddress,
         TestItem721[] memory nfts,
         uint256[] memory amounts
-    ) internal view returns (Order[] memory, Fulfillment[] memory, uint256) {
+    )
+        internal
+        view
+        returns (
+            Order[] memory,
+            Fulfillment[] memory,
+            uint256
+        )
+    {
         Order[] memory orders = new Order[](nfts.length + 1);
 
         ConsiderationItem[]

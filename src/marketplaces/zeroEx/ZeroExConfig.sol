@@ -26,10 +26,10 @@ contract ZeroExConfig is BaseMarketConfig, Test {
         return address(zeroEx);
     }
 
-    function beforeAllPrepareMarketplace(
-        address seller,
-        address
-    ) external override {
+    function beforeAllPrepareMarketplace(address seller, address)
+        external
+        override
+    {
         buyerNftApprovalTarget = sellerNftApprovalTarget = buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(
             zeroEx
         );
