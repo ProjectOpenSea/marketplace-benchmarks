@@ -116,11 +116,9 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             );
     }
 
-    function encodeApproveOrder(Order memory order)
-        internal
-        pure
-        returns (bytes memory)
-    {
+    function encodeApproveOrder(
+        Order memory order
+    ) internal pure returns (bytes memory) {
         return
             abi.encodeWithSelector(
                 IWyvern.approveOrder_.selector,
@@ -552,10 +550,10 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         return setupCalls;
     }
 
-    function beforeAllPrepareMarketplace(address seller, address buyer)
-        external
-        override
-    {
+    function beforeAllPrepareMarketplace(
+        address seller,
+        address buyer
+    ) external override {
         // Create Wyvern Proxy
         buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = 0xE5c783EE536cf5E63E792988335c4255169be4E1;
         buyerNftApprovalTarget = proxyRegistry.proxies(buyer);
@@ -691,6 +689,47 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         );
     }
 
+    function getPayload_BuyOfferedERC721WithWETH(
+        TestOrderContext calldata context,
+        TestItem721 memory nft,
+        TestItem20 memory erc20
+    ) external view override returns (TestOrderPayload memory execution) {
+        (
+            Order memory sellOrder,
+            Sig memory sellSignature
+        ) = buildERC721SellOrder(
+                context.offerer,
+                NULL_ADDRESS,
+                erc20.token,
+                erc20.amount,
+                nft,
+                DEFAULT_FEE_RECIPIENT,
+                0
+            );
+        (Order memory buyOrder, ) = buildERC721BuyOrder(
+            context.fulfiller,
+            NULL_ADDRESS,
+            erc20.token,
+            erc20.amount,
+            nft,
+            NULL_ADDRESS,
+            0
+        );
+        if (context.listOnChain) {
+            execution.submitOrder = TestCallParameters(
+                address(wyvern),
+                0,
+                encodeApproveOrder(sellOrder)
+            );
+            sellSignature = EMPTY_SIG;
+        }
+        execution.executeOrder = TestCallParameters(
+            address(wyvern),
+            0,
+            encodeAtomicMatch(buyOrder, sellOrder, EMPTY_SIG, sellSignature)
+        );
+    }
+
     function getPayload_BuyOfferedERC1155WithERC20(
         TestOrderContext calldata context,
         TestItem1155 calldata nft,
@@ -734,6 +773,46 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
     }
 
     function getPayload_BuyOfferedERC20WithERC721(
+        TestOrderContext calldata context,
+        TestItem20 calldata erc20,
+        TestItem721 calldata nft
+    ) external view override returns (TestOrderPayload memory execution) {
+        (Order memory buyOrder, Sig memory buySignature) = buildERC721BuyOrder(
+            context.offerer,
+            NULL_ADDRESS,
+            erc20.token,
+            erc20.amount,
+            nft,
+            DEFAULT_FEE_RECIPIENT,
+            0
+        );
+        (Order memory sellOrder, ) = buildERC721SellOrder(
+            context.fulfiller,
+            NULL_ADDRESS,
+            erc20.token,
+            erc20.amount,
+            nft,
+            NULL_ADDRESS,
+            0
+        );
+
+        if (context.listOnChain) {
+            execution.submitOrder = TestCallParameters(
+                address(wyvern),
+                0,
+                encodeApproveOrder(buyOrder)
+            );
+            buySignature = EMPTY_SIG;
+        }
+
+        execution.executeOrder = TestCallParameters(
+            address(wyvern),
+            0,
+            encodeAtomicMatch(buyOrder, sellOrder, buySignature, EMPTY_SIG)
+        );
+    }
+
+    function getPayload_BuyOfferedWETHWithERC721(
         TestOrderContext calldata context,
         TestItem20 calldata erc20,
         TestItem721 calldata nft

@@ -162,15 +162,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         address paymentTokenAddress,
         TestItem721[] memory nfts,
         uint256[] memory amounts
-    )
-        internal
-        view
-        returns (
-            Order[] memory,
-            Fulfillment[] memory,
-            uint256
-        )
-    {
+    ) internal view returns (Order[] memory, Fulfillment[] memory, uint256) {
         Order[] memory orders = new Order[](nfts.length + 1);
 
         ConsiderationItem[]
@@ -455,6 +447,49 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         );
     }
 
+    function getPayload_BuyOfferedERC721WithWETH(
+        TestOrderContext calldata context,
+        TestItem721 memory nft,
+        TestItem20 memory erc20
+    ) external view override returns (TestOrderPayload memory execution) {
+        (
+            Order memory order,
+            BasicOrderParameters memory basicComponents
+        ) = buildBasicOrder(
+                BasicOrderRouteType.ERC20_TO_ERC721,
+                context.offerer,
+                OfferItem(ItemType.ERC721, nft.token, nft.identifier, 1, 1),
+                ConsiderationItem(
+                    ItemType.ERC20,
+                    erc20.token,
+                    0,
+                    erc20.amount,
+                    erc20.amount,
+                    payable(context.offerer)
+                )
+            );
+        if (context.listOnChain) {
+            order.signature = "";
+            basicComponents.signature = "";
+
+            Order[] memory orders = new Order[](1);
+            orders[0] = order;
+            execution.submitOrder = TestCallParameters(
+                address(seaport),
+                0,
+                abi.encodeWithSelector(ISeaport.validate.selector, orders)
+            );
+        }
+        execution.executeOrder = TestCallParameters(
+            address(seaport),
+            0,
+            abi.encodeWithSelector(
+                ISeaport.fulfillBasicOrder.selector,
+                basicComponents
+            )
+        );
+    }
+
     function getPayload_BuyOfferedERC1155WithERC20(
         TestOrderContext calldata context,
         TestItem1155 calldata nft,
@@ -505,6 +540,55 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
     }
 
     function getPayload_BuyOfferedERC20WithERC721(
+        TestOrderContext calldata context,
+        TestItem20 memory erc20,
+        TestItem721 memory nft
+    ) external view override returns (TestOrderPayload memory execution) {
+        (
+            Order memory order,
+            BasicOrderParameters memory basicComponents
+        ) = buildBasicOrder(
+                BasicOrderRouteType.ERC721_TO_ERC20,
+                context.offerer,
+                OfferItem(
+                    ItemType.ERC20,
+                    erc20.token,
+                    0,
+                    erc20.amount,
+                    erc20.amount
+                ),
+                ConsiderationItem(
+                    ItemType.ERC721,
+                    nft.token,
+                    nft.identifier,
+                    1,
+                    1,
+                    payable(context.offerer)
+                )
+            );
+        if (context.listOnChain) {
+            order.signature = "";
+            basicComponents.signature = "";
+
+            Order[] memory orders = new Order[](1);
+            orders[0] = order;
+            execution.submitOrder = TestCallParameters(
+                address(seaport),
+                0,
+                abi.encodeWithSelector(ISeaport.validate.selector, orders)
+            );
+        }
+        execution.executeOrder = TestCallParameters(
+            address(seaport),
+            0,
+            abi.encodeWithSelector(
+                ISeaport.fulfillBasicOrder.selector,
+                basicComponents
+            )
+        );
+    }
+
+    function getPayload_BuyOfferedWETHWithERC721(
         TestOrderContext calldata context,
         TestItem20 memory erc20,
         TestItem721 memory nft
@@ -920,6 +1004,57 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
     }
 
     function getPayload_BuyOfferedManyERC721WithErc20DistinctOrders(
+        TestOrderContext[] calldata contexts,
+        address erc20Address,
+        TestItem721[] calldata nfts,
+        uint256[] calldata erc20Amounts
+    ) external view override returns (TestOrderPayload memory execution) {
+        require(
+            contexts.length == nfts.length &&
+                nfts.length == erc20Amounts.length,
+            "SeaportConfig::getPayload_BuyOfferedManyERC721WithEtherDistinctOrders: invalid input"
+        );
+        (
+            Order[] memory orders,
+            Fulfillment[] memory fullfillments,
+
+        ) = buildOrderAndFulfillmentManyDistinctOrders(
+                contexts,
+                erc20Address,
+                nfts,
+                erc20Amounts
+            );
+
+        // Validate all for simplicity for now, could make this combination of on-chain and not
+        if (contexts[0].listOnChain) {
+            Order[] memory ordersToValidate = new Order[](orders.length - 1); // Last order is fulfiller order
+            for (uint256 i = 0; i < orders.length - 1; i++) {
+                orders[i].signature = "";
+                ordersToValidate[i] = orders[i];
+            }
+
+            execution.submitOrder = TestCallParameters(
+                address(seaport),
+                0,
+                abi.encodeWithSelector(
+                    ISeaport.validate.selector,
+                    ordersToValidate
+                )
+            );
+        }
+
+        execution.executeOrder = TestCallParameters(
+            address(seaport),
+            0,
+            abi.encodeWithSelector(
+                ISeaport.matchOrders.selector,
+                orders,
+                fullfillments
+            )
+        );
+    }
+
+    function getPayload_BuyOfferedManyERC721WithWETHDistinctOrders(
         TestOrderContext[] calldata contexts,
         address erc20Address,
         TestItem721[] calldata nfts,

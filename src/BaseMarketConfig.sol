@@ -114,6 +114,23 @@ abstract contract BaseMarketConfig {
     }
 
     /**
+     * @dev Get call parameters to execute an order selling a 721 token for WETH.
+     *   If `context.listOnChain` is true and marketplace does not support on-chain
+     *   listing, this function must revert with NotImplemented.
+     * @param context Order context, including the buyer and seller and whether the
+     *  order should be listed on chain.
+     * @param nft Address and ID of 721 token to be sold.
+     * @param erc20 Address and amount for WETH to be received for nft.
+     */
+    function getPayload_BuyOfferedERC721WithWETH(
+        TestOrderContext calldata context,
+        TestItem721 calldata nft,
+        TestItem20 calldata erc20
+    ) external virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
+
+    /**
      * @dev Get call parameters to execute an order selling an 1155 token for an ERC20.
      *   If `context.listOnChain` is true and marketplace does not support on-chain
      *   listing, this function must revert with NotImplemented.
@@ -140,6 +157,23 @@ abstract contract BaseMarketConfig {
      * @param nft Address and ID for 721 token to be received for ERC20.
      */
     function getPayload_BuyOfferedERC20WithERC721(
+        TestOrderContext calldata context,
+        TestItem20 calldata erc20,
+        TestItem721 calldata nft
+    ) external virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
+
+        /**
+     * @dev Get call parameters to execute an order selling WETH for an ERC721.
+     *   If `context.listOnChain` is true and marketplace does not support on-chain
+     *   listing, this function must revert with NotImplemented.
+     * @param context Order context, including the buyer and seller and whether the
+     *  order should be listed on chain.
+     * @param erc20 Address and amount of WETH to be sold.
+     * @param nft Address and ID for 721 token to be received for WETH.
+     */
+    function getPayload_BuyOfferedWETHWithERC721(
         TestOrderContext calldata context,
         TestItem20 calldata erc20,
         TestItem721 calldata nft
@@ -287,6 +321,24 @@ abstract contract BaseMarketConfig {
      * @param erc20Amounts Array of Erc20 amounts to be received for the NFTs in each order
      */
     function getPayload_BuyOfferedManyERC721WithErc20DistinctOrders(
+        TestOrderContext[] calldata contexts,
+        address erc20Address,
+        TestItem721[] calldata nfts,
+        uint256[] calldata erc20Amounts
+    ) external view virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
+
+    /**
+     * @dev Get call parameters to execute an order "sweeping the floor" buy filling 10 distinct
+     *   ERC-721->WETH orders at once. Same seller on each order. If the market does not support the
+     *   order type, must revert with NotImplemented.
+     * @param contexts Array of contexts for each order
+     * @param erc20Address The WETH address to use across orders
+     * @param nfts Array of NFTs for each order
+     * @param erc20Amounts Array of WETH amounts to be received for the NFTs in each order
+     */
+    function getPayload_BuyOfferedManyERC721WithWETHDistinctOrders(
         TestOrderContext[] calldata contexts,
         address erc20Address,
         TestItem721[] calldata nfts,
