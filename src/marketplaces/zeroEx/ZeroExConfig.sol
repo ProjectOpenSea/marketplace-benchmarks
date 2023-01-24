@@ -851,4 +851,72 @@ contract ZeroExConfig is BaseMarketConfig, Test {
             )
         );
     }
+
+    function getPayload_BuyOfferedManyERC721WithWETHDistinctOrders(
+        TestOrderContext[] calldata contexts,
+        address erc20Address,
+        TestItem721[] calldata nfts,
+        uint256[] calldata erc20Amounts
+    ) external view override returns (TestOrderPayload memory execution) {
+        require(
+            contexts.length == nfts.length &&
+                nfts.length == erc20Amounts.length,
+            "ZeroExConfig::getPayload_BuyOfferedManyERC721WithEtherDistinctOrders/ARRAY_LENGTH_MISMATCH"
+        );
+        LibNFTOrder.ERC721Order[] memory orders = new LibNFTOrder.ERC721Order[](
+            contexts.length
+        );
+        LibSignature.Signature[] memory sigs = new LibSignature.Signature[](
+            contexts.length
+        );
+        bytes[] memory callbacks = new bytes[](contexts.length);
+
+        for (uint256 i = 0; i < contexts.length; i++) {
+            // Prepare the order
+            orders[i] = LibNFTOrder.ERC721Order({
+                direction: LibNFTOrder.TradeDirection.SELL_NFT,
+                maker: contexts[i].offerer,
+                taker: contexts[i].fulfiller,
+                expiry: block.timestamp + 120,
+                nonce: testNonce + i,
+                erc20Token: erc20Address,
+                erc20TokenAmount: erc20Amounts[i],
+                fees: new LibNFTOrder.Fee[](0),
+                erc721Token: nfts[i].token,
+                erc721TokenId: nfts[i].identifier,
+                erc721TokenProperties: new LibNFTOrder.Property[](0)
+            });
+
+            // Sign the order
+            (uint8 v, bytes32 r, bytes32 s) = _sign(
+                orders[i].maker,
+                zeroEx.getERC721OrderHash(orders[i])
+            );
+
+            // Prepare the signature
+            sigs[i] = LibSignature.Signature({
+                signatureType: LibSignature.SignatureType.EIP712,
+                v: v,
+                r: r,
+                s: s
+            });
+        }
+
+        // Not sure how best to do this, not implementing for now
+        if (contexts[0].listOnChain) {
+            _notImplemented();
+        }
+
+        execution.executeOrder = TestCallParameters(
+            address(zeroEx),
+            0,
+            abi.encodeWithSelector(
+                IZeroEx.batchBuyERC721s.selector,
+                orders,
+                sigs,
+                callbacks,
+                false
+            )
+        );
+    }
 }

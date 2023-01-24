@@ -214,6 +214,37 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         return (makerInput, takerInput);
     }
 
+    function buildExecution(
+        address maker,
+        address taker,
+        address nftContractAddress,
+        uint256 nftTokenId,
+        address paymentToken,
+        uint256 paymentTokenAmount,
+        Fee[] memory fee,
+        bool isOffer
+    ) internal view returns (Execution memory _execution) {
+        Execution memory execution;
+        Input memory makerInput;
+        Input memory takerInput;
+
+        (makerInput, takerInput) = buildInputPair(
+            maker,
+            taker,
+            nftContractAddress,
+            nftTokenId,
+            paymentToken,
+            paymentTokenAmount,
+            fee,
+            isOffer
+        );
+
+        execution.sell = makerInput;
+        execution.buy = takerInput;
+
+        return execution;
+    }
+
     function getPayload_BuyOfferedERC721WithEther(
         TestOrderContext calldata context,
         TestItem721 memory nft,
@@ -345,7 +376,7 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         );
     }
 
-    function convert(uint256 val) pure internal returns (uint16) {
+    function convert(uint256 val) internal pure returns (uint16) {
         return uint16(val);
     }
 
@@ -361,7 +392,10 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         rate = (feeEthAmount * 10000) / (priceEthAmount) + 1;
         uint16 convertedRate;
         convertedRate = convert(rate);
-        fees[0] = Fee({ recipient: payable(feeRecipient), rate: convertedRate });
+        fees[0] = Fee({
+            recipient: payable(feeRecipient),
+            rate: convertedRate
+        });
         (Input memory makerInput, Input memory takerInput) = buildInputPair(
             context.offerer,
             context.fulfiller,
@@ -400,9 +434,15 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         Fee[] memory fees = new Fee[](2);
         uint256 rate;
         rate = (feeEthAmount1 * 10000) / (priceEthAmount) + 1;
-        fees[0] = Fee({ recipient: payable(feeRecipient1), rate: convert(rate) });
+        fees[0] = Fee({
+            recipient: payable(feeRecipient1),
+            rate: convert(rate)
+        });
         rate = (feeEthAmount2 * 10000) / (priceEthAmount) + 1;
-        fees[1] = Fee({ recipient: payable(feeRecipient2), rate: convert(rate) });
+        fees[1] = Fee({
+            recipient: payable(feeRecipient2),
+            rate: convert(rate)
+        });
         (Input memory makerInput, Input memory takerInput) = buildInputPair(
             context.offerer,
             context.fulfiller,
@@ -429,234 +469,92 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         );
     }
 
-    // function getPayload_BuyOfferedManyERC721WithEther(
-    //     TestOrderContext calldata context,
-    //     TestItem721[] calldata nfts,
-    //     uint256 ethAmount
-    // ) external view override returns (TestOrderPayload memory execution) {
-    //     OfferItem[] memory offerItems = new OfferItem[](nfts.length);
+    function getPayload_BuyOfferedManyERC721WithEtherDistinctOrders(
+        TestOrderContext[] calldata contexts,
+        TestItem721[] calldata nfts,
+        uint256[] calldata ethAmounts
+    ) external view override returns (TestOrderPayload memory execution) {
+        require(
+            contexts.length == nfts.length && nfts.length == ethAmounts.length,
+            "BlurConfig::getPayload_BuyOfferedManyERC721WithEtherDistinctOrders: invalid input"
+        );
 
-    //     for (uint256 i = 0; i < nfts.length; i++) {
-    //         offerItems[i] = OfferItem(
-    //             ItemType.ERC721,
-    //             nfts[i].token,
-    //             nfts[i].identifier,
-    //             1,
-    //             1
-    //         );
-    //     }
+        uint256 sumEthAmount;
 
-    //     ConsiderationItem[] memory considerationItems = new ConsiderationItem[](
-    //         1
-    //     );
+        Execution[] memory executions = new Execution[](nfts.length);
+        Execution memory _execution;
+        for (uint256 i = 0; i < nfts.length; i++) {
+            if (contexts[i].listOnChain) {
+                _notImplemented();
+            }
 
-    //     considerationItems[0] = ConsiderationItem(
-    //         ItemType.NATIVE,
-    //         address(0),
-    //         0,
-    //         ethAmount,
-    //         ethAmount,
-    //         payable(context.offerer)
-    //     );
+            _execution = buildExecution(
+                contexts[i].offerer,
+                contexts[i].fulfiller,
+                nfts[i].token,
+                nfts[i].identifier,
+                address(0),
+                ethAmounts[i],
+                new Fee[](0),
+                false
+            );
 
-    //     Order memory order = buildOrder(
-    //         context.offerer,
-    //         offerItems,
-    //         considerationItems
-    //     );
+            executions[i] = _execution;
 
-    //     if (context.listOnChain) {
-    //         _notImplemented();
-    //     }
+            sumEthAmount += ethAmounts[i];
+        }
 
-    //     execution.executeOrder = TestCallParameters(
-    //         address(blur),
-    //         ethAmount,
-    //         abi.encodeWithSelector(
-    //             IBlurExchange.execute.selector,
-    //             makerInput,
-    //             takerInput
-    //         )
-    //     );
-    // }
+        execution.executeOrder = TestCallParameters(
+            address(blur),
+            sumEthAmount,
+            abi.encodeWithSelector(
+                IBlurExchange.bulkExecute.selector,
+                executions
+            )
+        );
+    }
 
-    // function getPayload_BuyOfferedManyERC721WithEtherDistinctOrders(
-    //     TestOrderContext[] calldata contexts,
-    //     TestItem721[] calldata nfts,
-    //     uint256[] calldata ethAmounts
-    // ) external view override returns (TestOrderPayload memory execution) {
-    //     require(
-    //         contexts.length == nfts.length && nfts.length == ethAmounts.length,
-    //         "SeaportConfig::getPayload_BuyOfferedManyERC721WithEtherDistinctOrders: invalid input"
-    //     );
+    function getPayload_BuyOfferedManyERC721WithWETHDistinctOrders(
+        TestOrderContext[] calldata contexts,
+        address erc20Address,
+        TestItem721[] calldata nfts,
+        uint256[] calldata erc20Amounts
+    ) external view override returns (TestOrderPayload memory execution) {
+        require(
+            contexts.length == nfts.length &&
+                nfts.length == erc20Amounts.length,
+            "BlurConfig::getPayload_BuyOfferedManyERC721WithEtherDistinctOrders: invalid input"
+        );
 
-    //     (
-    //         Order[] memory orders,
-    //         Fulfillment[] memory fullfillments,
-    //         uint256 sumEthAmount
-    //     ) = buildOrderAndFulfillmentManyDistinctOrders(
-    //             contexts,
-    //             address(0),
-    //             nfts,
-    //             ethAmounts
-    //         );
+        Execution[] memory executions = new Execution[](nfts.length);
+        Execution memory _execution;
 
-    //     // Validate all for simplicity for now, could make this combination of on-chain and not
-    //     if (contexts[0].listOnChain) {
-    //         Order[] memory ordersToValidate = new Order[](orders.length - 1); // Last order is fulfiller order
-    //         for (uint256 i = 0; i < orders.length - 1; i++) {
-    //             orders[i].signature = "";
-    //             ordersToValidate[i] = orders[i];
-    //         }
+        for (uint256 i = 0; i < nfts.length; i++) {
+            if (contexts[i].listOnChain) {
+                _notImplemented();
+            }
 
-    //         execution.submitOrder = TestCallParameters(
-    //             address(blur),
-    //             0,
-    //         abi.encodeWithSelector(
-    //             IBlurExchange.execute.selector,
-    //             makerInput,
-    //             takerInput
-    //         )
-    //         );
-    //     }
+            _execution = buildExecution(
+                contexts[i].offerer,
+                contexts[i].fulfiller,
+                nfts[i].token,
+                nfts[i].identifier,
+                erc20Address,
+                erc20Amounts[i],
+                new Fee[](0),
+                false
+            );
 
-    //     execution.executeOrder = TestCallParameters(
-    //         address(blur),
-    //         sumEthAmount,
-    //         abi.encodeWithSelector(
-    //             IBlurExchange.execute.selector,
-    //             makerInput,
-    //             takerInput
-    //         )
-    //     );
-    // }
+            executions[i] = _execution;
+        }
 
-    // function getPayload_BuyOfferedManyERC721WithErc20DistinctOrders(
-    //     TestOrderContext[] calldata contexts,
-    //     address erc20Address,
-    //     TestItem721[] calldata nfts,
-    //     uint256[] calldata erc20Amounts
-    // ) external view override returns (TestOrderPayload memory execution) {
-    //     require(
-    //         contexts.length == nfts.length &&
-    //             nfts.length == erc20Amounts.length,
-    //         "SeaportConfig::getPayload_BuyOfferedManyERC721WithEtherDistinctOrders: invalid input"
-    //     );
-    //     (
-    //         Order[] memory orders,
-    //         Fulfillment[] memory fullfillments,
-
-    //     ) = buildOrderAndFulfillmentManyDistinctOrders(
-    //             contexts,
-    //             erc20Address,
-    //             nfts,
-    //             erc20Amounts
-    //         );
-
-    //     // Validate all for simplicity for now, could make this combination of on-chain and not
-    //     if (contexts[0].listOnChain) {
-    //         Order[] memory ordersToValidate = new Order[](orders.length - 1); // Last order is fulfiller order
-    //         for (uint256 i = 0; i < orders.length - 1; i++) {
-    //             orders[i].signature = "";
-    //             ordersToValidate[i] = orders[i];
-    //         }
-
-    //         execution.submitOrder = TestCallParameters(
-    //             address(blur),
-    //             0,
-    //             abi.encodeWithSelector(
-    //                 IBlurExchange.validate.selector,
-    //                 ordersToValidate
-    //             )
-    //         );
-    //     }
-
-    //     execution.executeOrder = TestCallParameters(
-    //         address(blur),
-    //         0,
-    //         abi.encodeWithSelector(
-    //             IBlurExchange.execute.selector,
-    //             makerInput,
-    //             takerInput
-    //         )
-    //     );
-    // }
-
-    // function getPayload_MatchOrders_ABCA(
-    //     TestOrderContext[] calldata contexts,
-    //     TestItem721[] calldata nfts
-    // ) external view override returns (TestOrderPayload memory execution) {
-    //     require(contexts.length == nfts.length, "invalid input");
-
-    //     Order[] memory orders = new Order[](contexts.length);
-    //     Fulfillment[] memory fullfillments = new Fulfillment[](nfts.length);
-
-    //     for (uint256 i = 0; i < nfts.length; i++) {
-    //         uint256 wrappedIndex = i + 1 == nfts.length ? 0 : i + 1; // wrap around back to 0
-    //         {
-    //             OfferItem[] memory offerItems = new OfferItem[](1);
-    //             offerItems[0] = OfferItem(
-    //                 ItemType.ERC721,
-    //                 nfts[i].token,
-    //                 nfts[i].identifier,
-    //                 1,
-    //                 1
-    //             );
-
-    //             ConsiderationItem[]
-    //                 memory considerationItems = new ConsiderationItem[](1);
-    //             considerationItems[0] = ConsiderationItem(
-    //                 ItemType.ERC721,
-    //                 nfts[wrappedIndex].token,
-    //                 nfts[wrappedIndex].identifier,
-    //                 1,
-    //                 1,
-    //                 payable(contexts[i].offerer)
-    //             );
-    //             orders[i] = buildOrder(
-    //                 contexts[i].offerer,
-    //                 offerItems,
-    //                 considerationItems
-    //             );
-    //         }
-    //         // Set fulfillment
-    //         {
-    //             FulfillmentComponent
-    //                 memory nftConsiderationComponent = FulfillmentComponent(
-    //                     i,
-    //                     0
-    //                 );
-
-    //             FulfillmentComponent
-    //                 memory nftOfferComponent = FulfillmentComponent(
-    //                     wrappedIndex,
-    //                     0
-    //                 );
-
-    //             FulfillmentComponent[]
-    //                 memory nftOfferComponents = new FulfillmentComponent[](1);
-    //             nftOfferComponents[0] = nftOfferComponent;
-
-    //             FulfillmentComponent[]
-    //                 memory nftConsiderationComponents = new FulfillmentComponent[](
-    //                     1
-    //                 );
-    //             nftConsiderationComponents[0] = nftConsiderationComponent;
-    //             fullfillments[i] = Fulfillment(
-    //                 nftOfferComponents,
-    //                 nftConsiderationComponents
-    //             );
-    //         }
-    //     }
-
-    //     execution.executeOrder = TestCallParameters(
-    //         address(blur),
-    //         0,
-    //         abi.encodeWithSelector(
-    //             IBlurExchange.execute.selector,
-    //             makerInput,
-    //             takerInput
-    //         )
-    //     );
-    // }
+        execution.executeOrder = TestCallParameters(
+            address(blur),
+            0,
+            abi.encodeWithSelector(
+                IBlurExchange.bulkExecute.selector,
+                executions
+            )
+        );
+    }
 }

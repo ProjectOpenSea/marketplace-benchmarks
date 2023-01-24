@@ -330,6 +330,24 @@ abstract contract BaseMarketConfig {
     }
 
     /**
+     * @dev Get call parameters to execute an order "sweeping the floor" buy filling 10 distinct
+     *   ERC-721->ERC-20 orders at once. Same seller on each order. If the market does not support the
+     *   order type, must revert with NotImplemented.
+     * @param contexts Array of contexts for each order
+     * @param erc20Address The erc20 address to use across orders
+     * @param nfts Array of NFTs for each order
+     * @param erc20Amounts Array of Erc20 amounts to be received for the NFTs in each order
+     */
+    function getPayload_BuyOfferedManyERC721WithWETHDistinctOrders(
+        TestOrderContext[] calldata contexts,
+        address erc20Address,
+        TestItem721[] calldata nfts,
+        uint256[] calldata erc20Amounts
+    ) external view virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
+
+    /**
      * @dev Get call parameters to execute a match orders style execution. This execution
      *   involves arbitrary number of orders in the pattern A -> B -> C -> A. Where each arrow
      *   indicates an individual order. There orders are not fulfillable individually,

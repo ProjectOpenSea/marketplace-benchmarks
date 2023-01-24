@@ -484,4 +484,25 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
 
         execution.executeOrder = TestCallParameters(address(X2Y2), 0, payload);
     }
+
+    function getPayload_BuyOfferedManyERC721WithWETHDistinctOrders(
+        TestOrderContext[] calldata contexts,
+        address erc20Address,
+        TestItem721[] calldata nfts,
+        uint256[] calldata erc20Amounts
+    ) external view override returns (TestOrderPayload memory execution) {
+        if (contexts[0].listOnChain) {
+            _notImplemented();
+        }
+
+        (bytes memory payload, ) = encodeFillOrderDistinctOrders(
+            contexts,
+            nfts,
+            erc20Amounts,
+            erc20Address,
+            Market.INTENT_SELL
+        );
+
+        execution.executeOrder = TestCallParameters(address(X2Y2), 0, payload);
+    }
 }

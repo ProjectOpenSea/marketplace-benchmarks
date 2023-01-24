@@ -114,6 +114,8 @@ contract GenericMarketplaceTest is BaseOrderTest {
             config
         );
         benchmark_BuyTenOfferedERC721WithErc20DistinctOrders(config);
+        benchmark_BuyTenOfferedERC721WithWETHDistinctOrders_ListOnChain(config);
+        benchmark_BuyTenOfferedERC721WithWETHDistinctOrders(config);
         benchmark_MatchOrders_ABCA(config);
     }
 
@@ -177,10 +179,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyOfferedERC721WithEther(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
+    function benchmark_BuyOfferedERC721WithEther(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
         string memory testLabel = "(ERC721 -> ETH)";
         test721_1.mint(alice, 1);
         try
@@ -241,10 +242,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyOfferedERC1155WithEther(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
+    function benchmark_BuyOfferedERC1155WithEther(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
         string memory testLabel = "(ERC1155 -> ETH)";
         test1155_1.mint(alice, 1, 1);
         try
@@ -312,10 +312,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyOfferedERC721WithERC20(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
+    function benchmark_BuyOfferedERC721WithERC20(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
         string memory testLabel = "(ERC721 -> ERC20)";
         test721_1.mint(alice, 1);
         token1.mint(bob, 100);
@@ -352,7 +351,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         test721_1.mint(alice, 1);
         hevm.deal(bob, 100);
         hevm.prank(bob);
-        weth.deposit{value: 100}();
+        weth.deposit{ value: 100 }();
         try
             config.getPayload_BuyOfferedERC721WithERC20(
                 TestOrderContext(true, alice, bob),
@@ -390,15 +389,14 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyOfferedERC721WithWETH(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
+    function benchmark_BuyOfferedERC721WithWETH(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
         string memory testLabel = "(ERC721 -> WETH)";
         test721_1.mint(alice, 1);
         hevm.deal(bob, 100);
         hevm.prank(bob);
-        weth.deposit{value: 100}();
+        weth.deposit{ value: 100 }();
 
         try
             config.getPayload_BuyOfferedERC721WithWETH(
@@ -465,10 +463,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyOfferedERC1155WithERC20(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
+    function benchmark_BuyOfferedERC1155WithERC20(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
         string memory testLabel = "(ERC1155 -> ERC20)";
         test1155_1.mint(alice, 1, 1);
         token1.mint(bob, 100);
@@ -541,10 +538,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyOfferedERC20WithERC721(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
+    function benchmark_BuyOfferedERC20WithERC721(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
         string memory testLabel = "(ERC20 -> ERC721)";
         token1.mint(alice, 100);
         test721_1.mint(bob, 1);
@@ -580,7 +576,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         string memory testLabel = "(WETH -> ERC721 List-On-Chain)";
         hevm.deal(alice, 100);
         hevm.prank(alice);
-        weth.deposit{value: 100}();
+        weth.deposit{ value: 100 }();
         test721_1.mint(bob, 1);
         try
             config.getPayload_BuyOfferedWETHWithERC721(
@@ -619,14 +615,13 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyOfferedWETHWithERC721(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
+    function benchmark_BuyOfferedWETHWithERC721(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
         string memory testLabel = "(WETH -> ERC721)";
         hevm.deal(alice, 100);
         hevm.prank(alice);
-        weth.deposit{value: 100}();
+        weth.deposit{ value: 100 }();
         test721_1.mint(bob, 1);
         try
             config.getPayload_BuyOfferedWETHWithERC721(
@@ -694,10 +689,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyOfferedERC20WithERC1155(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
+    function benchmark_BuyOfferedERC20WithERC1155(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
         string memory testLabel = "(ERC20 -> ERC1155)";
         TestOrderContext memory context = TestOrderContext(false, alice, bob);
         token1.mint(alice, 100);
@@ -766,10 +760,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyOfferedERC721WithERC1155(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
+    function benchmark_BuyOfferedERC721WithERC1155(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
         string memory testLabel = "(ERC721 -> ERC1155)";
         TestOrderContext memory context = TestOrderContext(false, alice, bob);
         test721_1.mint(alice, 1);
@@ -836,10 +829,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyOfferedERC1155WithERC721(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
+    function benchmark_BuyOfferedERC1155WithERC721(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
         string memory testLabel = "(ERC1155 -> ERC721)";
         TestOrderContext memory context = TestOrderContext(false, alice, bob);
         test1155_1.mint(alice, 1, 1);
@@ -911,10 +903,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyOfferedERC721WithEtherFee(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
+    function benchmark_BuyOfferedERC721WithEtherFee(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
         string memory testLabel = "(ERC721 -> ETH One-Fee-Recipient)";
         test721_1.mint(alice, 1);
         try
@@ -1073,10 +1064,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyTenOfferedERC721WithEther(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
+    function benchmark_BuyTenOfferedERC721WithEther(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
         string memory testLabel = "(ERC721x10 -> ETH)";
 
         TestItem721[] memory nfts = new TestItem721[](10);
@@ -1294,10 +1284,106 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_MatchOrders_ABCA(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
+    function benchmark_BuyTenOfferedERC721WithWETHDistinctOrders(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string memory testLabel = "(ERC721x10 -> WETH Distinct Orders)";
+
+        hevm.deal(bob, 1045);
+        hevm.prank(bob);
+        weth.deposit{ value: 1045 }();
+        TestOrderContext[] memory contexts = new TestOrderContext[](10);
+        TestItem721[] memory nfts = new TestItem721[](10);
+        uint256[] memory wethAmounts = new uint256[](10);
+
+        for (uint256 i = 0; i < 10; i++) {
+            test721_1.mint(alice, i + 1);
+            nfts[i] = TestItem721(address(test721_1), i + 1);
+            contexts[i] = TestOrderContext(false, alice, bob);
+            wethAmounts[i] = 100 + i;
+        }
+
+        try
+            config.getPayload_BuyOfferedManyERC721WithWETHDistinctOrders(
+                contexts,
+                address(weth),
+                nfts,
+                wethAmounts
+            )
+        returns (TestOrderPayload memory payload) {
+            for (uint256 i = 1; i <= 10; i++) {
+                assertEq(test721_1.ownerOf(i), alice);
+            }
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill /w Sigs")),
+                bob,
+                payload.executeOrder
+            );
+
+            for (uint256 i = 1; i <= 10; i++) {
+                assertEq(test721_1.ownerOf(i), bob);
+            }
+            assertEq(weth.balanceOf(alice), 1045);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyTenOfferedERC721WithWETHDistinctOrders_ListOnChain(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string
+            memory testLabel = "(ERC721x10 -> WETH Distinct Orders List-On-Chain)";
+
+        hevm.deal(bob, 1045);
+        hevm.prank(bob);
+        weth.deposit{ value: 1045 }();
+        TestOrderContext[] memory contexts = new TestOrderContext[](10);
+        TestItem721[] memory nfts = new TestItem721[](10);
+        uint256[] memory wethAmounts = new uint256[](10);
+
+        for (uint256 i = 0; i < 10; i++) {
+            test721_1.mint(alice, i + 1);
+            nfts[i] = TestItem721(address(test721_1), i + 1);
+            contexts[i] = TestOrderContext(true, alice, bob);
+            wethAmounts[i] = 100 + i;
+        }
+
+        try
+            config.getPayload_BuyOfferedManyERC721WithWETHDistinctOrders(
+                contexts,
+                address(weth),
+                nfts,
+                wethAmounts
+            )
+        returns (TestOrderPayload memory payload) {
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " List")),
+                alice,
+                payload.submitOrder
+            );
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill")),
+                bob,
+                payload.executeOrder
+            );
+
+            for (uint256 i = 1; i <= 10; i++) {
+                assertEq(test721_1.ownerOf(i), bob);
+            }
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_MatchOrders_ABCA(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
         string memory testLabel = "(ERC721 A -> B -> C -> A)";
 
         test721_1.mint(alice, 1);
@@ -1375,28 +1461,24 @@ contract GenericMarketplaceTest is BaseOrderTest {
         _;
     }
 
-    function signDigest(address signer, bytes32 digest)
-        external
-        returns (
-            uint8 v,
-            bytes32 r,
-            bytes32 s
-        )
-    {
+    function signDigest(
+        address signer,
+        bytes32 digest
+    ) external returns (uint8 v, bytes32 r, bytes32 s) {
         (v, r, s) = hevm.sign(privateKeys[signer], digest);
     }
 
-    function _formatLog(string memory name, string memory label)
-        internal
-        pure
-        returns (string memory)
-    {
+    function _formatLog(
+        string memory name,
+        string memory label
+    ) internal pure returns (string memory) {
         return string(abi.encodePacked("[", name, "] ", label, " -- gas"));
     }
 
-    function _logNotSupported(string memory name, string memory label)
-        internal
-    {
+    function _logNotSupported(
+        string memory name,
+        string memory label
+    ) internal {
         emit log(
             string(
                 abi.encodePacked("[", name, "] ", label, " -- NOT SUPPORTED")
@@ -1439,11 +1521,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         );
     }
 
-    function _additionalGasFee(bytes memory callData)
-        internal
-        pure
-        returns (uint256)
-    {
+    function _additionalGasFee(
+        bytes memory callData
+    ) internal pure returns (uint256) {
         uint256 sum = 21000;
         for (uint256 i = 0; i < callData.length; i++) {
             // zero bytes = 4, non-zero = 16

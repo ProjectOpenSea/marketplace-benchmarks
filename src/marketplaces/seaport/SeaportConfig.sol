@@ -1054,6 +1054,57 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
         );
     }
 
+    function getPayload_BuyOfferedManyERC721WithWETHDistinctOrders(
+        TestOrderContext[] calldata contexts,
+        address erc20Address,
+        TestItem721[] calldata nfts,
+        uint256[] calldata erc20Amounts
+    ) external view override returns (TestOrderPayload memory execution) {
+        require(
+            contexts.length == nfts.length &&
+                nfts.length == erc20Amounts.length,
+            "SeaportConfig::getPayload_BuyOfferedManyERC721WithEtherDistinctOrders: invalid input"
+        );
+        (
+            Order[] memory orders,
+            Fulfillment[] memory fullfillments,
+
+        ) = buildOrderAndFulfillmentManyDistinctOrders(
+                contexts,
+                erc20Address,
+                nfts,
+                erc20Amounts
+            );
+
+        // Validate all for simplicity for now, could make this combination of on-chain and not
+        if (contexts[0].listOnChain) {
+            Order[] memory ordersToValidate = new Order[](orders.length - 1); // Last order is fulfiller order
+            for (uint256 i = 0; i < orders.length - 1; i++) {
+                orders[i].signature = "";
+                ordersToValidate[i] = orders[i];
+            }
+
+            execution.submitOrder = TestCallParameters(
+                address(seaport),
+                0,
+                abi.encodeWithSelector(
+                    ISeaport.validate.selector,
+                    ordersToValidate
+                )
+            );
+        }
+
+        execution.executeOrder = TestCallParameters(
+            address(seaport),
+            0,
+            abi.encodeWithSelector(
+                ISeaport.matchOrders.selector,
+                orders,
+                fullfillments
+            )
+        );
+    }
+
     function getPayload_MatchOrders_ABCA(
         TestOrderContext[] calldata contexts,
         TestItem721[] calldata nfts
