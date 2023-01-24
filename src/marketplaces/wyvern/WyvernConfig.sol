@@ -116,9 +116,11 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             );
     }
 
-    function encodeApproveOrder(
-        Order memory order
-    ) internal pure returns (bytes memory) {
+    function encodeApproveOrder(Order memory order)
+        internal
+        pure
+        returns (bytes memory)
+    {
         return
             abi.encodeWithSelector(
                 IWyvern.approveOrder_.selector,
@@ -550,10 +552,10 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         return setupCalls;
     }
 
-    function beforeAllPrepareMarketplace(
-        address seller,
-        address buyer
-    ) external override {
+    function beforeAllPrepareMarketplace(address seller, address buyer)
+        external
+        override
+    {
         // Create Wyvern Proxy
         buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = 0xE5c783EE536cf5E63E792988335c4255169be4E1;
         buyerNftApprovalTarget = proxyRegistry.proxies(buyer);

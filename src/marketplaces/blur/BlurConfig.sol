@@ -70,7 +70,12 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     )
         internal
         view
-        returns (Order memory _order, uint8 _v, bytes32 _r, bytes32 _s)
+        returns (
+            Order memory _order,
+            uint8 _v,
+            bytes32 _r,
+            bytes32 _s
+        )
     {
         Order memory order;
 

@@ -164,7 +164,7 @@ abstract contract BaseMarketConfig {
         _notImplemented();
     }
 
-        /**
+    /**
      * @dev Get call parameters to execute an order selling WETH for an ERC721.
      *   If `context.listOnChain` is true and marketplace does not support on-chain
      *   listing, this function must revert with NotImplemented.
