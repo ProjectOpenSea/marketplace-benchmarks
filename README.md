@@ -47,7 +47,7 @@ A marketplace config must inherits [`BaseMarketConfig`](src/BaseMarketConfig.sol
 ##### *Optional Functions*
 There are a variety of different types of tests which your market can support by implementing any of the functions defined in the `Test Payload Calls` section of [`BaseMarketConfig`](src/BaseMarketConfig.sol). Tests that use unimplemented payload calls will show up as incompatable with your marketplace.
 
-`beforeAllPrepareMarketplaceCall` is an optional setup function which allows for any arbitrary calls to be sent from any address. For example: it is used to deploy Wyvern proxies for the buyer and seller prior to benchmarking Wyvern.
+`beforeAllPrepareMarketplaceCall` is an optional setup function which allows for any arbitrary calls to be sent from any address. For example: it was used to deploy Wyvern proxies for the buyer and seller prior to benchmarking Wyvern.
 
 ### Adding A Test
 Anyone can add a generalized test to this repository which will enable for checkpointing different functionalities across marketplaces.
