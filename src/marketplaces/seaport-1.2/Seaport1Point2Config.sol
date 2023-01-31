@@ -21,7 +21,7 @@ contract Seaport1Point2Config is
     }
 
     ISeaport internal constant seaport =
-        ISeaport(0x000000000090d2b159528c290616CF919B24e1d9);
+        ISeaport(0x00000000000006c7676171937C444f6BDe3D6282);
 
     function buildBasicOrder(
         BasicOrderRouteType routeType,
@@ -360,7 +360,7 @@ contract Seaport1Point2Config is
             address(seaport),
             ethAmount,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -409,7 +409,7 @@ contract Seaport1Point2Config is
             address(seaport),
             ethAmount,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -452,7 +452,7 @@ contract Seaport1Point2Config is
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -495,7 +495,7 @@ contract Seaport1Point2Config is
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -544,7 +544,7 @@ contract Seaport1Point2Config is
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -593,7 +593,7 @@ contract Seaport1Point2Config is
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -642,7 +642,7 @@ contract Seaport1Point2Config is
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -691,7 +691,7 @@ contract Seaport1Point2Config is
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -843,7 +843,7 @@ contract Seaport1Point2Config is
             address(seaport),
             priceEthAmount + feeEthAmount,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -903,7 +903,7 @@ contract Seaport1Point2Config is
             address(seaport),
             priceEthAmount + feeEthAmount1 + feeEthAmount2,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
