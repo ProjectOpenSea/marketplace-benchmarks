@@ -4,14 +4,11 @@ pragma solidity >=0.8.7;
 import { BaseMarketConfig } from "../../BaseMarketConfig.sol";
 import { TestCallParameters, TestOrderContext, TestOrderPayload, TestItem721, TestItem1155, TestItem20 } from "../../Types.sol";
 import "./lib/ConsiderationStructs.sol";
-import "./lib/ConsiderationAlphaTypeHashes.sol";
+import "./lib/ConsiderationTypeHashes.sol";
 import { ConsiderationInterface as ISeaport } from "./interfaces/ConsiderationInterface.sol";
 import "forge-std/console2.sol";
 
-contract Seaport1Point2Config is
-    BaseMarketConfig,
-    ConsiderationAlphaTypeHashes
-{
+contract Seaport1Point2Config is BaseMarketConfig, ConsiderationTypeHashes {
     function name() external pure override returns (string memory) {
         return "Seaport-1.2";
     }
@@ -21,7 +18,7 @@ contract Seaport1Point2Config is
     }
 
     ISeaport internal constant seaport =
-        ISeaport(0x000000000090d2b159528c290616CF919B24e1d9);
+        ISeaport(0x00000000000006c7676171937C444f6BDe3D6282);
 
     function buildBasicOrder(
         BasicOrderRouteType routeType,
@@ -360,7 +357,7 @@ contract Seaport1Point2Config is
             address(seaport),
             ethAmount,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -409,7 +406,7 @@ contract Seaport1Point2Config is
             address(seaport),
             ethAmount,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -452,7 +449,7 @@ contract Seaport1Point2Config is
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -495,7 +492,7 @@ contract Seaport1Point2Config is
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -544,7 +541,7 @@ contract Seaport1Point2Config is
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -593,7 +590,7 @@ contract Seaport1Point2Config is
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -642,7 +639,7 @@ contract Seaport1Point2Config is
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -691,7 +688,7 @@ contract Seaport1Point2Config is
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -843,7 +840,7 @@ contract Seaport1Point2Config is
             address(seaport),
             priceEthAmount + feeEthAmount,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -903,7 +900,7 @@ contract Seaport1Point2Config is
             address(seaport),
             priceEthAmount + feeEthAmount1 + feeEthAmount2,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
