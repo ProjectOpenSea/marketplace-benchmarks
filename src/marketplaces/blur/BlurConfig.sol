@@ -347,6 +347,9 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         address feeRecipient,
         uint256 feeEthAmount
     ) external view override returns (TestOrderPayload memory execution) {
+        // TODO: figure out why this isn't working
+        _notImplemented();
+
         Fee[] memory fees = new Fee[](1);
         uint256 rate;
         rate = (feeEthAmount * 10000) / (priceEthAmount) + 1;
@@ -391,6 +394,9 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
         address feeRecipient2,
         uint256 feeEthAmount2
     ) external view override returns (TestOrderPayload memory execution) {
+        // TODO: figure out why this isn't working
+        _notImplemented();
+
         Fee[] memory fees = new Fee[](2);
         uint256 rate;
         rate = (feeEthAmount1 * 10000) / (priceEthAmount) + 1;
