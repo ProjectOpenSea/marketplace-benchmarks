@@ -23,8 +23,8 @@ contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig blurConfig;
     BaseMarketConfig foundationConfig;
     BaseMarketConfig looksRareConfig;
-    BaseMarketConfig SeaportOnePointOneConfig;
-    BaseMarketConfig SeaportOnePointFourConfig;
+    BaseMarketConfig seaportOnePointOneConfig;
+    BaseMarketConfig seaportOnePointFourConfig;
     BaseMarketConfig sudoswapConfig;
     BaseMarketConfig wyvernConfig;
     BaseMarketConfig x2y2Config;
