@@ -8,9 +8,12 @@ import "./lib/ConsiderationTypeHashes.sol";
 import { ConsiderationInterface as ISeaport } from "./interfaces/ConsiderationInterface.sol";
 import "forge-std/console2.sol";
 
-contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
+contract SeaportOnePointFourConfig is
+    BaseMarketConfig,
+    ConsiderationTypeHashes
+{
     function name() external pure override returns (string memory) {
-        return "Seaport";
+        return "Seaport 1.4";
     }
 
     function market() public pure override returns (address) {
@@ -18,7 +21,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
     }
 
     ISeaport internal constant seaport =
-        ISeaport(0x00000000006c3852cbEf3e08E8dF289169EdE581);
+        ISeaport(0x00000000000001ad428e4906aE43D8F9852d0dD6);
 
     function buildBasicOrder(
         BasicOrderRouteType routeType,
@@ -357,7 +360,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             address(seaport),
             ethAmount,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -406,7 +409,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             address(seaport),
             ethAmount,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -449,7 +452,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -492,7 +495,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -541,7 +544,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -590,7 +593,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -639,7 +642,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -688,7 +691,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -840,7 +843,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             address(seaport),
             priceEthAmount + feeEthAmount,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
@@ -900,7 +903,7 @@ contract SeaportConfig is BaseMarketConfig, ConsiderationTypeHashes {
             address(seaport),
             priceEthAmount + feeEthAmount1 + feeEthAmount2,
             abi.encodeWithSelector(
-                ISeaport.fulfillBasicOrder.selector,
+                ISeaport.fulfillBasicOrder_efficient_6GL6yc.selector,
                 basicComponents
             )
         );
