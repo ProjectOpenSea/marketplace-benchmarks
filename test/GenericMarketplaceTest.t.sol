@@ -5,8 +5,8 @@ import { BaseMarketConfig } from "../src/BaseMarketConfig.sol";
 import { BlurConfig } from "../src/marketplaces/blur/BlurConfig.sol";
 import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
 import { LooksRareConfig } from "../src/marketplaces/looksRare/LooksRareConfig.sol";
-import { Seaport1Point2Config } from "../src/marketplaces/seaport-1.2/Seaport1Point2Config.sol";
-import { SeaportConfig } from "../src/marketplaces/seaport/SeaportConfig.sol";
+import { SeaportOnePointOneConfig } from "../src/marketplaces/seaport-1.1/SeaportOnePointOneConfig.sol";
+import { SeaportOnePointFourConfig } from "../src/marketplaces/seaport-1.4/SeaportOnePointFourConfig.sol";
 import { SudoswapConfig } from "../src/marketplaces/sudoswap/SudoswapConfig.sol";
 import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
 import { X2Y2Config } from "../src/marketplaces/X2Y2/X2Y2Config.sol";
@@ -23,8 +23,8 @@ contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig blurConfig;
     BaseMarketConfig foundationConfig;
     BaseMarketConfig looksRareConfig;
-    BaseMarketConfig seaport1Point2Config;
-    BaseMarketConfig seaportConfig;
+    BaseMarketConfig seaportOnePointOneConfig;
+    BaseMarketConfig seaportOnePointFourConfig;
     BaseMarketConfig sudoswapConfig;
     BaseMarketConfig wyvernConfig;
     BaseMarketConfig x2y2Config;
@@ -34,20 +34,24 @@ contract GenericMarketplaceTest is BaseOrderTest {
         blurConfig = BaseMarketConfig(new BlurConfig());
         foundationConfig = BaseMarketConfig(new FoundationConfig());
         looksRareConfig = BaseMarketConfig(new LooksRareConfig());
-        seaport1Point2Config = BaseMarketConfig(new Seaport1Point2Config());
-        seaportConfig = BaseMarketConfig(new SeaportConfig());
+        seaportOnePointOneConfig = BaseMarketConfig(
+            new SeaportOnePointOneConfig()
+        );
+        seaportOnePointFourConfig = BaseMarketConfig(
+            new SeaportOnePointFourConfig()
+        );
         sudoswapConfig = BaseMarketConfig(new SudoswapConfig());
         wyvernConfig = BaseMarketConfig(new WyvernConfig());
         x2y2Config = BaseMarketConfig(new X2Y2Config());
         zeroExConfig = BaseMarketConfig(new ZeroExConfig());
     }
 
-    function testSeaport() external {
-        benchmarkMarket(seaportConfig);
+    function testSeaportOnePointOne() external {
+        benchmarkMarket(seaportOnePointOneConfig);
     }
 
-    function testSeaportOnePointTwo() external {
-        benchmarkMarket(seaport1Point2Config);
+    function testSeaportOnePointFour() external {
+        benchmarkMarket(seaportOnePointFourConfig);
     }
 
     // function testWyvern() external {
