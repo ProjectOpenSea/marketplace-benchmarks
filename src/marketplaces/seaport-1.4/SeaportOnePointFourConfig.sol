@@ -170,18 +170,16 @@ contract SeaportOnePointFourConfig is
         view
         returns (
             Order[] memory,
-            Fulfillment[] memory,
+            FulfillmentComponent[][] memory,
+            FulfillmentComponent[][] memory,
             uint256
         )
     {
-        Order[] memory orders = new Order[](nfts.length + 1);
+        Order[] memory orders = new Order[](nfts.length);
 
-        ConsiderationItem[]
-            memory fulfillerConsiderationItems = new ConsiderationItem[](
-                nfts.length
-            );
+        FulfillmentComponent[][] memory offerFulfillments = new FulfillmentComponent[][](0);
 
-        Fulfillment[] memory fullfillments = new Fulfillment[](nfts.length + 1);
+        FulfillmentComponent[][] memory considerationFulfillments = new FulfillmentComponent[][](nfts.length);
 
         for (uint256 i = 0; i < nfts.length; i++) {
             // Build offer orders
@@ -217,41 +215,21 @@ contract SeaportOnePointFourConfig is
                     considerationItems
                 );
             }
-            {
-                fulfillerConsiderationItems[i] = ConsiderationItem(
-                    ItemType.ERC721,
-                    nfts[i].token,
-                    nfts[i].identifier,
-                    1,
-                    1,
-                    payable(contexts[i].fulfiller)
-                );
-            }
+
             {
                 // Add fulfillment components for each NFT
-
                 FulfillmentComponent
                     memory nftConsiderationComponent = FulfillmentComponent(
                         nfts.length,
                         i
                     );
 
-                FulfillmentComponent
-                    memory nftOfferComponent = FulfillmentComponent(i, 0);
-
-                FulfillmentComponent[]
-                    memory nftOfferComponents = new FulfillmentComponent[](1);
-                nftOfferComponents[0] = nftOfferComponent;
-
                 FulfillmentComponent[]
                     memory nftConsiderationComponents = new FulfillmentComponent[](
                         1
                     );
                 nftConsiderationComponents[0] = nftConsiderationComponent;
-                fullfillments[i] = Fulfillment(
-                    nftOfferComponents,
-                    nftConsiderationComponents
-                );
+                considerationFulfillments[i] = nftConsiderationComponents;
             }
         }
 
@@ -261,60 +239,7 @@ contract SeaportOnePointFourConfig is
             sumAmounts += amounts[i];
         }
 
-        {
-            FulfillmentComponent
-                memory paymentTokenOfferComponent = FulfillmentComponent(
-                    nfts.length,
-                    0
-                );
-
-            FulfillmentComponent[]
-                memory paymentTokenOfferComponents = new FulfillmentComponent[](
-                    1
-                );
-            paymentTokenOfferComponents[0] = paymentTokenOfferComponent;
-
-            FulfillmentComponent[]
-                memory paymentTokenConsiderationComponents = new FulfillmentComponent[](
-                    nfts.length
-                );
-            for (uint256 i = 0; i < nfts.length; i++) {
-                {
-                    FulfillmentComponent
-                        memory paymentTokenConsiderationComponent = FulfillmentComponent(
-                            i,
-                            0
-                        );
-                    paymentTokenConsiderationComponents[
-                        i
-                    ] = paymentTokenConsiderationComponent;
-                }
-            }
-            fullfillments[nfts.length] = Fulfillment(
-                paymentTokenOfferComponents,
-                paymentTokenConsiderationComponents
-            );
-        }
-
-        // Build sweep floor order
-        OfferItem[] memory fulfillerOfferItems = new OfferItem[](1);
-        fulfillerOfferItems[0] = OfferItem(
-            paymentTokenAddress != address(0)
-                ? ItemType.ERC20
-                : ItemType.NATIVE,
-            paymentTokenAddress,
-            0,
-            sumAmounts,
-            sumAmounts
-        );
-        orders[nfts.length] = buildOrder(
-            contexts[0].fulfiller,
-            fulfillerOfferItems,
-            fulfillerConsiderationItems
-        );
-        orders[nfts.length].signature = ""; // Signature isn't needed since fulfiller is msg.sender
-
-        return (orders, fullfillments, sumAmounts);
+        return (orders, offerFulfillments, considerationFulfillments, sumAmounts);
     }
 
     function beforeAllPrepareMarketplace(address, address) external override {
@@ -976,7 +901,8 @@ contract SeaportOnePointFourConfig is
 
         (
             Order[] memory orders,
-            Fulfillment[] memory fullfillments,
+            FulfillmentComponent[][] memory offerFulfillments,
+            FulfillmentComponent[][] memory considerationFulfillments,
             uint256 sumEthAmount
         ) = buildOrderAndFulfillmentManyDistinctOrders(
                 contexts,
@@ -1007,9 +933,12 @@ contract SeaportOnePointFourConfig is
             address(seaport),
             sumEthAmount,
             abi.encodeWithSelector(
-                ISeaport.matchOrders.selector,
+                ISeaport.fulfillAvailableOrders.selector,
                 orders,
-                fullfillments
+                offerFulfillments,
+                considerationFulfillments,
+                bytes32(0),
+                nfts.length
             )
         );
     }
@@ -1027,7 +956,8 @@ contract SeaportOnePointFourConfig is
         );
         (
             Order[] memory orders,
-            Fulfillment[] memory fullfillments,
+            FulfillmentComponent[][] memory offerFulfillments,
+            FulfillmentComponent[][] memory considerationFulfillments,
 
         ) = buildOrderAndFulfillmentManyDistinctOrders(
                 contexts,
@@ -1058,9 +988,12 @@ contract SeaportOnePointFourConfig is
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.matchOrders.selector,
+                ISeaport.fulfillAvailableOrders.selector,
                 orders,
-                fullfillments
+                offerFulfillments,
+                considerationFulfillments,
+                bytes32(0),
+                nfts.length
             )
         );
     }
@@ -1078,7 +1011,8 @@ contract SeaportOnePointFourConfig is
         );
         (
             Order[] memory orders,
-            Fulfillment[] memory fullfillments,
+            FulfillmentComponent[][] memory offerFulfillments,
+            FulfillmentComponent[][] memory considerationFulfillments,
 
         ) = buildOrderAndFulfillmentManyDistinctOrders(
                 contexts,
@@ -1109,9 +1043,12 @@ contract SeaportOnePointFourConfig is
             address(seaport),
             0,
             abi.encodeWithSelector(
-                ISeaport.matchOrders.selector,
+                ISeaport.fulfillAvailableOrders.selector,
                 orders,
-                fullfillments
+                offerFulfillments,
+                considerationFulfillments,
+                bytes32(0),
+                nfts.length
             )
         );
     }
