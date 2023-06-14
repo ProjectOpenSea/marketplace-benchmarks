@@ -45,17 +45,17 @@ struct TestOrderPayload {
 struct TestBundleOrderWithSingleFeeReceiver {
     TestOrderContext context;
     TestItem721[] nfts;
-    uint256[] ethAmounts;
+    uint256[] itemPrices;
     address feeRecipient;
-    uint256 feeEthAmount;
+    uint256 feeRate;
 }
 
 struct TestBundleOrderWithTwoFeeReceivers {
     TestOrderContext context;
     TestItem721[] nfts;
-    uint256[] ethAmounts;
+    uint256[] itemPrices;
     address feeRecipient1;
-    uint256 feeEthAmount1;
+    uint256 feeRate1;
     address feeRecipient2;
-    uint256 feeEthAmount2;
+    uint256 feeRate2;
 }

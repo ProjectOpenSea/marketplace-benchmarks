@@ -57,9 +57,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmarkMarket(seaportOnePointFourConfig);
     }
 
-    // function testWyvern() external {
-    //     benchmarkMarket(wyvernConfig);
-    // }
+     //function testWyvern() external {
+     //    benchmarkMarket(wyvernConfig);
+     //}
 
     function testFoundation() external {
         benchmarkMarket(foundationConfig);
@@ -1177,15 +1177,14 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
         TestItem721[] memory nfts = new TestItem721[](10);
         uint256[] memory nftPrices = new uint256[](10);
-        uint256[] memory fees = new uint256[](10);
-        uint256 totalFees = 0;
+        uint256 totalPrice = 0;
+        uint256 feeRate = 500;
 
         for (uint256 i = 0; i < 10; i++) {
             test721_1.mint(alice, i + 1);
             nfts[i] = TestItem721(address(test721_1), i + 1);
             nftPrices[i] = 100 + (100 * i);
-            fees[i] = 5 + (5 * i);
-            totalFees += fees[i];
+            totalPrice += nftPrices[i];
         }
 
         try
@@ -1193,9 +1192,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
                 TestBundleOrderWithSingleFeeReceiver({
                     context: TestOrderContext(false, alice, bob),
                     nfts: nfts,
-                    ethAmounts: nftPrices,
+                    itemPrices: nftPrices,
                     feeRecipient: feeReciever1,
-                    feeEthAmount: totalFees
+                    feeRate: feeRate
                 })
             )
         returns (TestOrderPayload memory payload) {
@@ -1214,7 +1213,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
             for (uint256 i = 0; i < 10; i++) {
                 assertEq(test721_1.ownerOf(i + 1), bob);
             }
-            assertEq(feeReciever1.balance, totalFees);
+            assertEq(feeReciever1.balance, (totalPrice * feeRate) / 10000);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
@@ -1228,15 +1227,15 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
         TestItem721[] memory nfts = new TestItem721[](10);
         uint256[] memory nftPrices = new uint256[](10);
-        uint256 totalFees1 = 0;
-        uint256 totalFees2 = 0;
+        uint256 totalPrice = 0;
+        uint256 feeRate1 = 500;
+        uint256 feeRate2 = 1000;
 
         for (uint256 i = 0; i < 10; i++) {
             test721_1.mint(alice, i + 1);
             nfts[i] = TestItem721(address(test721_1), i + 1);
             nftPrices[i] = 100 + (100 * i);
-            totalFees1 += 5 + (5 * i);
-            totalFees2 += 10 + (10 * i);
+            totalPrice += nftPrices[i];
         }
 
         try
@@ -1244,11 +1243,11 @@ contract GenericMarketplaceTest is BaseOrderTest {
                 TestBundleOrderWithTwoFeeReceivers({
                     context: TestOrderContext(false, alice, bob),
                     nfts: nfts,
-                    ethAmounts: nftPrices,
+                    itemPrices: nftPrices,
                     feeRecipient1: feeReciever1,
-                    feeEthAmount1: totalFees1,
+                    feeRate1: feeRate1,
                     feeRecipient2: feeReciever2,
-                    feeEthAmount2: totalFees2
+                    feeRate2: feeRate2
                 })
             )
         returns (TestOrderPayload memory payload) {
@@ -1268,8 +1267,8 @@ contract GenericMarketplaceTest is BaseOrderTest {
             for (uint256 i = 0; i < 10; i++) {
                 assertEq(test721_1.ownerOf(i + 1), bob);
             }
-            assertEq(feeReciever1.balance, totalFees1);
-            assertEq(feeReciever2.balance, totalFees2);
+            assertEq(feeReciever1.balance, (totalPrice * feeRate1) / 10000);
+            assertEq(feeReciever2.balance, (totalPrice * feeRate2) / 10000);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }

@@ -2,7 +2,7 @@
 pragma solidity >=0.8.7;
 
 import { BaseMarketConfig } from "../../BaseMarketConfig.sol";
-import { TestCallParameters, TestOrderContext, TestOrderPayload, TestItem721, TestItem1155, TestItem20 } from "../../Types.sol";
+import "../../Types.sol";
 import "./lib/ConsiderationStructs.sol";
 import "./lib/ConsiderationTypeHashes.sol";
 import { ConsiderationInterface as ISeaport } from "./interfaces/ConsiderationInterface.sol";
@@ -1005,6 +1005,154 @@ contract SeaportOnePointFourConfig is
         );
 
         if (context.listOnChain) {
+            order.signature = "";
+
+            Order[] memory orders = new Order[](1);
+            orders[0] = order;
+            execution.submitOrder = TestCallParameters(
+                address(seaport),
+                0,
+                abi.encodeWithSelector(ISeaport.validate.selector, orders)
+            );
+        }
+
+         execution.executeOrder = TestCallParameters(
+            address(seaport),
+            sumPayments,
+            abi.encodeWithSelector(ISeaport.fulfillOrder.selector, order, 0)
+        );
+    }
+
+    function getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividuallyOneFeeRecipient(
+        TestBundleOrderWithSingleFeeReceiver memory args
+    ) external view override returns (TestOrderPayload memory execution) {
+
+        uint256 sumPayments = 0;
+        address alice = args.context.offerer;
+        uint256 numItemsInBundle = args.nfts.length;
+
+        OfferItem[] memory offerItems = new OfferItem[](numItemsInBundle);
+        ConsiderationItem[] memory considerationItems = new ConsiderationItem[](numItemsInBundle * 2);
+
+        for (uint256 i = 0; i < numItemsInBundle; i++) {
+            uint256 itemPrice = args.itemPrices[i];
+            uint256 itemFee = itemPrice * args.feeRate / 10000;
+            uint256 sellerProceeds = itemPrice - itemFee;
+            offerItems[i] = OfferItem(
+                ItemType.ERC721,
+                args.nfts[i].token,
+                args.nfts[i].identifier,
+                1,
+                1
+            );
+
+            considerationItems[2 * i] = ConsiderationItem(
+                ItemType.NATIVE,
+                address(0),
+                0,
+                sellerProceeds,
+                sellerProceeds,
+                payable(alice)
+            );
+
+            considerationItems[2 * i + 1] = ConsiderationItem(
+                ItemType.NATIVE,
+                address(0),
+                0,
+                itemFee,
+                itemFee,
+                payable(args.feeRecipient)
+            );
+
+            sumPayments += args.itemPrices[i];
+        }
+
+        Order memory order = buildOrder(
+            alice,
+            offerItems,
+            considerationItems
+        );
+
+        if (args.context.listOnChain) {
+            order.signature = "";
+
+            Order[] memory orders = new Order[](1);
+            orders[0] = order;
+            execution.submitOrder = TestCallParameters(
+                address(seaport),
+                0,
+                abi.encodeWithSelector(ISeaport.validate.selector, orders)
+            );
+        }
+
+         execution.executeOrder = TestCallParameters(
+            address(seaport),
+            sumPayments,
+            abi.encodeWithSelector(ISeaport.fulfillOrder.selector, order, 0)
+        );
+    }
+
+    function getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividuallyTwoFeeRecipients(
+        TestBundleOrderWithTwoFeeReceivers memory args
+    ) external view override returns (TestOrderPayload memory execution) {
+
+        uint256 sumPayments = 0;
+        address alice = args.context.offerer;
+        uint256 numItemsInBundle = args.nfts.length;
+
+        OfferItem[] memory offerItems = new OfferItem[](numItemsInBundle);
+        ConsiderationItem[] memory considerationItems = new ConsiderationItem[](numItemsInBundle * 3);
+
+        for (uint256 i = 0; i < numItemsInBundle; i++) {
+            uint256 itemPrice = args.itemPrices[i];
+            uint256 itemFee1 = itemPrice * args.feeRate1 / 10000;
+            uint256 itemFee2 = itemPrice * args.feeRate2 / 10000;
+            uint256 sellerProceeds = itemPrice - itemFee1 - itemFee2;
+            offerItems[i] = OfferItem(
+                ItemType.ERC721,
+                args.nfts[i].token,
+                args.nfts[i].identifier,
+                1,
+                1
+            );
+
+            considerationItems[3 * i] = ConsiderationItem(
+                ItemType.NATIVE,
+                address(0),
+                0,
+                sellerProceeds,
+                sellerProceeds,
+                payable(alice)
+            );
+
+            considerationItems[3 * i + 1] = ConsiderationItem(
+                ItemType.NATIVE,
+                address(0),
+                0,
+                itemFee1,
+                itemFee1,
+                payable(args.feeRecipient1)
+            );
+
+            considerationItems[3 * i + 2] = ConsiderationItem(
+                ItemType.NATIVE,
+                address(0),
+                0,
+                itemFee2,
+                itemFee2,
+                payable(args.feeRecipient2)
+            );
+
+            sumPayments += args.itemPrices[i];
+        }
+
+        Order memory order = buildOrder(
+            alice,
+            offerItems,
+            considerationItems
+        );
+
+        if (args.context.listOnChain) {
             order.signature = "";
 
             Order[] memory orders = new Order[](1);

@@ -474,7 +474,7 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
         paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
 
         for (uint256 i = 0; i < numItemsInBundle; ++i) {
-            totalEthAmount += args.ethAmounts[i];
+            totalEthAmount += args.itemPrices[i];
         }
 
         MatchedOrderBundleBase memory bundledOfferDetails = MatchedOrderBundleBase({
@@ -485,7 +485,7 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
             buyer: bob,
             delegatedPurchaser: address(0),
             marketplace: args.feeRecipient,
-            marketplaceFeeNumerator: args.feeEthAmount * 10000 / totalEthAmount,
+            marketplaceFeeNumerator: args.feeRate,
             offerNonce: _getNextNonce(bob),
             offerPrice: totalEthAmount,
             offerExpiration: type(uint256).max
@@ -513,7 +513,7 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
             bundledOfferItems[i].tokenId = args.nfts[i].identifier;
             bundledOfferItems[i].amount = 1;
             bundledOfferItems[i].maxRoyaltyFeeNumerator = 0;
-            bundledOfferItems[i].itemPrice = args.ethAmounts[i];
+            bundledOfferItems[i].itemPrice = args.itemPrices[i];
             bundledOfferItems[i].listingNonce = 0;
             bundledOfferItems[i].listingExpiration = 0;
             bundledOfferItems[i].seller = alice;
@@ -595,7 +595,7 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
         paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
 
         for (uint256 i = 0; i < numItemsInBundle; ++i) {
-            totalEthAmount += args.ethAmounts[i];
+            totalEthAmount += args.itemPrices[i];
         }
 
         MatchedOrderBundleBase memory bundledOfferDetails = MatchedOrderBundleBase({
@@ -606,7 +606,7 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
             buyer: bob,
             delegatedPurchaser: address(0),
             marketplace: args.feeRecipient1,
-            marketplaceFeeNumerator: args.feeEthAmount1 * 10000 / totalEthAmount,
+            marketplaceFeeNumerator: args.feeRate1,
             offerNonce: _getNextNonce(bob),
             offerPrice: totalEthAmount,
             offerExpiration: type(uint256).max
@@ -633,8 +633,8 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
         for (uint256 i = 0; i < numItemsInBundle; ++i) {
             bundledOfferItems[i].tokenId = args.nfts[i].identifier;
             bundledOfferItems[i].amount = 1;
-            bundledOfferItems[i].maxRoyaltyFeeNumerator = args.feeEthAmount2 * 10000 / totalEthAmount;
-            bundledOfferItems[i].itemPrice = args.ethAmounts[i];
+            bundledOfferItems[i].maxRoyaltyFeeNumerator = args.feeRate2;
+            bundledOfferItems[i].itemPrice = args.itemPrices[i];
             bundledOfferItems[i].listingNonce = 0;
             bundledOfferItems[i].listingExpiration = 0;
             bundledOfferItems[i].seller = alice;
@@ -670,7 +670,7 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
             accumulator.sellers[i] = alice;
             accumulator.sumListingPrices += saleDetails.listingMinPrice;
 
-            TestERC721(args.nfts[i].token).setTokenRoyalty(saleDetails.tokenId, args.feeRecipient2, uint96(saleDetails.maxRoyaltyFeeNumerator));
+            TestERC721(args.nfts[i].token).setTokenRoyalty(saleDetails.tokenId, args.feeRecipient2, uint96(args.feeRate2));
         }
 
 
