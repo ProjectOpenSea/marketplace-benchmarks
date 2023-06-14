@@ -5,6 +5,7 @@ import { BaseMarketConfig } from "../src/BaseMarketConfig.sol";
 import { BlurConfig } from "../src/marketplaces/blur/BlurConfig.sol";
 import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
 import { LooksRareConfig } from "../src/marketplaces/looksRare/LooksRareConfig.sol";
+import { PaymentProcessorConfig } from '../src/marketplaces/lb-payment-processor/PaymentProcessorConfig.sol';
 import { SeaportOnePointOneConfig } from "../src/marketplaces/seaport-1.1/SeaportOnePointOneConfig.sol";
 import { SeaportOnePointFourConfig } from "../src/marketplaces/seaport-1.4/SeaportOnePointFourConfig.sol";
 import { SudoswapConfig } from "../src/marketplaces/sudoswap/SudoswapConfig.sol";
@@ -12,7 +13,7 @@ import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
 import { X2Y2Config } from "../src/marketplaces/X2Y2/X2Y2Config.sol";
 import { ZeroExConfig } from "../src/marketplaces/zeroEx/ZeroExConfig.sol";
 
-import { SetupCall, TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "../src/Types.sol";
+import "../src/Types.sol";
 
 import "./tokens/TestERC20.sol";
 import "./tokens/TestERC721.sol";
@@ -23,6 +24,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig blurConfig;
     BaseMarketConfig foundationConfig;
     BaseMarketConfig looksRareConfig;
+    BaseMarketConfig paymentProcessorConfig;
     BaseMarketConfig seaportOnePointOneConfig;
     BaseMarketConfig seaportOnePointFourConfig;
     BaseMarketConfig sudoswapConfig;
@@ -34,6 +36,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         blurConfig = BaseMarketConfig(new BlurConfig());
         foundationConfig = BaseMarketConfig(new FoundationConfig());
         looksRareConfig = BaseMarketConfig(new LooksRareConfig());
+        paymentProcessorConfig = BaseMarketConfig(new PaymentProcessorConfig());
         seaportOnePointOneConfig = BaseMarketConfig(
             new SeaportOnePointOneConfig()
         );
@@ -82,45 +85,53 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmarkMarket(blurConfig);
     }
 
+    function testPaymentProcessor() external {
+        benchmarkMarket(paymentProcessorConfig);
+    }
+
     function benchmarkMarket(BaseMarketConfig config) public {
         beforeAllPrepareMarketplaceTest(config);
-        benchmark_BuyOfferedERC721WithEther_ListOnChain(config);
         benchmark_BuyOfferedERC721WithEther(config);
-        benchmark_BuyOfferedERC1155WithEther_ListOnChain(config);
         benchmark_BuyOfferedERC1155WithEther(config);
-        benchmark_BuyOfferedERC721WithWETH_ListOnChain(config);
         benchmark_BuyOfferedERC721WithWETH(config);
-        benchmark_BuyOfferedERC721WithERC20_ListOnChain(config);
         benchmark_BuyOfferedERC721WithERC20(config);
-        benchmark_BuyOfferedERC1155WithERC20_ListOnChain(config);
         benchmark_BuyOfferedERC1155WithERC20(config);
-        benchmark_BuyOfferedERC20WithERC721_ListOnChain(config);
         benchmark_BuyOfferedERC20WithERC721(config);
-        benchmark_BuyOfferedWETHWithERC721_ListOnChain(config);
         benchmark_BuyOfferedWETHWithERC721(config);
-        benchmark_BuyOfferedERC20WithERC1155_ListOnChain(config);
         benchmark_BuyOfferedERC20WithERC1155(config);
-        benchmark_BuyOfferedERC721WithERC1155_ListOnChain(config);
         benchmark_BuyOfferedERC721WithERC1155(config);
-        benchmark_BuyOfferedERC1155WithERC721_ListOnChain(config);
         benchmark_BuyOfferedERC1155WithERC721(config);
-        benchmark_BuyOfferedERC721WithEtherFee_ListOnChain(config);
         benchmark_BuyOfferedERC721WithEtherFee(config);
-        benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients_ListOnChain(config);
         benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients(config);
-        benchmark_BuyTenOfferedERC721WithEther_ListOnChain(config);
         benchmark_BuyTenOfferedERC721WithEther(config);
+        benchmark_BuyTenOfferedERC721WithEtherDistinctOrders(config);
+        benchmark_BuyTenOfferedERC721WithErc20DistinctOrders(config);
+        benchmark_BuyTenOfferedERC721WithWETHDistinctOrders(config);
+        benchmark_MatchOrders_ABCA(config);
+        benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividually(config);
+        benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFee(config);
+        benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFeeTwoRecipients(config);
+
+        benchmark_BuyOfferedERC721WithEther_ListOnChain(config);
+        benchmark_BuyOfferedERC1155WithEther_ListOnChain(config);
+        benchmark_BuyOfferedERC721WithWETH_ListOnChain(config);
+        benchmark_BuyOfferedERC721WithERC20_ListOnChain(config);
+        benchmark_BuyOfferedERC1155WithERC20_ListOnChain(config);
+        benchmark_BuyOfferedERC20WithERC721_ListOnChain(config);
+        benchmark_BuyOfferedWETHWithERC721_ListOnChain(config);
+        benchmark_BuyOfferedERC20WithERC1155_ListOnChain(config);
+        benchmark_BuyOfferedERC721WithERC1155_ListOnChain(config);
+        benchmark_BuyOfferedERC1155WithERC721_ListOnChain(config);
+        benchmark_BuyOfferedERC721WithEtherFee_ListOnChain(config);
+        benchmark_BuyOfferedERC721WithEtherFeeTwoRecipients_ListOnChain(config);
+        benchmark_BuyTenOfferedERC721WithEther_ListOnChain(config);
         benchmark_BuyTenOfferedERC721WithEtherDistinctOrders_ListOnChain(
             config
         );
-        benchmark_BuyTenOfferedERC721WithEtherDistinctOrders(config);
         benchmark_BuyTenOfferedERC721WithErc20DistinctOrders_ListOnChain(
             config
         );
-        benchmark_BuyTenOfferedERC721WithErc20DistinctOrders(config);
         benchmark_BuyTenOfferedERC721WithWETHDistinctOrders_ListOnChain(config);
-        benchmark_BuyTenOfferedERC721WithWETHDistinctOrders(config);
-        benchmark_MatchOrders_ABCA(config);
     }
 
     function beforeAllPrepareMarketplaceTest(BaseMarketConfig config) internal {
@@ -1112,6 +1123,153 @@ contract GenericMarketplaceTest is BaseOrderTest {
             for (uint256 i = 0; i < 10; i++) {
                 assertEq(test721_1.ownerOf(i + 1), bob);
             }
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividually(BaseMarketConfig config)
+        internal
+        prepareTest(config)
+    {
+        string memory testLabel = "(ERC721x10 -> ETH (Priced Indvidually))";
+
+        TestItem721[] memory nfts = new TestItem721[](10);
+        uint256[] memory nftPrices = new uint256[](10);
+
+        for (uint256 i = 0; i < 10; i++) {
+            test721_1.mint(alice, i + 1);
+            nfts[i] = TestItem721(address(test721_1), i + 1);
+            nftPrices[i] = 100 + (100 * i);
+        }
+
+        try
+            config.getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividually(
+                TestOrderContext(false, alice, bob),
+                nfts,
+                nftPrices
+            )
+        returns (TestOrderPayload memory payload) {
+            for (uint256 i = 0; i < 10; i++) {
+                assertEq(test721_1.ownerOf(i + 1), alice);
+            }
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill /w Sig")),
+                bob,
+                payload.executeOrder
+            );
+
+            for (uint256 i = 0; i < 10; i++) {
+                assertEq(test721_1.ownerOf(i + 1), bob);
+            }
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFee(BaseMarketConfig config)
+        internal
+        prepareTest(config)
+    {
+        string memory testLabel = "(ERC721x10 -> ETH One-Fee-Recipient (Priced Indvidually))";
+
+        TestItem721[] memory nfts = new TestItem721[](10);
+        uint256[] memory nftPrices = new uint256[](10);
+        uint256[] memory fees = new uint256[](10);
+        uint256 totalFees = 0;
+
+        for (uint256 i = 0; i < 10; i++) {
+            test721_1.mint(alice, i + 1);
+            nfts[i] = TestItem721(address(test721_1), i + 1);
+            nftPrices[i] = 100 + (100 * i);
+            fees[i] = 5 + (5 * i);
+            totalFees += fees[i];
+        }
+
+        try
+            config.getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividuallyOneFeeRecipient(
+                TestBundleOrderWithSingleFeeReceiver({
+                    context: TestOrderContext(false, alice, bob),
+                    nfts: nfts,
+                    ethAmounts: nftPrices,
+                    feeRecipient: feeReciever1,
+                    feeEthAmount: totalFees
+                })
+            )
+        returns (TestOrderPayload memory payload) {
+            for (uint256 i = 0; i < 10; i++) {
+                assertEq(test721_1.ownerOf(i + 1), alice);
+            }
+            assertEq(feeReciever1.balance, 0);
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill /w Sig")),
+                bob,
+                payload.executeOrder
+            );
+
+            for (uint256 i = 0; i < 10; i++) {
+                assertEq(test721_1.ownerOf(i + 1), bob);
+            }
+            assertEq(feeReciever1.balance, totalFees);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFeeTwoRecipients(BaseMarketConfig config)
+        internal
+        prepareTest(config)
+    {
+        string memory testLabel = "(ERC721x10 -> ETH Two-Fee-Recipients (Priced Indvidually))";
+
+        TestItem721[] memory nfts = new TestItem721[](10);
+        uint256[] memory nftPrices = new uint256[](10);
+        uint256 totalFees1 = 0;
+        uint256 totalFees2 = 0;
+
+        for (uint256 i = 0; i < 10; i++) {
+            test721_1.mint(alice, i + 1);
+            nfts[i] = TestItem721(address(test721_1), i + 1);
+            nftPrices[i] = 100 + (100 * i);
+            totalFees1 += 5 + (5 * i);
+            totalFees2 += 10 + (10 * i);
+        }
+
+        try
+            config.getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividuallyTwoFeeRecipients(
+                TestBundleOrderWithTwoFeeReceivers({
+                    context: TestOrderContext(false, alice, bob),
+                    nfts: nfts,
+                    ethAmounts: nftPrices,
+                    feeRecipient1: feeReciever1,
+                    feeEthAmount1: totalFees1,
+                    feeRecipient2: feeReciever2,
+                    feeEthAmount2: totalFees2
+                })
+            )
+        returns (TestOrderPayload memory payload) {
+            for (uint256 i = 0; i < 10; i++) {
+                assertEq(test721_1.ownerOf(i + 1), alice);
+            }
+            assertEq(feeReciever1.balance, 0);
+            assertEq(feeReciever2.balance, 0);
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill /w Sig")),
+                bob,
+                payload.executeOrder
+            );
+
+            for (uint256 i = 0; i < 10; i++) {
+                assertEq(test721_1.ownerOf(i + 1), bob);
+            }
+            assertEq(feeReciever1.balance, totalFees1);
+            assertEq(feeReciever2.balance, totalFees2);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }

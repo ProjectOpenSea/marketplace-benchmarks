@@ -964,6 +964,65 @@ contract SeaportOnePointFourConfig is
         );
     }
 
+    function getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividually(
+        TestOrderContext calldata context,
+        TestItem721[] calldata nfts,
+        uint256[] calldata ethAmounts
+    ) external view override returns (TestOrderPayload memory execution) {
+
+        uint256 sumPayments = 0;
+        address alice = context.offerer;
+        uint256 numItemsInBundle = nfts.length;
+
+        OfferItem[] memory offerItems = new OfferItem[](numItemsInBundle);
+        ConsiderationItem[] memory considerationItems = new ConsiderationItem[](numItemsInBundle);
+
+        for (uint256 i = 0; i < numItemsInBundle; i++) {
+            offerItems[i] = OfferItem(
+                ItemType.ERC721,
+                nfts[i].token,
+                nfts[i].identifier,
+                1,
+                1
+            );
+
+            considerationItems[i] = ConsiderationItem(
+                ItemType.NATIVE,
+                address(0),
+                0,
+                ethAmounts[i],
+                ethAmounts[i],
+                payable(alice)
+            );
+
+            sumPayments += ethAmounts[i];
+        }
+
+        Order memory order = buildOrder(
+            alice,
+            offerItems,
+            considerationItems
+        );
+
+        if (context.listOnChain) {
+            order.signature = "";
+
+            Order[] memory orders = new Order[](1);
+            orders[0] = order;
+            execution.submitOrder = TestCallParameters(
+                address(seaport),
+                0,
+                abi.encodeWithSelector(ISeaport.validate.selector, orders)
+            );
+        }
+
+         execution.executeOrder = TestCallParameters(
+            address(seaport),
+            sumPayments,
+            abi.encodeWithSelector(ISeaport.fulfillOrder.selector, order, 0)
+        );
+    }
+
     function getPayload_BuyOfferedManyERC721WithEtherDistinctOrders(
         TestOrderContext[] calldata contexts,
         TestItem721[] calldata nfts,

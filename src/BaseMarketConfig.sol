@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.7;
 
-import { SetupCall, TestOrderPayload, TestOrderContext, TestCallParameters, TestItem20, TestItem721, TestItem1155 } from "./Types.sol";
+import "./Types.sol";
 
 abstract contract BaseMarketConfig {
     /**
@@ -249,7 +249,7 @@ abstract contract BaseMarketConfig {
         uint256 priceEthAmount,
         address feeRecipient,
         uint256 feeEthAmount
-    ) external view virtual returns (TestOrderPayload memory execution) {
+    ) external virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
 
@@ -274,7 +274,7 @@ abstract contract BaseMarketConfig {
         uint256 feeEthAmount1,
         address feeRecipient2,
         uint256 feeEthAmount2
-    ) external view virtual returns (TestOrderPayload memory execution) {
+    ) external virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
 
@@ -291,6 +291,68 @@ abstract contract BaseMarketConfig {
         TestOrderContext calldata context,
         TestItem721[] calldata nfts,
         uint256 ethAmount
+    ) external virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
+
+    /**
+     * @dev Get call parameters to execute an order selling many 721 tokens for Ether.
+     *   If `context.listOnChain` is true and marketplace does not support on-chain
+     *   listing, this function must revert with NotImplemented.
+     *   Each token is priced individually as royalties can exist per individual NFT
+     *   and context is lost when pricing the entire bundle.
+     * @param context Order context, including the buyer and seller and whether the
+     *  order should be listed on chain.
+     * @param nfts Array of Address and ID for ERC721 tokens to be sold.
+     * @param ethAmounts Array of Ether amounts to be received for each NFT.
+     */
+    function getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividually(
+        TestOrderContext calldata context,
+        TestItem721[] calldata nfts,
+        uint256[] calldata ethAmounts
+    ) external virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
+
+
+    /**
+     * @dev Get call parameters to execute an order selling many 721 tokens for Ether with one fee recipient.
+     *   If `context.listOnChain` is true and marketplace does not support on-chain
+     *   listing, this function must revert with NotImplemented.
+     *   Each token is priced individually as royalties can exist per individual NFT
+     *   and context is lost when pricing the entire bundle.
+     * @param args Struct containing the data needed to create the payload: 
+     *      args.context        Order context, including the buyer and seller and whether the
+     *                          order should be listed on chain.
+     *      args.nfts           Array of Address and ID for ERC721 tokens to be sold.
+     *      args.ethAmounts     Array of Ether amounts to be received for each NFT.
+     *      args.feeRecipient   Address to send fee to.
+     *      args.feeEthAmounts  Amount of Ether to send for fee.
+     */
+    function getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividuallyOneFeeRecipient(
+        TestBundleOrderWithSingleFeeReceiver memory args
+    ) external virtual returns (TestOrderPayload memory execution) {
+        _notImplemented();
+    }
+
+    /**
+     * @dev Get call parameters to execute an order selling many 721 tokens for Ether with one fee recipient.
+     *   If `context.listOnChain` is true and marketplace does not support on-chain
+     *   listing, this function must revert with NotImplemented.
+     *   Each token is priced individually as royalties can exist per individual NFT
+     *   and context is lost when pricing the entire bundle.
+     * @param args Struct containing the data needed to create the payload: 
+     *      args.context        Order context, including the buyer and seller and whether the
+     *                          order should be listed on chain.
+     *      args.nfts           Array of Address and ID for ERC721 tokens to be sold.
+     *      args.ethAmounts     Array of Ether amounts to be received for each NFT.
+     *      args.feeRecipient1  Address to send fee 1 to.
+     *      args.feeEthAmount1  Amount of Ether to send for fee 1.
+     *      args.feeRecipient2  Address to send fee 2 to.
+     *      args.feeEthAmount2  Amount of Ether to send for fee 2.
+     */
+    function getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividuallyTwoFeeRecipients(
+        TestBundleOrderWithTwoFeeReceivers memory args
     ) external virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
