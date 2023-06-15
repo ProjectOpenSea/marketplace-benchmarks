@@ -26,6 +26,7 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
     /// @notice keccack256("BundledSaleApproval(uint8 protocol,address marketplace,uint256 marketplaceFeeNumerator,address privateBuyer,address seller,address tokenAddress,uint256 expiration,uint256 nonce,uint256 masterNonce,address coin,uint256[] tokenIds,uint256[] amounts,uint256[] maxRoyaltyFeeNumerators,uint256[] itemPrices)")
     bytes32 public constant BUNDLED_SALE_APPROVAL_HASH = 0x80244acca7a02d7199149a3038653fc8cb10ca984341ec429a626fab631e1662;
 
+    uint256 internal securityPolicyId;
 
     IPaymentProcessor paymentProcessor = IPaymentProcessor(address(0x009a1dC629242961C9E4f089b437aFD394474cc0));
     mapping (address => uint256) internal _nonces;
@@ -42,6 +43,17 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
         buyerNftApprovalTarget = sellerNftApprovalTarget = buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(
             paymentProcessor
         );
+
+        securityPolicyId = paymentProcessor.createSecurityPolicy(
+            false, 
+            true, 
+            false, 
+            false, 
+            false, 
+            false, 
+            false, 
+            2300, 
+            "TEST POLICY");
     }
 
     function getPayload_BuyOfferedERC721WithEther(
@@ -93,6 +105,419 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
         execution.executeOrder = TestCallParameters(
             address(paymentProcessor),
             ethAmount,
+            payload
+        );
+    }
+
+    function getPayload_BuyOfferedERC1155WithEther(
+        TestOrderContext calldata context,
+        TestItem1155 calldata nft,
+        uint256 ethAmount
+    ) external override returns (TestOrderPayload memory execution) {
+        if (context.listOnChain) {
+            _notImplemented();
+        }
+
+        address alice = context.offerer;
+        address bob = context.fulfiller;
+
+        vm.prank(alice);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
+
+        vm.prank(bob);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
+
+        MatchedOrder memory saleDetails = MatchedOrder({
+                sellerAcceptedOffer: false,
+                collectionLevelOffer: false,
+                protocol: TokenProtocols.ERC1155,
+                paymentCoin: address(0),
+                tokenAddress: nft.token,
+                seller: alice,
+                privateBuyer: address(0),
+                buyer: bob,
+                delegatedPurchaser: address(0),
+                marketplace: address(0),
+                marketplaceFeeNumerator: 0,
+                maxRoyaltyFeeNumerator: 0,
+                listingNonce: _getNextNonce(alice),
+                offerNonce: _getNextNonce(bob),
+                listingMinPrice: ethAmount,
+                offerPrice: ethAmount,
+                listingExpiration: type(uint256).max,
+                offerExpiration: type(uint256).max,
+                tokenId: nft.identifier,
+                amount: nft.amount
+            });
+    
+        SignatureECDSA memory signedListing = _getSignedListing(alice, saleDetails);
+        SignatureECDSA memory signedOffer = _getSignedOffer(bob, saleDetails);
+
+        bytes memory payload = abi.encodeWithSelector(IPaymentProcessor.buySingleListing.selector, saleDetails, signedListing, signedOffer);
+
+        execution.executeOrder = TestCallParameters(
+            address(paymentProcessor),
+            ethAmount,
+            payload
+        );
+    }
+
+    function getPayload_BuyOfferedERC721WithERC20(
+        TestOrderContext calldata context,
+        TestItem721 calldata nft,
+        TestItem20 calldata erc20
+    ) external override returns (TestOrderPayload memory execution) {
+        if (context.listOnChain) {
+            _notImplemented();
+        }
+
+        vm.prank(nft.token);
+        paymentProcessor.setCollectionSecurityPolicy(nft.token, securityPolicyId);
+
+        if (!paymentProcessor.isPaymentMethodApproved(securityPolicyId, erc20.token)) {
+            paymentProcessor.whitelistPaymentMethod(securityPolicyId, erc20.token);
+        }
+
+        address alice = context.offerer;
+        address bob = context.fulfiller;
+
+        vm.prank(alice);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
+
+        vm.prank(bob);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
+
+        MatchedOrder memory saleDetails = MatchedOrder({
+                sellerAcceptedOffer: false,
+                collectionLevelOffer: false,
+                protocol: TokenProtocols.ERC721,
+                paymentCoin: erc20.token,
+                tokenAddress: nft.token,
+                seller: alice,
+                privateBuyer: address(0),
+                buyer: bob,
+                delegatedPurchaser: address(0),
+                marketplace: address(0),
+                marketplaceFeeNumerator: 0,
+                maxRoyaltyFeeNumerator: 0,
+                listingNonce: _getNextNonce(alice),
+                offerNonce: _getNextNonce(bob),
+                listingMinPrice: erc20.amount,
+                offerPrice: erc20.amount,
+                listingExpiration: type(uint256).max,
+                offerExpiration: type(uint256).max,
+                tokenId: nft.identifier,
+                amount: 1
+            });
+    
+        SignatureECDSA memory signedListing = _getSignedListing(alice, saleDetails);
+        SignatureECDSA memory signedOffer = _getSignedOffer(bob, saleDetails);
+
+        bytes memory payload = abi.encodeWithSelector(IPaymentProcessor.buySingleListing.selector, saleDetails, signedListing, signedOffer);
+
+        execution.executeOrder = TestCallParameters(
+            address(paymentProcessor),
+            0,
+            payload
+        );
+    }
+
+    function getPayload_BuyOfferedERC721WithWETH(
+        TestOrderContext calldata context,
+        TestItem721 memory nft,
+        TestItem20 memory erc20
+    ) external override returns (TestOrderPayload memory execution) {
+        if (context.listOnChain) {
+            _notImplemented();
+        }
+
+        vm.prank(nft.token);
+        paymentProcessor.setCollectionSecurityPolicy(nft.token, securityPolicyId);
+
+        if (!paymentProcessor.isPaymentMethodApproved(securityPolicyId, erc20.token)) {
+            paymentProcessor.whitelistPaymentMethod(securityPolicyId, erc20.token);
+        }
+
+        address alice = context.offerer;
+        address bob = context.fulfiller;
+
+        vm.prank(alice);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
+
+        vm.prank(bob);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
+
+        MatchedOrder memory saleDetails = MatchedOrder({
+                sellerAcceptedOffer: false,
+                collectionLevelOffer: false,
+                protocol: TokenProtocols.ERC721,
+                paymentCoin: erc20.token,
+                tokenAddress: nft.token,
+                seller: alice,
+                privateBuyer: address(0),
+                buyer: bob,
+                delegatedPurchaser: address(0),
+                marketplace: address(0),
+                marketplaceFeeNumerator: 0,
+                maxRoyaltyFeeNumerator: 0,
+                listingNonce: _getNextNonce(alice),
+                offerNonce: _getNextNonce(bob),
+                listingMinPrice: erc20.amount,
+                offerPrice: erc20.amount,
+                listingExpiration: type(uint256).max,
+                offerExpiration: type(uint256).max,
+                tokenId: nft.identifier,
+                amount: 1
+            });
+    
+        SignatureECDSA memory signedListing = _getSignedListing(alice, saleDetails);
+        SignatureECDSA memory signedOffer = _getSignedOffer(bob, saleDetails);
+
+        bytes memory payload = abi.encodeWithSelector(IPaymentProcessor.buySingleListing.selector, saleDetails, signedListing, signedOffer);
+
+        execution.executeOrder = TestCallParameters(
+            address(paymentProcessor),
+            0,
+            payload
+        );
+    }
+
+    function getPayload_BuyOfferedERC1155WithERC20(
+        TestOrderContext calldata context,
+        TestItem1155 calldata nft,
+        TestItem20 memory erc20
+    ) external override returns (TestOrderPayload memory execution) {
+        if (context.listOnChain) {
+            _notImplemented();
+        }
+
+        vm.prank(nft.token);
+        paymentProcessor.setCollectionSecurityPolicy(nft.token, securityPolicyId);
+
+        if (!paymentProcessor.isPaymentMethodApproved(securityPolicyId, erc20.token)) {
+            paymentProcessor.whitelistPaymentMethod(securityPolicyId, erc20.token);
+        }
+
+        address alice = context.offerer;
+        address bob = context.fulfiller;
+
+        vm.prank(alice);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
+
+        vm.prank(bob);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
+
+        MatchedOrder memory saleDetails = MatchedOrder({
+                sellerAcceptedOffer: false,
+                collectionLevelOffer: false,
+                protocol: TokenProtocols.ERC1155,
+                paymentCoin: erc20.token,
+                tokenAddress: nft.token,
+                seller: alice,
+                privateBuyer: address(0),
+                buyer: bob,
+                delegatedPurchaser: address(0),
+                marketplace: address(0),
+                marketplaceFeeNumerator: 0,
+                maxRoyaltyFeeNumerator: 0,
+                listingNonce: _getNextNonce(alice),
+                offerNonce: _getNextNonce(bob),
+                listingMinPrice: erc20.amount,
+                offerPrice: erc20.amount,
+                listingExpiration: type(uint256).max,
+                offerExpiration: type(uint256).max,
+                tokenId: nft.identifier,
+                amount: nft.amount
+            });
+    
+        SignatureECDSA memory signedListing = _getSignedListing(alice, saleDetails);
+        SignatureECDSA memory signedOffer = _getSignedOffer(bob, saleDetails);
+
+        bytes memory payload = abi.encodeWithSelector(IPaymentProcessor.buySingleListing.selector, saleDetails, signedListing, signedOffer);
+
+        execution.executeOrder = TestCallParameters(
+            address(paymentProcessor),
+            0,
+            payload
+        );
+    }
+
+    function getPayload_BuyOfferedERC20WithERC721(
+        TestOrderContext calldata context,
+        TestItem20 memory erc20,
+        TestItem721 memory nft
+    ) external override returns (TestOrderPayload memory execution) {
+        if (context.listOnChain) {
+            _notImplemented();
+        }
+
+        vm.prank(nft.token);
+        paymentProcessor.setCollectionSecurityPolicy(nft.token, securityPolicyId);
+
+        if (!paymentProcessor.isPaymentMethodApproved(securityPolicyId, erc20.token)) {
+            paymentProcessor.whitelistPaymentMethod(securityPolicyId, erc20.token);
+        }
+
+        address alice = context.offerer;
+        address bob = context.fulfiller;
+
+        vm.prank(alice);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
+
+        vm.prank(bob);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
+
+        MatchedOrder memory saleDetails = MatchedOrder({
+                sellerAcceptedOffer: true,
+                collectionLevelOffer: false,
+                protocol: TokenProtocols.ERC721,
+                paymentCoin: erc20.token,
+                tokenAddress: nft.token,
+                seller: bob,
+                privateBuyer: address(0),
+                buyer: alice,
+                delegatedPurchaser: address(0),
+                marketplace: address(0),
+                marketplaceFeeNumerator: 0,
+                maxRoyaltyFeeNumerator: 0,
+                listingNonce: _getNextNonce(bob),
+                offerNonce: _getNextNonce(alice),
+                listingMinPrice: erc20.amount,
+                offerPrice: erc20.amount,
+                listingExpiration: type(uint256).max,
+                offerExpiration: type(uint256).max,
+                tokenId: nft.identifier,
+                amount: 1
+            });
+    
+        SignatureECDSA memory signedListing = _getSignedListing(bob, saleDetails);
+        SignatureECDSA memory signedOffer = _getSignedOffer(alice, saleDetails);
+
+        bytes memory payload = abi.encodeWithSelector(IPaymentProcessor.buySingleListing.selector, saleDetails, signedListing, signedOffer);
+
+        execution.executeOrder = TestCallParameters(
+            address(paymentProcessor),
+            0,
+            payload
+        );
+    }
+
+    function getPayload_BuyOfferedWETHWithERC721(
+        TestOrderContext calldata context,
+        TestItem20 memory erc20,
+        TestItem721 memory nft
+    ) external override returns (TestOrderPayload memory execution) {
+        if (context.listOnChain) {
+            _notImplemented();
+        }
+
+        vm.prank(nft.token);
+        paymentProcessor.setCollectionSecurityPolicy(nft.token, securityPolicyId);
+
+        if (!paymentProcessor.isPaymentMethodApproved(securityPolicyId, erc20.token)) {
+            paymentProcessor.whitelistPaymentMethod(securityPolicyId, erc20.token);
+        }
+
+        address alice = context.offerer;
+        address bob = context.fulfiller;
+
+        vm.prank(alice);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
+
+        vm.prank(bob);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
+
+        MatchedOrder memory saleDetails = MatchedOrder({
+                sellerAcceptedOffer: true,
+                collectionLevelOffer: false,
+                protocol: TokenProtocols.ERC721,
+                paymentCoin: erc20.token,
+                tokenAddress: nft.token,
+                seller: bob,
+                privateBuyer: address(0),
+                buyer: alice,
+                delegatedPurchaser: address(0),
+                marketplace: address(0),
+                marketplaceFeeNumerator: 0,
+                maxRoyaltyFeeNumerator: 0,
+                listingNonce: _getNextNonce(bob),
+                offerNonce: _getNextNonce(alice),
+                listingMinPrice: erc20.amount,
+                offerPrice: erc20.amount,
+                listingExpiration: type(uint256).max,
+                offerExpiration: type(uint256).max,
+                tokenId: nft.identifier,
+                amount: 1
+            });
+    
+        SignatureECDSA memory signedListing = _getSignedListing(bob, saleDetails);
+        SignatureECDSA memory signedOffer = _getSignedOffer(alice, saleDetails);
+
+        bytes memory payload = abi.encodeWithSelector(IPaymentProcessor.buySingleListing.selector, saleDetails, signedListing, signedOffer);
+
+        execution.executeOrder = TestCallParameters(
+            address(paymentProcessor),
+            0,
+            payload
+        );
+    }
+
+    function getPayload_BuyOfferedERC20WithERC1155(
+        TestOrderContext calldata context,
+        TestItem20 memory erc20,
+        TestItem1155 memory nft
+    ) external override returns (TestOrderPayload memory execution) {
+        if (context.listOnChain) {
+            _notImplemented();
+        }
+
+        vm.prank(nft.token);
+        paymentProcessor.setCollectionSecurityPolicy(nft.token, securityPolicyId);
+
+        if (!paymentProcessor.isPaymentMethodApproved(securityPolicyId, erc20.token)) {
+            paymentProcessor.whitelistPaymentMethod(securityPolicyId, erc20.token);
+        }
+
+        address alice = context.offerer;
+        address bob = context.fulfiller;
+
+        vm.prank(alice);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
+
+        vm.prank(bob);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
+
+        MatchedOrder memory saleDetails = MatchedOrder({
+                sellerAcceptedOffer: true,
+                collectionLevelOffer: false,
+                protocol: TokenProtocols.ERC1155,
+                paymentCoin: erc20.token,
+                tokenAddress: nft.token,
+                seller: bob,
+                privateBuyer: address(0),
+                buyer: alice,
+                delegatedPurchaser: address(0),
+                marketplace: address(0),
+                marketplaceFeeNumerator: 0,
+                maxRoyaltyFeeNumerator: 0,
+                listingNonce: _getNextNonce(bob),
+                offerNonce: _getNextNonce(alice),
+                listingMinPrice: erc20.amount,
+                offerPrice: erc20.amount,
+                listingExpiration: type(uint256).max,
+                offerExpiration: type(uint256).max,
+                tokenId: nft.identifier,
+                amount: nft.amount
+            });
+    
+        SignatureECDSA memory signedListing = _getSignedListing(bob, saleDetails);
+        SignatureECDSA memory signedOffer = _getSignedOffer(alice, saleDetails);
+
+        bytes memory payload = abi.encodeWithSelector(IPaymentProcessor.buySingleListing.selector, saleDetails, signedListing, signedOffer);
+
+        execution.executeOrder = TestCallParameters(
+            address(paymentProcessor),
+            0,
             payload
         );
     }
@@ -563,6 +988,7 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
 
         SignatureECDSA memory signedBundledListing = _getSignedBundledListing(alice, accumulatorHashes, bundleOfferDetailsExtended);
         SignatureECDSA memory signedBundledOffer = _getSignedOfferForBundledItems(bob, bundledOfferDetails, bundledOfferItems);
+        
         bytes memory payload = abi.encodeWithSelector(
                 IPaymentProcessor.buyBundledListing.selector, 
                 signedBundledListing,
@@ -684,6 +1110,7 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
 
         SignatureECDSA memory signedBundledListing = _getSignedBundledListing(alice, accumulatorHashes, bundleOfferDetailsExtended);
         SignatureECDSA memory signedBundledOffer = _getSignedOfferForBundledItems(bob, bundledOfferDetails, bundledOfferItems);
+        
         bytes memory payload = abi.encodeWithSelector(
                 IPaymentProcessor.buyBundledListing.selector, 
                 signedBundledListing,
@@ -696,6 +1123,310 @@ contract PaymentProcessorConfig is BaseMarketConfig, Test {
             totalEthAmount,
             payload
         );
+    }
+
+    function getPayload_BuyOfferedManyERC721WithEtherDistinctOrders(
+        TestOrderContext[] calldata contexts,
+        TestItem721[] calldata nfts,
+        uint256[] calldata ethAmounts
+    ) external override returns (TestOrderPayload memory execution) {
+        for (uint256 i = 0; i < contexts.length; ++i) {
+            if (contexts[i].listOnChain) {
+                _notImplemented();
+            }
+        }
+
+        uint256 totalEthAmount = 0;
+        uint256 numItemsInBundle = nfts.length;
+        address alice = contexts[0].offerer;
+        address bob = contexts[0].fulfiller;
+
+        vm.prank(alice);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
+
+        vm.prank(bob);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
+
+        for (uint256 i = 0; i < numItemsInBundle; ++i) {
+            totalEthAmount += ethAmounts[i];
+        }
+        
+        MatchedOrderBundleBase memory bundledOfferDetails = MatchedOrderBundleBase({
+            protocol: TokenProtocols.ERC721,
+            paymentCoin: address(0),
+            tokenAddress: nfts[0].token,
+            privateBuyer: address(0),
+            buyer: bob,
+            delegatedPurchaser: address(0),
+            marketplace: address(0),
+            marketplaceFeeNumerator: 0,
+            offerNonce: _getNextNonce(bob),
+            offerPrice: totalEthAmount,
+            offerExpiration: type(uint256).max
+        });
+    
+        BundledItem[] memory bundledOfferItems = new BundledItem[](numItemsInBundle);
+        SignatureECDSA[] memory signedListings = new SignatureECDSA[](numItemsInBundle);
+    
+            for (uint256 i = 0; i < numItemsInBundle; ++i) {
+    
+                bundledOfferItems[i].seller = alice;
+                bundledOfferItems[i].tokenId = nfts[i].identifier;
+                bundledOfferItems[i].amount = 1;
+                bundledOfferItems[i].maxRoyaltyFeeNumerator = 0;
+                bundledOfferItems[i].listingNonce = _getNextNonce(alice);
+                bundledOfferItems[i].itemPrice = ethAmounts[i];
+                bundledOfferItems[i].listingExpiration = type(uint256).max;
+    
+                MatchedOrder memory saleDetails = 
+                    MatchedOrder({
+                        sellerAcceptedOffer: false,
+                        collectionLevelOffer: false,
+                        protocol: bundledOfferDetails.protocol,
+                        paymentCoin: bundledOfferDetails.paymentCoin,
+                        tokenAddress: bundledOfferDetails.tokenAddress,
+                        seller: bundledOfferItems[i].seller,
+                        privateBuyer: address(0),
+                        buyer: bundledOfferDetails.buyer,
+                        delegatedPurchaser: bundledOfferDetails.delegatedPurchaser,
+                        marketplace: bundledOfferDetails.marketplace,
+                        marketplaceFeeNumerator: bundledOfferDetails.marketplaceFeeNumerator,
+                        maxRoyaltyFeeNumerator: bundledOfferItems[i].maxRoyaltyFeeNumerator,
+                        listingNonce: bundledOfferItems[i].listingNonce,
+                        offerNonce: bundledOfferDetails.offerNonce,
+                        listingMinPrice: bundledOfferItems[i].itemPrice,
+                        offerPrice: bundledOfferItems[i].itemPrice,
+                        listingExpiration: bundledOfferItems[i].listingExpiration,
+                        offerExpiration: bundledOfferDetails.offerExpiration,
+                        tokenId: bundledOfferItems[i].tokenId,
+                        amount: bundledOfferItems[i].amount
+                    });
+    
+                signedListings[i] = _getSignedListing(alice, saleDetails);
+            }
+    
+            SignatureECDSA memory signedOffer = _getSignedOfferForBundledItems(bob, bundledOfferDetails, bundledOfferItems);
+
+            bytes memory payload = abi.encodeWithSelector(
+                IPaymentProcessor.sweepCollection.selector, 
+                signedOffer,
+                bundledOfferDetails,
+                bundledOfferItems,
+                signedListings);
+
+            execution.executeOrder = TestCallParameters(
+                address(paymentProcessor),
+                totalEthAmount,
+                payload
+            );
+    }
+
+    function getPayload_BuyOfferedManyERC721WithErc20DistinctOrders(
+        TestOrderContext[] calldata contexts,
+        address erc20Address,
+        TestItem721[] calldata nfts,
+        uint256[] calldata erc20Amounts
+    ) external override returns (TestOrderPayload memory execution) {
+        for (uint256 i = 0; i < contexts.length; ++i) {
+            if (contexts[i].listOnChain) {
+                _notImplemented();
+            }
+        }
+
+        vm.prank(nfts[0].token);
+        paymentProcessor.setCollectionSecurityPolicy(nfts[0].token, securityPolicyId);
+
+        if (!paymentProcessor.isPaymentMethodApproved(securityPolicyId, erc20Address)) {
+            paymentProcessor.whitelistPaymentMethod(securityPolicyId, erc20Address);
+        }
+
+        uint256 totalErc20Amount = 0;
+        uint256 numItemsInBundle = nfts.length;
+        address alice = contexts[0].offerer;
+        address bob = contexts[0].fulfiller;
+
+        vm.prank(alice);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
+
+        vm.prank(bob);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
+
+        for (uint256 i = 0; i < numItemsInBundle; ++i) {
+            totalErc20Amount += erc20Amounts[i];
+        }
+        
+        MatchedOrderBundleBase memory bundledOfferDetails = MatchedOrderBundleBase({
+            protocol: TokenProtocols.ERC721,
+            paymentCoin: erc20Address,
+            tokenAddress: nfts[0].token,
+            privateBuyer: address(0),
+            buyer: bob,
+            delegatedPurchaser: address(0),
+            marketplace: address(0),
+            marketplaceFeeNumerator: 0,
+            offerNonce: _getNextNonce(bob),
+            offerPrice: totalErc20Amount,
+            offerExpiration: type(uint256).max
+        });
+    
+        BundledItem[] memory bundledOfferItems = new BundledItem[](numItemsInBundle);
+        SignatureECDSA[] memory signedListings = new SignatureECDSA[](numItemsInBundle);
+    
+            for (uint256 i = 0; i < numItemsInBundle; ++i) {
+    
+                bundledOfferItems[i].seller = alice;
+                bundledOfferItems[i].tokenId = nfts[i].identifier;
+                bundledOfferItems[i].amount = 1;
+                bundledOfferItems[i].maxRoyaltyFeeNumerator = 0;
+                bundledOfferItems[i].listingNonce = _getNextNonce(alice);
+                bundledOfferItems[i].itemPrice = erc20Amounts[i];
+                bundledOfferItems[i].listingExpiration = type(uint256).max;
+    
+                MatchedOrder memory saleDetails = 
+                    MatchedOrder({
+                        sellerAcceptedOffer: false,
+                        collectionLevelOffer: false,
+                        protocol: bundledOfferDetails.protocol,
+                        paymentCoin: bundledOfferDetails.paymentCoin,
+                        tokenAddress: bundledOfferDetails.tokenAddress,
+                        seller: bundledOfferItems[i].seller,
+                        privateBuyer: address(0),
+                        buyer: bundledOfferDetails.buyer,
+                        delegatedPurchaser: bundledOfferDetails.delegatedPurchaser,
+                        marketplace: bundledOfferDetails.marketplace,
+                        marketplaceFeeNumerator: bundledOfferDetails.marketplaceFeeNumerator,
+                        maxRoyaltyFeeNumerator: bundledOfferItems[i].maxRoyaltyFeeNumerator,
+                        listingNonce: bundledOfferItems[i].listingNonce,
+                        offerNonce: bundledOfferDetails.offerNonce,
+                        listingMinPrice: bundledOfferItems[i].itemPrice,
+                        offerPrice: bundledOfferItems[i].itemPrice,
+                        listingExpiration: bundledOfferItems[i].listingExpiration,
+                        offerExpiration: bundledOfferDetails.offerExpiration,
+                        tokenId: bundledOfferItems[i].tokenId,
+                        amount: bundledOfferItems[i].amount
+                    });
+    
+                signedListings[i] = _getSignedListing(alice, saleDetails);
+            }
+    
+            SignatureECDSA memory signedOffer = _getSignedOfferForBundledItems(bob, bundledOfferDetails, bundledOfferItems);
+
+            bytes memory payload = abi.encodeWithSelector(
+                IPaymentProcessor.sweepCollection.selector, 
+                signedOffer,
+                bundledOfferDetails,
+                bundledOfferItems,
+                signedListings);
+
+            execution.executeOrder = TestCallParameters(
+                address(paymentProcessor),
+                0,
+                payload
+            );
+    }
+
+    function getPayload_BuyOfferedManyERC721WithWETHDistinctOrders(
+        TestOrderContext[] calldata contexts,
+        address erc20Address,
+        TestItem721[] calldata nfts,
+        uint256[] calldata erc20Amounts
+    ) external override returns (TestOrderPayload memory execution) {
+        for (uint256 i = 0; i < contexts.length; ++i) {
+            if (contexts[i].listOnChain) {
+                _notImplemented();
+            }
+        }
+
+        vm.prank(nfts[0].token);
+        paymentProcessor.setCollectionSecurityPolicy(nfts[0].token, securityPolicyId);
+
+        if (!paymentProcessor.isPaymentMethodApproved(securityPolicyId, erc20Address)) {
+            paymentProcessor.whitelistPaymentMethod(securityPolicyId, erc20Address);
+        }
+
+        uint256 totalErc20Amount = 0;
+        uint256 numItemsInBundle = nfts.length;
+        address alice = contexts[0].offerer;
+        address bob = contexts[0].fulfiller;
+
+        vm.prank(alice);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(alice));
+
+        vm.prank(bob);
+        paymentProcessor.revokeSingleNonce(address(0), _getNextNonce(bob));
+
+        for (uint256 i = 0; i < numItemsInBundle; ++i) {
+            totalErc20Amount += erc20Amounts[i];
+        }
+        
+        MatchedOrderBundleBase memory bundledOfferDetails = MatchedOrderBundleBase({
+            protocol: TokenProtocols.ERC721,
+            paymentCoin: erc20Address,
+            tokenAddress: nfts[0].token,
+            privateBuyer: address(0),
+            buyer: bob,
+            delegatedPurchaser: address(0),
+            marketplace: address(0),
+            marketplaceFeeNumerator: 0,
+            offerNonce: _getNextNonce(bob),
+            offerPrice: totalErc20Amount,
+            offerExpiration: type(uint256).max
+        });
+    
+        BundledItem[] memory bundledOfferItems = new BundledItem[](numItemsInBundle);
+        SignatureECDSA[] memory signedListings = new SignatureECDSA[](numItemsInBundle);
+    
+            for (uint256 i = 0; i < numItemsInBundle; ++i) {
+    
+                bundledOfferItems[i].seller = alice;
+                bundledOfferItems[i].tokenId = nfts[i].identifier;
+                bundledOfferItems[i].amount = 1;
+                bundledOfferItems[i].maxRoyaltyFeeNumerator = 0;
+                bundledOfferItems[i].listingNonce = _getNextNonce(alice);
+                bundledOfferItems[i].itemPrice = erc20Amounts[i];
+                bundledOfferItems[i].listingExpiration = type(uint256).max;
+    
+                MatchedOrder memory saleDetails = 
+                    MatchedOrder({
+                        sellerAcceptedOffer: false,
+                        collectionLevelOffer: false,
+                        protocol: bundledOfferDetails.protocol,
+                        paymentCoin: bundledOfferDetails.paymentCoin,
+                        tokenAddress: bundledOfferDetails.tokenAddress,
+                        seller: bundledOfferItems[i].seller,
+                        privateBuyer: address(0),
+                        buyer: bundledOfferDetails.buyer,
+                        delegatedPurchaser: bundledOfferDetails.delegatedPurchaser,
+                        marketplace: bundledOfferDetails.marketplace,
+                        marketplaceFeeNumerator: bundledOfferDetails.marketplaceFeeNumerator,
+                        maxRoyaltyFeeNumerator: bundledOfferItems[i].maxRoyaltyFeeNumerator,
+                        listingNonce: bundledOfferItems[i].listingNonce,
+                        offerNonce: bundledOfferDetails.offerNonce,
+                        listingMinPrice: bundledOfferItems[i].itemPrice,
+                        offerPrice: bundledOfferItems[i].itemPrice,
+                        listingExpiration: bundledOfferItems[i].listingExpiration,
+                        offerExpiration: bundledOfferDetails.offerExpiration,
+                        tokenId: bundledOfferItems[i].tokenId,
+                        amount: bundledOfferItems[i].amount
+                    });
+    
+                signedListings[i] = _getSignedListing(alice, saleDetails);
+            }
+    
+            SignatureECDSA memory signedOffer = _getSignedOfferForBundledItems(bob, bundledOfferDetails, bundledOfferItems);
+
+            bytes memory payload = abi.encodeWithSelector(
+                IPaymentProcessor.sweepCollection.selector, 
+                signedOffer,
+                bundledOfferDetails,
+                bundledOfferItems,
+                signedListings);
+
+            execution.executeOrder = TestCallParameters(
+                address(paymentProcessor),
+                0,
+                payload
+            );
     }
 
     function _getNextNonce(address account) internal returns (uint256) {

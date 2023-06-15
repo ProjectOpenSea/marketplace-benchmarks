@@ -92,7 +92,7 @@ abstract contract BaseMarketConfig {
         TestOrderContext calldata context,
         TestItem1155 calldata nft,
         uint256 ethAmount
-    ) external view virtual returns (TestOrderPayload memory execution) {
+    ) external virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
 
@@ -143,7 +143,7 @@ abstract contract BaseMarketConfig {
         TestOrderContext calldata context,
         TestItem1155 calldata nft,
         TestItem20 calldata erc20
-    ) external view virtual returns (TestOrderPayload memory execution) {
+    ) external virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
 
@@ -194,7 +194,7 @@ abstract contract BaseMarketConfig {
         TestOrderContext calldata context,
         TestItem20 calldata erc20,
         TestItem1155 calldata nft
-    ) external view virtual returns (TestOrderPayload memory execution) {
+    ) external virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
 
@@ -314,7 +314,6 @@ abstract contract BaseMarketConfig {
         _notImplemented();
     }
 
-
     /**
      * @dev Get call parameters to execute an order selling many 721 tokens for Ether with one fee recipient.
      *   If `context.listOnChain` is true and marketplace does not support on-chain
@@ -369,7 +368,7 @@ abstract contract BaseMarketConfig {
         TestOrderContext[] calldata contexts,
         TestItem721[] calldata nfts,
         uint256[] calldata ethAmounts
-    ) external view virtual returns (TestOrderPayload memory execution) {
+    ) external virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
 
@@ -387,7 +386,7 @@ abstract contract BaseMarketConfig {
         address erc20Address,
         TestItem721[] calldata nfts,
         uint256[] calldata erc20Amounts
-    ) external view virtual returns (TestOrderPayload memory execution) {
+    ) external virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
 
@@ -405,7 +404,7 @@ abstract contract BaseMarketConfig {
         address erc20Address,
         TestItem721[] calldata nfts,
         uint256[] calldata erc20Amounts
-    ) external view virtual returns (TestOrderPayload memory execution) {
+    ) external virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
 
