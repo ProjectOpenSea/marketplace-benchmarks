@@ -39,7 +39,7 @@ jobs:
         uses: onbjerg/foundry-toolchain@v1
         with:
           version: nightly
-          run: yarn lint:check
+          run: forge fmt --check
 
       - uses: actions/setup-node@v2
         with:

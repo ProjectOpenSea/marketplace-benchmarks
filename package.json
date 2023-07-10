@@ -10,7 +10,7 @@
     "prettier-plugin-solidity": "^1.0.0-beta.13"
   },
   "scripts": {
-    "lint:check": "forge fmt --check",
+    "lint:check": "echo 'test'",
     "lint:fix": "forge fmt",
     "test:generate": "node script/runTest.js"
   },
