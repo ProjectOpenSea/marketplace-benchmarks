@@ -35,16 +35,9 @@ jobs:
         with:
           ref: "refs/pull/${{ github.event.number }}/merge"
 
-      - name: Install Foundry
-        uses: onbjerg/foundry-toolchain@v1
-        with:
-          version: nightly
-
-      - name: Install dependencies
-        run: forge install
-
       - uses: actions/setup-node@v2
         with:
           node-version: 12.x
+      - run: forge install
       - run: yarn install --frozen-lockfile
       - run: yarn lint:check
