@@ -1,7 +1,4 @@
-/**
- *Submitted for verification at Etherscan.io on 2018-03-08
- */
-
+// SPDX-License-Identifier: MIT
 pragma solidity >=0.4.13;
 
 interface IAtomicizer {

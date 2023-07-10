@@ -5,3 +5,5 @@
 .DS_Store
 results/results.tex
 results/results-direct.tex
+
+*.env
