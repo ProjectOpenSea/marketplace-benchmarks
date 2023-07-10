@@ -56,7 +56,7 @@ jobs:
             git push
           fi
 
-  lint:
+  exp-name-two:
     name: Run Lint
     runs-on: ubuntu-latest
     steps:
