@@ -1359,7 +1359,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
-    }
+    } 
 
     /*//////////////////////////////////////////////////////////////
                           Helpers
