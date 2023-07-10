@@ -341,12 +341,19 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     }
 
     function getPayload_BuyOfferedERC721WithEtherOneFeeRecipient(
-        TestOrderContext calldata /* context*/,
-        TestItem721 memory /* nft*/,
-        uint256 /* priceEthAmount*/,
-        address /* feeRecipient*/,
+        TestOrderContext calldata, /* context*/
+        TestItem721 memory, /* nft*/
+        uint256, /* priceEthAmount*/
+        address, /* feeRecipient*/
         uint256 /* feeEthAmount */
-    ) external pure override returns (TestOrderPayload memory /* execution */) {
+    )
+        external
+        pure
+        override
+        returns (
+            TestOrderPayload memory /* execution */
+        )
+    {
         // TODO: figure out why this isn't working
         _notImplemented();
 
@@ -386,14 +393,21 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     }
 
     function getPayload_BuyOfferedERC721WithEtherTwoFeeRecipient(
-        TestOrderContext calldata /* context */,
-        TestItem721 memory /* nft */,
-        uint256 /* priceEthAmount */,
-        address /* feeRecipient1 */,
-        uint256 /* feeEthAmount1 */,
-        address /* feeRecipient2 */,
+        TestOrderContext calldata, /* context */
+        TestItem721 memory, /* nft */
+        uint256, /* priceEthAmount */
+        address, /* feeRecipient1 */
+        uint256, /* feeEthAmount1 */
+        address, /* feeRecipient2 */
         uint256 /* feeEthAmount2 */
-    ) external pure override returns (TestOrderPayload memory /* execution */) {
+    )
+        external
+        pure
+        override
+        returns (
+            TestOrderPayload memory /* execution */
+        )
+    {
         // TODO: figure out why this isn't working
         _notImplemented();
 

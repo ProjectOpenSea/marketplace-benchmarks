@@ -92,13 +92,20 @@ contract FoundationConfig is BaseMarketConfig {
 
     function getPayload_BuyOfferedERC721WithEtherTwoFeeRecipient(
         TestOrderContext calldata context,
-        TestItem721 memory /* nft */,
-        uint256 /* priceEthAmount */,
-        address /* feeRecipient1 */,
-        uint256 /* feeEthAmount1 */,
-        address /* feeRecipient2 */,
+        TestItem721 memory, /* nft */
+        uint256, /* priceEthAmount */
+        address, /* feeRecipient1 */
+        uint256, /* feeEthAmount1 */
+        address, /* feeRecipient2 */
         uint256 /* feeEthAmount2 */
-    ) external pure override returns (TestOrderPayload memory /* execution */) {
+    )
+        external
+        pure
+        override
+        returns (
+            TestOrderPayload memory /* execution */
+        )
+    {
         if (!context.listOnChain) {
             _notImplemented();
         }
