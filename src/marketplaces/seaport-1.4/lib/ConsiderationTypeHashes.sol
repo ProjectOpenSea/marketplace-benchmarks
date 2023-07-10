@@ -9,9 +9,8 @@ uint256 constant EIP712_ConsiderationItem_size = 0xe0;
 uint256 constant EIP712_DomainSeparator_offset = 0x02;
 uint256 constant EIP712_OrderHash_offset = 0x22;
 uint256 constant EIP712_DigestPayload_size = 0x42;
-uint256 constant EIP_712_PREFIX = (
-    0x1901000000000000000000000000000000000000000000000000000000000000
-);
+uint256 constant EIP_712_PREFIX =
+    (0x1901000000000000000000000000000000000000000000000000000000000000);
 
 contract ConsiderationTypeHashes {
     bytes32 internal immutable _NAME_HASH;
@@ -45,12 +44,12 @@ contract ConsiderationTypeHashes {
         // prettier-ignore
         bytes memory considerationItemTypeString = abi.encodePacked(
             "ConsiderationItem(",
-                "uint8 itemType,",
-                "address token,",
-                "uint256 identifierOrCriteria,",
-                "uint256 startAmount,",
-                "uint256 endAmount,",
-                "address recipient",
+            "uint8 itemType,",
+            "address token,",
+            "uint256 identifierOrCriteria,",
+            "uint256 startAmount,",
+            "uint256 endAmount,",
+            "address recipient",
             ")"
         );
 
@@ -58,36 +57,35 @@ contract ConsiderationTypeHashes {
         // prettier-ignore
         bytes memory orderComponentsPartialTypeString = abi.encodePacked(
             "OrderComponents(",
-                "address offerer,",
-                "address zone,",
-                "OfferItem[] offer,",
-                "ConsiderationItem[] consideration,",
-                "uint8 orderType,",
-                "uint256 startTime,",
-                "uint256 endTime,",
-                "bytes32 zoneHash,",
-                "uint256 salt,",
-                "bytes32 conduitKey,",
-                "uint256 counter",
+            "address offerer,",
+            "address zone,",
+            "OfferItem[] offer,",
+            "ConsiderationItem[] consideration,",
+            "uint8 orderType,",
+            "uint256 startTime,",
+            "uint256 endTime,",
+            "bytes32 zoneHash,",
+            "uint256 salt,",
+            "bytes32 conduitKey,",
+            "uint256 counter",
             ")"
         );
         // Derive the OfferItem type hash using the corresponding type string.
         bytes32 offerItemTypehash = keccak256(offerItemTypeString);
 
         // Derive ConsiderationItem type hash using corresponding type string.
-        bytes32 considerationItemTypehash = keccak256(
-            considerationItemTypeString
-        );
+        bytes32 considerationItemTypehash =
+            keccak256(considerationItemTypeString);
 
         // Construct the primary EIP-712 domain type string.
         // prettier-ignore
         _EIP_712_DOMAIN_TYPEHASH = keccak256(
             abi.encodePacked(
                 "EIP712Domain(",
-                    "string name,",
-                    "string version,",
-                    "uint256 chainId,",
-                    "address verifyingContract",
+                "string name,",
+                "string version,",
+                "uint256 chainId,",
+                "address verifyingContract",
                 ")"
             )
         );
@@ -173,17 +171,16 @@ contract ConsiderationTypeHashes {
         view
         returns (bytes32)
     {
-        return
-            keccak256(
-                abi.encode(
-                    _OFFER_ITEM_TYPEHASH,
-                    offerItem.itemType,
-                    offerItem.token,
-                    offerItem.identifierOrCriteria,
-                    offerItem.startAmount,
-                    offerItem.endAmount
-                )
-            );
+        return keccak256(
+            abi.encode(
+                _OFFER_ITEM_TYPEHASH,
+                offerItem.itemType,
+                offerItem.token,
+                offerItem.identifierOrCriteria,
+                offerItem.startAmount,
+                offerItem.endAmount
+            )
+        );
     }
 
     /**
@@ -198,18 +195,17 @@ contract ConsiderationTypeHashes {
         view
         returns (bytes32)
     {
-        return
-            keccak256(
-                abi.encode(
-                    _CONSIDERATION_ITEM_TYPEHASH,
-                    considerationItem.itemType,
-                    considerationItem.token,
-                    considerationItem.identifierOrCriteria,
-                    considerationItem.startAmount,
-                    considerationItem.endAmount,
-                    considerationItem.recipient
-                )
-            );
+        return keccak256(
+            abi.encode(
+                _CONSIDERATION_ITEM_TYPEHASH,
+                considerationItem.itemType,
+                considerationItem.token,
+                considerationItem.identifierOrCriteria,
+                considerationItem.startAmount,
+                considerationItem.endAmount,
+                considerationItem.recipient
+            )
+        );
     }
 
     /**
@@ -248,29 +244,27 @@ contract ConsiderationTypeHashes {
             ++i
         ) {
             // Hash the consideration and place the result into memory.
-            considerationHashes[i] = _hashConsiderationItem(
-                orderParameters.consideration[i]
-            );
+            considerationHashes[i] =
+                _hashConsiderationItem(orderParameters.consideration[i]);
         }
 
         // Derive and return the order hash as specified by EIP-712.
 
-        return
-            keccak256(
-                abi.encode(
-                    _ORDER_TYPEHASH,
-                    orderParameters.offerer,
-                    orderParameters.zone,
-                    keccak256(abi.encodePacked(offerHashes)),
-                    keccak256(abi.encodePacked(considerationHashes)),
-                    orderParameters.orderType,
-                    orderParameters.startTime,
-                    orderParameters.endTime,
-                    orderParameters.zoneHash,
-                    orderParameters.salt,
-                    orderParameters.conduitKey,
-                    counter
-                )
-            );
+        return keccak256(
+            abi.encode(
+                _ORDER_TYPEHASH,
+                orderParameters.offerer,
+                orderParameters.zone,
+                keccak256(abi.encodePacked(offerHashes)),
+                keccak256(abi.encodePacked(considerationHashes)),
+                orderParameters.orderType,
+                orderParameters.startTime,
+                orderParameters.endTime,
+                orderParameters.zoneHash,
+                orderParameters.salt,
+                orderParameters.conduitKey,
+                counter
+            )
+        );
     }
 }

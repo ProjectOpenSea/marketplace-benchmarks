@@ -5,7 +5,15 @@ import "solmate/tokens/ERC20.sol";
 import "forge-std/Test.sol";
 
 import { BaseMarketConfig } from "../../BaseMarketConfig.sol";
-import { SetupCall, TestCallParameters, TestOrderContext, TestOrderPayload, TestItem721, TestItem1155, TestItem20 } from "../../Types.sol";
+import {
+    SetupCall,
+    TestCallParameters,
+    TestOrderContext,
+    TestOrderPayload,
+    TestItem721,
+    TestItem1155,
+    TestItem20
+} from "../../Types.sol";
 import { IZeroEx } from "./interfaces/IZeroEx.sol";
 import "./lib/LibNFTOrder.sol";
 import "./lib/LibSignature.sol";
@@ -31,9 +39,8 @@ contract ZeroExConfig is BaseMarketConfig, Test {
         external
         override
     {
-        buyerNftApprovalTarget = sellerNftApprovalTarget = buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(
-            zeroEx
-        );
+        buyerNftApprovalTarget = sellerNftApprovalTarget =
+        buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(zeroEx);
 
         // Consume the usedNonce, allows for testNonce to become gas optimized
         vm.prank(seller);
@@ -61,10 +68,8 @@ contract ZeroExConfig is BaseMarketConfig, Test {
         });
 
         // Sign the order
-        (uint8 v, bytes32 r, bytes32 s) = _sign(
-            order.maker,
-            zeroEx.getERC721OrderHash(order)
-        );
+        (uint8 v, bytes32 r, bytes32 s) =
+            _sign(order.maker, zeroEx.getERC721OrderHash(order));
 
         // Prepare the signature
         LibSignature.Signature memory sig = LibSignature.Signature({
@@ -87,8 +92,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
                 address(zeroEx),
                 0,
                 abi.encodeWithSelector(
-                    IZeroEx.preSignERC721Order.selector,
-                    order
+                    IZeroEx.preSignERC721Order.selector, order
                 )
             );
         }
@@ -123,10 +127,8 @@ contract ZeroExConfig is BaseMarketConfig, Test {
         });
 
         // Sign the order
-        (uint8 v, bytes32 r, bytes32 s) = _sign(
-            order.maker,
-            zeroEx.getERC1155OrderHash(order)
-        );
+        (uint8 v, bytes32 r, bytes32 s) =
+            _sign(order.maker, zeroEx.getERC1155OrderHash(order));
 
         // Prepare the signature
         LibSignature.Signature memory sig = LibSignature.Signature({
@@ -149,8 +151,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
                 address(zeroEx),
                 0,
                 abi.encodeWithSelector(
-                    IZeroEx.preSignERC1155Order.selector,
-                    order
+                    IZeroEx.preSignERC1155Order.selector, order
                 )
             );
         }
@@ -160,11 +161,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
             address(zeroEx),
             ethAmount,
             abi.encodeWithSelector(
-                IZeroEx.buyERC1155.selector,
-                order,
-                sig,
-                uint128(nft.amount),
-                ""
+                IZeroEx.buyERC1155.selector, order, sig, uint128(nft.amount), ""
             )
         );
     }
@@ -190,10 +187,8 @@ contract ZeroExConfig is BaseMarketConfig, Test {
         });
 
         // Sign the order
-        (uint8 v, bytes32 r, bytes32 s) = _sign(
-            order.maker,
-            zeroEx.getERC721OrderHash(order)
-        );
+        (uint8 v, bytes32 r, bytes32 s) =
+            _sign(order.maker, zeroEx.getERC721OrderHash(order));
 
         // Prepare the signature
         LibSignature.Signature memory sig = LibSignature.Signature({
@@ -216,8 +211,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
                 address(zeroEx),
                 0,
                 abi.encodeWithSelector(
-                    IZeroEx.preSignERC721Order.selector,
-                    order
+                    IZeroEx.preSignERC721Order.selector, order
                 )
             );
         }
@@ -251,10 +245,8 @@ contract ZeroExConfig is BaseMarketConfig, Test {
         });
 
         // Sign the order
-        (uint8 v, bytes32 r, bytes32 s) = _sign(
-            order.maker,
-            zeroEx.getERC721OrderHash(order)
-        );
+        (uint8 v, bytes32 r, bytes32 s) =
+            _sign(order.maker, zeroEx.getERC721OrderHash(order));
 
         // Prepare the signature
         LibSignature.Signature memory sig = LibSignature.Signature({
@@ -277,8 +269,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
                 address(zeroEx),
                 0,
                 abi.encodeWithSelector(
-                    IZeroEx.preSignERC721Order.selector,
-                    order
+                    IZeroEx.preSignERC721Order.selector, order
                 )
             );
         }
@@ -313,10 +304,8 @@ contract ZeroExConfig is BaseMarketConfig, Test {
         });
 
         // Sign the order
-        (uint8 v, bytes32 r, bytes32 s) = _sign(
-            order.maker,
-            zeroEx.getERC1155OrderHash(order)
-        );
+        (uint8 v, bytes32 r, bytes32 s) =
+            _sign(order.maker, zeroEx.getERC1155OrderHash(order));
 
         // Prepare the signature
         LibSignature.Signature memory sig = LibSignature.Signature({
@@ -339,8 +328,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
                 address(zeroEx),
                 0,
                 abi.encodeWithSelector(
-                    IZeroEx.preSignERC1155Order.selector,
-                    order
+                    IZeroEx.preSignERC1155Order.selector, order
                 )
             );
         }
@@ -350,11 +338,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
             address(zeroEx),
             0,
             abi.encodeWithSelector(
-                IZeroEx.buyERC1155.selector,
-                order,
-                sig,
-                uint128(nft.amount),
-                ""
+                IZeroEx.buyERC1155.selector, order, sig, uint128(nft.amount), ""
             )
         );
     }
@@ -380,10 +364,8 @@ contract ZeroExConfig is BaseMarketConfig, Test {
         });
 
         // Sign the order
-        (uint8 v, bytes32 r, bytes32 s) = _sign(
-            order.maker,
-            zeroEx.getERC721OrderHash(order)
-        );
+        (uint8 v, bytes32 r, bytes32 s) =
+            _sign(order.maker, zeroEx.getERC721OrderHash(order));
 
         // Prepare the signature
         LibSignature.Signature memory sig = LibSignature.Signature({
@@ -406,8 +388,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
                 address(zeroEx),
                 0,
                 abi.encodeWithSelector(
-                    IZeroEx.preSignERC721Order.selector,
-                    order
+                    IZeroEx.preSignERC721Order.selector, order
                 )
             );
         }
@@ -448,10 +429,8 @@ contract ZeroExConfig is BaseMarketConfig, Test {
         });
 
         // Sign the order
-        (uint8 v, bytes32 r, bytes32 s) = _sign(
-            order.maker,
-            zeroEx.getERC721OrderHash(order)
-        );
+        (uint8 v, bytes32 r, bytes32 s) =
+            _sign(order.maker, zeroEx.getERC721OrderHash(order));
 
         // Prepare the signature
         LibSignature.Signature memory sig = LibSignature.Signature({
@@ -474,8 +453,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
                 address(zeroEx),
                 0,
                 abi.encodeWithSelector(
-                    IZeroEx.preSignERC721Order.selector,
-                    order
+                    IZeroEx.preSignERC721Order.selector, order
                 )
             );
         }
@@ -517,10 +495,8 @@ contract ZeroExConfig is BaseMarketConfig, Test {
         });
 
         // Sign the order
-        (uint8 v, bytes32 r, bytes32 s) = _sign(
-            order.maker,
-            zeroEx.getERC1155OrderHash(order)
-        );
+        (uint8 v, bytes32 r, bytes32 s) =
+            _sign(order.maker, zeroEx.getERC1155OrderHash(order));
 
         // Prepare the signature
         LibSignature.Signature memory sig = LibSignature.Signature({
@@ -543,8 +519,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
                 address(zeroEx),
                 0,
                 abi.encodeWithSelector(
-                    IZeroEx.preSignERC1155Order.selector,
-                    order
+                    IZeroEx.preSignERC1155Order.selector, order
                 )
             );
         }
@@ -596,10 +571,8 @@ contract ZeroExConfig is BaseMarketConfig, Test {
         });
 
         // Sign the order
-        (uint8 v, bytes32 r, bytes32 s) = _sign(
-            order.maker,
-            zeroEx.getERC721OrderHash(order)
-        );
+        (uint8 v, bytes32 r, bytes32 s) =
+            _sign(order.maker, zeroEx.getERC721OrderHash(order));
 
         // Prepare the signature
         LibSignature.Signature memory sig = LibSignature.Signature({
@@ -622,8 +595,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
                 address(zeroEx),
                 0,
                 abi.encodeWithSelector(
-                    IZeroEx.preSignERC721Order.selector,
-                    order
+                    IZeroEx.preSignERC721Order.selector, order
                 )
             );
         }
@@ -674,10 +646,8 @@ contract ZeroExConfig is BaseMarketConfig, Test {
         });
 
         // Sign the order
-        (uint8 v, bytes32 r, bytes32 s) = _sign(
-            order.maker,
-            zeroEx.getERC721OrderHash(order)
-        );
+        (uint8 v, bytes32 r, bytes32 s) =
+            _sign(order.maker, zeroEx.getERC721OrderHash(order));
 
         // Prepare the signature
         LibSignature.Signature memory sig = LibSignature.Signature({
@@ -700,8 +670,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
                 address(zeroEx),
                 0,
                 abi.encodeWithSelector(
-                    IZeroEx.preSignERC721Order.selector,
-                    order
+                    IZeroEx.preSignERC721Order.selector, order
                 )
             );
         }
@@ -753,10 +722,8 @@ contract ZeroExConfig is BaseMarketConfig, Test {
             });
 
             // Sign the order
-            (uint8 v, bytes32 r, bytes32 s) = _sign(
-                orders[i].maker,
-                zeroEx.getERC721OrderHash(orders[i])
-            );
+            (uint8 v, bytes32 r, bytes32 s) =
+                _sign(orders[i].maker, zeroEx.getERC721OrderHash(orders[i]));
 
             // Prepare the signature
             sigs[i] = LibSignature.Signature({
@@ -776,11 +743,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
             address(zeroEx),
             sumEth,
             abi.encodeWithSelector(
-                IZeroEx.batchBuyERC721s.selector,
-                orders,
-                sigs,
-                callbacks,
-                false
+                IZeroEx.batchBuyERC721s.selector, orders, sigs, callbacks, false
             )
         );
     }
@@ -792,8 +755,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
         uint256[] calldata erc20Amounts
     ) external view override returns (TestOrderPayload memory execution) {
         require(
-            contexts.length == nfts.length &&
-                nfts.length == erc20Amounts.length,
+            contexts.length == nfts.length && nfts.length == erc20Amounts.length,
             "ZeroExConfig::getPayload_BuyOfferedManyERC721WithEtherDistinctOrders/ARRAY_LENGTH_MISMATCH"
         );
         LibNFTOrder.ERC721Order[] memory orders = new LibNFTOrder.ERC721Order[](
@@ -821,10 +783,8 @@ contract ZeroExConfig is BaseMarketConfig, Test {
             });
 
             // Sign the order
-            (uint8 v, bytes32 r, bytes32 s) = _sign(
-                orders[i].maker,
-                zeroEx.getERC721OrderHash(orders[i])
-            );
+            (uint8 v, bytes32 r, bytes32 s) =
+                _sign(orders[i].maker, zeroEx.getERC721OrderHash(orders[i]));
 
             // Prepare the signature
             sigs[i] = LibSignature.Signature({
@@ -844,11 +804,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
             address(zeroEx),
             0,
             abi.encodeWithSelector(
-                IZeroEx.batchBuyERC721s.selector,
-                orders,
-                sigs,
-                callbacks,
-                false
+                IZeroEx.batchBuyERC721s.selector, orders, sigs, callbacks, false
             )
         );
     }
@@ -860,8 +816,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
         uint256[] calldata erc20Amounts
     ) external view override returns (TestOrderPayload memory execution) {
         require(
-            contexts.length == nfts.length &&
-                nfts.length == erc20Amounts.length,
+            contexts.length == nfts.length && nfts.length == erc20Amounts.length,
             "ZeroExConfig::getPayload_BuyOfferedManyERC721WithEtherDistinctOrders/ARRAY_LENGTH_MISMATCH"
         );
         LibNFTOrder.ERC721Order[] memory orders = new LibNFTOrder.ERC721Order[](
@@ -889,10 +844,8 @@ contract ZeroExConfig is BaseMarketConfig, Test {
             });
 
             // Sign the order
-            (uint8 v, bytes32 r, bytes32 s) = _sign(
-                orders[i].maker,
-                zeroEx.getERC721OrderHash(orders[i])
-            );
+            (uint8 v, bytes32 r, bytes32 s) =
+                _sign(orders[i].maker, zeroEx.getERC721OrderHash(orders[i]));
 
             // Prepare the signature
             sigs[i] = LibSignature.Signature({
@@ -912,11 +865,7 @@ contract ZeroExConfig is BaseMarketConfig, Test {
             address(zeroEx),
             0,
             abi.encodeWithSelector(
-                IZeroEx.batchBuyERC721s.selector,
-                orders,
-                sigs,
-                callbacks,
-                false
+                IZeroEx.batchBuyERC721s.selector, orders, sigs, callbacks, false
             )
         );
     }

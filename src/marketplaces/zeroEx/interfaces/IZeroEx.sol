@@ -252,7 +252,8 @@ interface IZeroEx {
     ///      an order with the same nonce has already been filled or
     ///      cancelled.
     /// @param orderNonces The order nonces.
-    function batchCancelERC1155Orders(uint256[] calldata orderNonces) external;
+    function batchCancelERC1155Orders(uint256[] calldata orderNonces)
+        external;
 
     /// @dev Buys multiple ERC1155 assets by filling the
     ///      given orders.

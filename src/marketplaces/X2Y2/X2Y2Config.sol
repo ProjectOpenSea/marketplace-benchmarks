@@ -5,7 +5,15 @@ import { IX2Y2Marketplace } from "./interfaces/IX2Y2Marketplace.sol";
 import { BaseMarketConfig } from "../../BaseMarketConfig.sol";
 import { Market } from "./interfaces/MarketConstants.sol";
 import { X2Y2TypeHashes } from "./lib/X2Y2TypeHashes.sol";
-import { SetupCall, TestCallParameters, TestOrderContext, TestOrderPayload, TestItem721, TestItem1155, TestItem20 } from "../../Types.sol";
+import {
+    SetupCall,
+    TestCallParameters,
+    TestOrderContext,
+    TestOrderPayload,
+    TestItem721,
+    TestItem1155,
+    TestItem20
+} from "../../Types.sol";
 
 contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
     IX2Y2Marketplace internal constant X2Y2 =
@@ -98,10 +106,8 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
 
                 orders[i].items = items;
 
-                (orders[i].v, orders[i].r, orders[i].s) = _sign(
-                    contexts[i].offerer,
-                    _deriveOrderDigest(orders[i])
-                );
+                (orders[i].v, orders[i].r, orders[i].s) =
+                    _sign(contexts[i].offerer, _deriveOrderDigest(orders[i]));
                 orders[i].signVersion = Market.SIGN_V1;
             }
             {
@@ -119,10 +125,8 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
         input.orders = orders;
         input.details = details;
 
-        (input.v, input.r, input.s) = _sign(
-            X2Y2Signer,
-            _deriveInputDigest(input)
-        );
+        (input.v, input.r, input.s) =
+            _sign(X2Y2Signer, _deriveInputDigest(input));
 
         payload = abi.encodeWithSelector(IX2Y2Marketplace.run.selector, input);
     }
@@ -161,10 +165,8 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
 
         orders[0].items = items;
 
-        (orders[0].v, orders[0].r, orders[0].s) = _sign(
-            offerer,
-            _deriveOrderDigest(orders[0])
-        );
+        (orders[0].v, orders[0].r, orders[0].s) =
+            _sign(offerer, _deriveOrderDigest(orders[0]));
         orders[0].signVersion = Market.SIGN_V1;
 
         input.orders = orders;
@@ -181,10 +183,8 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
         details[0].executionDelegate = erc721Delegate;
         input.details = details;
 
-        (input.v, input.r, input.s) = _sign(
-            X2Y2Signer,
-            _deriveInputDigest(input)
-        );
+        (input.v, input.r, input.s) =
+            _sign(X2Y2Signer, _deriveInputDigest(input));
 
         return abi.encodeWithSelector(IX2Y2Marketplace.run.selector, input);
     }
@@ -213,11 +213,8 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
             fees
         );
 
-        execution.executeOrder = TestCallParameters(
-            address(X2Y2),
-            ethAmount,
-            payload
-        );
+        execution.executeOrder =
+            TestCallParameters(address(X2Y2), ethAmount, payload);
     }
 
     function getPayload_BuyOfferedERC721WithERC20(
@@ -359,9 +356,7 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
         );
 
         execution.executeOrder = TestCallParameters(
-            address(X2Y2),
-            priceEthAmount + feeEthAmount,
-            payload
+            address(X2Y2), priceEthAmount + feeEthAmount, payload
         );
     }
 
@@ -383,15 +378,13 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
 
         Market.Fee[] memory fees = new Market.Fee[](2);
         fees[0] = Market.Fee(
-            (feeEthAmount1 * 1000000) /
-                (priceEthAmount + feeEthAmount1 + feeEthAmount2) +
-                1,
+            (feeEthAmount1 * 1000000)
+                / (priceEthAmount + feeEthAmount1 + feeEthAmount2) + 1,
             feeRecipient1
         );
         fees[1] = Market.Fee(
-            (feeEthAmount2 * 1000000) /
-                (priceEthAmount + feeEthAmount1 + feeEthAmount2) +
-                1,
+            (feeEthAmount2 * 1000000)
+                / (priceEthAmount + feeEthAmount1 + feeEthAmount2) + 1,
             feeRecipient2
         );
 
@@ -433,11 +426,8 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
             fees
         );
 
-        execution.executeOrder = TestCallParameters(
-            address(X2Y2),
-            ethAmount,
-            payload
-        );
+        execution.executeOrder =
+            TestCallParameters(address(X2Y2), ethAmount, payload);
     }
 
     function getPayload_BuyOfferedManyERC721WithEtherDistinctOrders(
@@ -450,18 +440,11 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
         }
 
         (bytes memory payload, uint256 ethSum) = encodeFillOrderDistinctOrders(
-            contexts,
-            nfts,
-            ethAmounts,
-            address(0),
-            Market.INTENT_SELL
+            contexts, nfts, ethAmounts, address(0), Market.INTENT_SELL
         );
 
-        execution.executeOrder = TestCallParameters(
-            address(X2Y2),
-            ethSum,
-            payload
-        );
+        execution.executeOrder =
+            TestCallParameters(address(X2Y2), ethSum, payload);
     }
 
     function getPayload_BuyOfferedManyERC721WithErc20DistinctOrders(
@@ -474,12 +457,8 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
             _notImplemented();
         }
 
-        (bytes memory payload, ) = encodeFillOrderDistinctOrders(
-            contexts,
-            nfts,
-            erc20Amounts,
-            erc20Address,
-            Market.INTENT_SELL
+        (bytes memory payload,) = encodeFillOrderDistinctOrders(
+            contexts, nfts, erc20Amounts, erc20Address, Market.INTENT_SELL
         );
 
         execution.executeOrder = TestCallParameters(address(X2Y2), 0, payload);
@@ -495,12 +474,8 @@ contract X2Y2Config is BaseMarketConfig, X2Y2TypeHashes {
             _notImplemented();
         }
 
-        (bytes memory payload, ) = encodeFillOrderDistinctOrders(
-            contexts,
-            nfts,
-            erc20Amounts,
-            erc20Address,
-            Market.INTENT_SELL
+        (bytes memory payload,) = encodeFillOrderDistinctOrders(
+            contexts, nfts, erc20Amounts, erc20Address, Market.INTENT_SELL
         );
 
         execution.executeOrder = TestCallParameters(address(X2Y2), 0, payload);

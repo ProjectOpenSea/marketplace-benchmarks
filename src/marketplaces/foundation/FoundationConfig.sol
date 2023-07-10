@@ -3,7 +3,14 @@ pragma solidity >=0.8.7;
 
 import { BaseMarketConfig } from "../../BaseMarketConfig.sol";
 import { IFoundation } from "./interfaces/IFoundation.sol";
-import { TestCallParameters, TestOrderContext, TestOrderPayload, TestItem721, TestItem1155, TestItem20 } from "../../Types.sol";
+import {
+    TestCallParameters,
+    TestOrderContext,
+    TestOrderPayload,
+    TestItem721,
+    TestItem1155,
+    TestItem20
+} from "../../Types.sol";
 
 contract FoundationConfig is BaseMarketConfig {
     function name() external pure override returns (string memory) {
@@ -19,9 +26,9 @@ contract FoundationConfig is BaseMarketConfig {
 
     function beforeAllPrepareMarketplace(address, address) external override {
         // ERC-20 n/a but currently required by the test suite
-        buyerNftApprovalTarget = sellerNftApprovalTarget = buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(
-            foundation
-        );
+        buyerNftApprovalTarget = sellerNftApprovalTarget =
+        buyerErc20ApprovalTarget =
+            sellerErc20ApprovalTarget = address(foundation);
     }
 
     function getPayload_BuyOfferedERC721WithEther(
@@ -92,13 +99,18 @@ contract FoundationConfig is BaseMarketConfig {
 
     function getPayload_BuyOfferedERC721WithEtherTwoFeeRecipient(
         TestOrderContext calldata context,
-        TestItem721 memory /* nft */,
-        uint256 /* priceEthAmount */,
-        address /* feeRecipient1 */,
-        uint256 /* feeEthAmount1 */,
-        address /* feeRecipient2 */,
+        TestItem721 memory, /* nft */
+        uint256, /* priceEthAmount */
+        address, /* feeRecipient1 */
+        uint256, /* feeEthAmount1 */
+        address, /* feeRecipient2 */
         uint256 /* feeEthAmount2 */
-    ) external pure override returns (TestOrderPayload memory /* execution */) {
+    )
+        external
+        pure
+        override
+        returns (TestOrderPayload memory /* execution */ )
+    {
         if (!context.listOnChain) {
             _notImplemented();
         }

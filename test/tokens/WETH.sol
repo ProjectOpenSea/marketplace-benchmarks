@@ -26,15 +26,19 @@ contract WETH is TestERC20 {
         return true;
     }
 
-    function transfer(address dst, uint256 wad) public override returns (bool) {
+    function transfer(address dst, uint256 wad)
+        public
+        override
+        returns (bool)
+    {
         return transferFrom(msg.sender, dst, wad);
     }
 
-    function transferFrom(
-        address src,
-        address dst,
-        uint256 wad
-    ) public override returns (bool) {
+    function transferFrom(address src, address dst, uint256 wad)
+        public
+        override
+        returns (bool)
+    {
         require(balanceOf[src] >= wad);
 
         if (

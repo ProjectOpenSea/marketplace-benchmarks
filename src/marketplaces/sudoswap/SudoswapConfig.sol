@@ -4,7 +4,15 @@ pragma solidity ^0.8.0;
 import "solmate/tokens/ERC20.sol";
 
 import { BaseMarketConfig } from "../../BaseMarketConfig.sol";
-import { SetupCall, TestCallParameters, TestOrderContext, TestOrderPayload, TestItem721, TestItem1155, TestItem20 } from "../../Types.sol";
+import {
+    SetupCall,
+    TestCallParameters,
+    TestOrderContext,
+    TestOrderPayload,
+    TestItem721,
+    TestItem1155,
+    TestItem20
+} from "../../Types.sol";
 import { IPair } from "./interfaces/IPair.sol";
 import { IRouter } from "./interfaces/IRouter.sol";
 import { IPairFactory } from "./interfaces/IPairFactory.sol";
@@ -39,9 +47,8 @@ contract SudoswapConfig is BaseMarketConfig {
     }
 
     function beforeAllPrepareMarketplace(address, address) external override {
-        buyerNftApprovalTarget = sellerNftApprovalTarget = buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(
-            ROUTER
-        );
+        buyerNftApprovalTarget = sellerNftApprovalTarget =
+        buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = address(ROUTER);
     }
 
     function beforeAllPrepareMarketplaceCall(
@@ -60,9 +67,8 @@ contract SudoswapConfig is BaseMarketConfig {
             sender: PAIR_FACTORY.owner(),
             target: address(PAIR_FACTORY),
             data: abi.encodeWithSelector(
-                IPairFactory.changeProtocolFeeMultiplier.selector,
-                0
-            )
+                IPairFactory.changeProtocolFeeMultiplier.selector, 0
+                )
         });
 
         // whitelist the new router
@@ -70,10 +76,8 @@ contract SudoswapConfig is BaseMarketConfig {
             sender: PAIR_FACTORY.owner(),
             target: address(PAIR_FACTORY),
             data: abi.encodeWithSelector(
-                IPairFactory.setRouterAllowed.selector,
-                address(ROUTER),
-                true
-            )
+                IPairFactory.setRouterAllowed.selector, address(ROUTER), true
+                )
         });
 
         // deploy pools
@@ -139,8 +143,9 @@ contract SudoswapConfig is BaseMarketConfig {
         TestItem721 memory nft,
         uint256 ethAmount
     ) external override returns (TestOrderPayload memory execution) {
-        if (!context.listOnChain || nft.token != erc721Address)
+        if (!context.listOnChain || nft.token != erc721Address) {
             _notImplemented();
+        }
 
         // update market address so tests know where the ERC721 will be escrowed
         currentMarket = address(ethNftPool);
@@ -155,7 +160,7 @@ contract SudoswapConfig is BaseMarketConfig {
                 context.offerer,
                 address(ethNftPool),
                 nft.identifier
-            )
+                )
         });
 
         // construct executeOrder payload
@@ -172,7 +177,7 @@ contract SudoswapConfig is BaseMarketConfig {
                 context.fulfiller,
                 false,
                 address(0)
-            )
+                )
         });
     }
 
@@ -182,10 +187,8 @@ contract SudoswapConfig is BaseMarketConfig {
         TestItem20 calldata erc20
     ) external override returns (TestOrderPayload memory execution) {
         if (
-            !context.listOnChain ||
-            nft.token != erc721Address ||
-            erc20.token != erc20Address ||
-            erc20.amount != NFT_PRICE
+            !context.listOnChain || nft.token != erc721Address
+                || erc20.token != erc20Address || erc20.amount != NFT_PRICE
         ) _notImplemented();
 
         // update market address so tests know where the ERC721 will be escrowed
@@ -201,7 +204,7 @@ contract SudoswapConfig is BaseMarketConfig {
                 context.offerer,
                 address(erc20NftPool),
                 nft.identifier
-            )
+                )
         });
 
         // construct executeOrder payload
@@ -209,8 +212,8 @@ contract SudoswapConfig is BaseMarketConfig {
         uint256[] memory nftIds = new uint256[](1);
         nftIds[0] = nft.identifier;
 
-        IRouter.PairSwapSpecific[]
-            memory swapList = new IRouter.PairSwapSpecific[](1);
+        IRouter.PairSwapSpecific[] memory swapList =
+            new IRouter.PairSwapSpecific[](1);
         swapList[0] = IRouter.PairSwapSpecific({
             pair: address(erc20NftPool),
             nftIds: nftIds
@@ -224,7 +227,7 @@ contract SudoswapConfig is BaseMarketConfig {
                 erc20.amount,
                 context.fulfiller,
                 type(uint256).max
-            )
+                )
         });
     }
 
@@ -234,10 +237,8 @@ contract SudoswapConfig is BaseMarketConfig {
         TestItem721 calldata nft
     ) external override returns (TestOrderPayload memory execution) {
         if (
-            !context.listOnChain ||
-            nft.token != erc721Address ||
-            erc20.token != erc20Address ||
-            erc20.amount != NFT_PRICE
+            !context.listOnChain || nft.token != erc721Address
+                || erc20.token != erc20Address || erc20.amount != NFT_PRICE
         ) _notImplemented();
 
         // update market address so tests know where the ERC20 will be escrowed
@@ -249,10 +250,8 @@ contract SudoswapConfig is BaseMarketConfig {
             target: erc20.token,
             value: 0,
             data: abi.encodeWithSelector(
-                ERC20.transfer.selector,
-                address(erc20TokenPool),
-                erc20.amount
-            )
+                ERC20.transfer.selector, address(erc20TokenPool), erc20.amount
+                )
         });
 
         // construct executeOrder payload
@@ -260,8 +259,8 @@ contract SudoswapConfig is BaseMarketConfig {
         uint256[] memory nftIds = new uint256[](1);
         nftIds[0] = nft.identifier;
 
-        IRouter.PairSwapSpecific[]
-            memory swapList = new IRouter.PairSwapSpecific[](1);
+        IRouter.PairSwapSpecific[] memory swapList =
+            new IRouter.PairSwapSpecific[](1);
         swapList[0] = IRouter.PairSwapSpecific({
             pair: address(erc20TokenPool),
             nftIds: nftIds
@@ -275,7 +274,7 @@ contract SudoswapConfig is BaseMarketConfig {
                 0,
                 context.fulfiller,
                 type(uint256).max
-            )
+                )
         });
     }
 
@@ -306,7 +305,7 @@ contract SudoswapConfig is BaseMarketConfig {
                 nftAddress,
                 ids,
                 address(ethNftPool)
-            )
+                )
         });
 
         // construct executeOrder payload
@@ -321,7 +320,7 @@ contract SudoswapConfig is BaseMarketConfig {
                 context.fulfiller,
                 false,
                 address(0)
-            )
+                )
         });
     }
 
@@ -348,14 +347,14 @@ contract SudoswapConfig is BaseMarketConfig {
                 nfts[0].token,
                 ids,
                 pools
-            )
+                )
         });
 
         // construct executeOrder payload
         // fulfiller calls router
 
-        IRouter.PairSwapSpecific[]
-            memory swapList = new IRouter.PairSwapSpecific[](nfts.length);
+        IRouter.PairSwapSpecific[] memory swapList =
+            new IRouter.PairSwapSpecific[](nfts.length);
 
         for (uint256 i = 0; i < nfts.length; i++) {
             uint256[] memory singleId = new uint256[](1);
@@ -380,7 +379,7 @@ contract SudoswapConfig is BaseMarketConfig {
                 contexts[0].offerer,
                 contexts[0].fulfiller,
                 type(uint256).max
-            )
+                )
         });
     }
 }

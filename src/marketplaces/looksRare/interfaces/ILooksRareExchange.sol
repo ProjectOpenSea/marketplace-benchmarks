@@ -19,5 +19,6 @@ interface ILooksRareExchange {
         OrderTypes.MakerOrder calldata makerBid
     ) external;
 
-    function updateProtocolFeeRecipient(address _protocolFeeRecipient) external;
+    function updateProtocolFeeRecipient(address _protocolFeeRecipient)
+        external;
 }

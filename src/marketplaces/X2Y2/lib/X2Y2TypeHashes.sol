@@ -32,10 +32,9 @@ contract X2Y2TypeHashes {
         pure
         returns (bytes32)
     {
-        return
-            keccak256(
-                abi.encode(input.shared, input.details.length, input.details)
-            );
+        return keccak256(
+            abi.encode(input.shared, input.details.length, input.details)
+        );
     }
 
     function _hashItem(Market.Order memory order, Market.OrderItem memory item)
@@ -44,19 +43,18 @@ contract X2Y2TypeHashes {
         virtual
         returns (bytes32)
     {
-        return
-            keccak256(
-                abi.encode(
-                    order.salt,
-                    order.user,
-                    order.network,
-                    order.intent,
-                    order.delegateType,
-                    order.deadline,
-                    order.currency,
-                    order.dataMask,
-                    item
-                )
-            );
+        return keccak256(
+            abi.encode(
+                order.salt,
+                order.user,
+                order.network,
+                order.intent,
+                order.delegateType,
+                order.deadline,
+                order.currency,
+                order.dataMask,
+                item
+            )
+        );
     }
 }

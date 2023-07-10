@@ -8,9 +8,8 @@ uint256 constant EIP712_Order_size = 0x180;
 uint256 constant EIP712_DomainSeparator_offset = 0x02;
 uint256 constant EIP712_OrderHash_offset = 0x22;
 uint256 constant EIP712_DigestPayload_size = 0x42;
-uint256 constant EIP_712_PREFIX = (
-    0x1901000000000000000000000000000000000000000000000000000000000000
-);
+uint256 constant EIP_712_PREFIX =
+    (0x1901000000000000000000000000000000000000000000000000000000000000);
 
 contract WyvernTypeHashes {
     bytes32 internal constant _NAME_HASH =
@@ -34,16 +33,15 @@ contract WyvernTypeHashes {
      * @return The domain separator.
      */
     function _deriveDomainSeparator() internal pure returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    _EIP_712_DOMAIN_TYPEHASH,
-                    _NAME_HASH,
-                    _VERSION_HASH,
-                    1,
-                    wyvernAddress
-                )
-            );
+        return keccak256(
+            abi.encode(
+                _EIP_712_DOMAIN_TYPEHASH,
+                _NAME_HASH,
+                _VERSION_HASH,
+                1,
+                wyvernAddress
+            )
+        );
     }
 
     function _deriveEIP712Digest(bytes32 orderHash)
@@ -100,18 +98,13 @@ contract WyvernTypeHashes {
         index = ArrayUtils.unsafeWriteUint8Word(index, uint8(order.saleKind));
         index = ArrayUtils.unsafeWriteAddressWord(index, order.target);
         index = ArrayUtils.unsafeWriteUint8Word(index, uint8(order.howToCall));
+        index = ArrayUtils.unsafeWriteBytes32(index, keccak256(order._calldata));
         index = ArrayUtils.unsafeWriteBytes32(
-            index,
-            keccak256(order._calldata)
-        );
-        index = ArrayUtils.unsafeWriteBytes32(
-            index,
-            keccak256(order.replacementPattern)
+            index, keccak256(order.replacementPattern)
         );
         index = ArrayUtils.unsafeWriteAddressWord(index, order.staticTarget);
         index = ArrayUtils.unsafeWriteBytes32(
-            index,
-            keccak256(order.staticExtradata)
+            index, keccak256(order.staticExtradata)
         );
         index = ArrayUtils.unsafeWriteAddressWord(index, order.paymentToken);
         index = ArrayUtils.unsafeWriteUint(index, order.basePrice);

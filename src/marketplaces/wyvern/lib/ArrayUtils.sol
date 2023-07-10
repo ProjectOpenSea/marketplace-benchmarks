@@ -50,8 +50,7 @@ library ArrayUtils {
                (bounds checks could still probably be optimized away in assembly, but this is a rare case) */
             for (i = index; i < array.length; i++) {
                 array[i] =
-                    ((mask[i] ^ 0xff) & array[i]) |
-                    (mask[i] & desired[i]);
+                    ((mask[i] ^ 0xff) & array[i]) | (mask[i] & desired[i]);
             }
         }
     }

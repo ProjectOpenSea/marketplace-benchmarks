@@ -4,3 +4,8 @@ bytecode_hash = "none"
 optimizer_runs = 1_000_000
 ignored_error_codes = [5574, 5667, 9302]
 evm_version='shanghai'
+
+[fmt]
+line_length = 80
+tab_width = 4
+bracket_spacing = true

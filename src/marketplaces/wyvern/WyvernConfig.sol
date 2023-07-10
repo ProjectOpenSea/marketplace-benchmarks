@@ -2,7 +2,15 @@
 pragma solidity >=0.8.7;
 
 import { BaseMarketConfig } from "../../BaseMarketConfig.sol";
-import { SetupCall, TestCallParameters, TestOrderContext, TestOrderPayload, TestItem721, TestItem1155, TestItem20 } from "../../Types.sol";
+import {
+    SetupCall,
+    TestCallParameters,
+    TestOrderContext,
+    TestOrderPayload,
+    TestItem721,
+    TestItem1155,
+    TestItem20
+} from "../../Types.sol";
 import { WyvernInterface as IWyvern } from "./interfaces/WyvernInterface.sol";
 import { IWyvernProxyRegistry } from "./interfaces/IWyvernProxyRegistry.sol";
 import { IERC721 } from "./interfaces/IERC721.sol";
@@ -50,70 +58,69 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         Sig memory buySignature,
         Sig memory sellSignature
     ) internal pure returns (bytes memory) {
-        return
-            abi.encodeWithSelector(
-                IWyvern.atomicMatch_.selector,
-                [
-                    buyOrder.exchange,
-                    buyOrder.maker,
-                    buyOrder.taker,
-                    buyOrder.feeRecipient,
-                    buyOrder.target,
-                    NULL_ADDRESS,
-                    buyOrder.paymentToken,
-                    sellOrder.exchange,
-                    sellOrder.maker,
-                    sellOrder.taker,
-                    sellOrder.feeRecipient,
-                    sellOrder.target,
-                    NULL_ADDRESS,
-                    sellOrder.paymentToken
-                ],
-                [
-                    buyOrder.makerRelayerFee,
-                    0,
-                    0,
-                    0,
-                    buyOrder.basePrice,
-                    0,
-                    buyOrder.listingTime,
-                    buyOrder.expirationTime,
-                    buyOrder.salt,
-                    sellOrder.makerRelayerFee,
-                    0,
-                    0,
-                    0,
-                    sellOrder.basePrice,
-                    0,
-                    sellOrder.listingTime,
-                    sellOrder.expirationTime,
-                    sellOrder.salt
-                ],
-                [
-                    uint8(buyOrder.feeMethod),
-                    uint8(buyOrder.side),
-                    uint8(buyOrder.saleKind),
-                    uint8(buyOrder.howToCall),
-                    uint8(sellOrder.feeMethod),
-                    uint8(sellOrder.side),
-                    uint8(sellOrder.saleKind),
-                    uint8(sellOrder.howToCall)
-                ],
-                buyOrder._calldata,
-                sellOrder._calldata,
-                buyOrder.replacementPattern,
-                sellOrder.replacementPattern,
-                EMPTY_BYTES,
-                EMPTY_BYTES,
-                [buySignature.v, sellSignature.v],
-                [
-                    buySignature.r,
-                    buySignature.s,
-                    sellSignature.r,
-                    sellSignature.s,
-                    bytes32(0)
-                ]
-            );
+        return abi.encodeWithSelector(
+            IWyvern.atomicMatch_.selector,
+            [
+                buyOrder.exchange,
+                buyOrder.maker,
+                buyOrder.taker,
+                buyOrder.feeRecipient,
+                buyOrder.target,
+                NULL_ADDRESS,
+                buyOrder.paymentToken,
+                sellOrder.exchange,
+                sellOrder.maker,
+                sellOrder.taker,
+                sellOrder.feeRecipient,
+                sellOrder.target,
+                NULL_ADDRESS,
+                sellOrder.paymentToken
+            ],
+            [
+                buyOrder.makerRelayerFee,
+                0,
+                0,
+                0,
+                buyOrder.basePrice,
+                0,
+                buyOrder.listingTime,
+                buyOrder.expirationTime,
+                buyOrder.salt,
+                sellOrder.makerRelayerFee,
+                0,
+                0,
+                0,
+                sellOrder.basePrice,
+                0,
+                sellOrder.listingTime,
+                sellOrder.expirationTime,
+                sellOrder.salt
+            ],
+            [
+                uint8(buyOrder.feeMethod),
+                uint8(buyOrder.side),
+                uint8(buyOrder.saleKind),
+                uint8(buyOrder.howToCall),
+                uint8(sellOrder.feeMethod),
+                uint8(sellOrder.side),
+                uint8(sellOrder.saleKind),
+                uint8(sellOrder.howToCall)
+            ],
+            buyOrder._calldata,
+            sellOrder._calldata,
+            buyOrder.replacementPattern,
+            sellOrder.replacementPattern,
+            EMPTY_BYTES,
+            EMPTY_BYTES,
+            [buySignature.v, sellSignature.v],
+            [
+                buySignature.r,
+                buySignature.s,
+                sellSignature.r,
+                sellSignature.s,
+                bytes32(0)
+            ]
+        );
     }
 
     function encodeApproveOrder(Order memory order)
@@ -121,38 +128,37 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         pure
         returns (bytes memory)
     {
-        return
-            abi.encodeWithSelector(
-                IWyvern.approveOrder_.selector,
-                [
-                    order.exchange,
-                    order.maker,
-                    order.taker,
-                    order.feeRecipient,
-                    order.target,
-                    NULL_ADDRESS,
-                    order.paymentToken
-                ],
-                [
-                    order.makerRelayerFee,
-                    0,
-                    0,
-                    0,
-                    order.basePrice,
-                    0,
-                    order.listingTime,
-                    order.expirationTime,
-                    order.salt
-                ],
-                order.feeMethod,
-                order.side,
-                order.saleKind,
-                order.howToCall,
-                order._calldata,
-                order.replacementPattern,
-                EMPTY_BYTES,
-                true
-            );
+        return abi.encodeWithSelector(
+            IWyvern.approveOrder_.selector,
+            [
+                order.exchange,
+                order.maker,
+                order.taker,
+                order.feeRecipient,
+                order.target,
+                NULL_ADDRESS,
+                order.paymentToken
+            ],
+            [
+                order.makerRelayerFee,
+                0,
+                0,
+                0,
+                order.basePrice,
+                0,
+                order.listingTime,
+                order.expirationTime,
+                order.salt
+            ],
+            order.feeMethod,
+            order.side,
+            order.saleKind,
+            order.howToCall,
+            order._calldata,
+            order.replacementPattern,
+            EMPTY_BYTES,
+            true
+        );
     }
 
     function buildOrder(
@@ -195,13 +201,9 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         address taker,
         uint256 identifier
     ) internal pure returns (bytes memory) {
-        return
-            abi.encodeWithSelector(
-                IERC721.transferFrom.selector,
-                maker,
-                taker,
-                identifier
-            );
+        return abi.encodeWithSelector(
+            IERC721.transferFrom.selector, maker, taker, identifier
+        );
     }
 
     function encodeERC721ReplacementPatternSell()
@@ -209,13 +211,12 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         pure
         returns (bytes memory)
     {
-        return
-            abi.encodeWithSelector(
-                bytes4(0x00000000),
-                0x0000000000000000000000000000000000000000000000000000000000000000,
-                0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff,
-                0x0000000000000000000000000000000000000000000000000000000000000000
-            );
+        return abi.encodeWithSelector(
+            bytes4(0x00000000),
+            0x0000000000000000000000000000000000000000000000000000000000000000,
+            0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff,
+            0x0000000000000000000000000000000000000000000000000000000000000000
+        );
     }
 
     function encodeERC721ReplacementPatternBuy()
@@ -223,13 +224,12 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         pure
         returns (bytes memory)
     {
-        return
-            abi.encodeWithSelector(
-                bytes4(0x00000000),
-                0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff,
-                0x0000000000000000000000000000000000000000000000000000000000000000,
-                0x0000000000000000000000000000000000000000000000000000000000000000
-            );
+        return abi.encodeWithSelector(
+            bytes4(0x00000000),
+            0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff,
+            0x0000000000000000000000000000000000000000000000000000000000000000,
+            0x0000000000000000000000000000000000000000000000000000000000000000
+        );
     }
 
     function encodeERC721BatchTransferFrom(
@@ -244,11 +244,8 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         uint256 calldataLengthSum = 0;
 
         for (uint256 i = 0; i < nfts.length; i++) {
-            calldatas[i] = encodeERC721TransferFrom(
-                maker,
-                taker,
-                nfts[i].identifier
-            );
+            calldatas[i] =
+                encodeERC721TransferFrom(maker, taker, nfts[i].identifier);
             calldataLengths[i] = calldatas[i].length;
             targets[i] = nfts[i].token;
             calldataLengthSum += calldataLengths[i];
@@ -263,14 +260,13 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             }
         }
 
-        return
-            abi.encodeWithSelector(
-                IAtomicizer.atomicize.selector,
-                targets,
-                values,
-                calldataLengths,
-                _calldata
-            );
+        return abi.encodeWithSelector(
+            IAtomicizer.atomicize.selector,
+            targets,
+            values,
+            calldataLengths,
+            _calldata
+        );
     }
 
     function buildERC721SellOrder(
@@ -282,27 +278,23 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         address feeRecipient,
         uint256 fee
     ) internal view returns (Order memory order, Sig memory signature) {
-        bytes memory _calldata = encodeERC721TransferFrom(
-            maker,
-            NULL_ADDRESS,
-            nft.identifier
-        );
+        bytes memory _calldata =
+            encodeERC721TransferFrom(maker, NULL_ADDRESS, nft.identifier);
         bytes memory replacementPattern = encodeERC721ReplacementPatternSell();
 
-        return
-            buildOrder(
-                maker,
-                taker,
-                paymentToken,
-                price,
-                nft.token,
-                feeRecipient,
-                fee,
-                Side.Sell,
-                HowToCall.Call,
-                _calldata,
-                replacementPattern
-            );
+        return buildOrder(
+            maker,
+            taker,
+            paymentToken,
+            price,
+            nft.token,
+            feeRecipient,
+            fee,
+            Side.Sell,
+            HowToCall.Call,
+            _calldata,
+            replacementPattern
+        );
     }
 
     function buildERC721BuyOrder(
@@ -314,27 +306,23 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         address feeRecipient,
         uint256 fee
     ) internal view returns (Order memory order, Sig memory signature) {
-        bytes memory _calldata = encodeERC721TransferFrom(
-            NULL_ADDRESS,
-            maker,
-            nft.identifier
-        );
+        bytes memory _calldata =
+            encodeERC721TransferFrom(NULL_ADDRESS, maker, nft.identifier);
         bytes memory replacementPattern = encodeERC721ReplacementPatternBuy();
 
-        return
-            buildOrder(
-                maker,
-                taker,
-                paymentToken,
-                price,
-                nft.token,
-                feeRecipient,
-                fee,
-                Side.Buy,
-                HowToCall.Call,
-                _calldata,
-                replacementPattern
-            );
+        return buildOrder(
+            maker,
+            taker,
+            paymentToken,
+            price,
+            nft.token,
+            feeRecipient,
+            fee,
+            Side.Buy,
+            HowToCall.Call,
+            _calldata,
+            replacementPattern
+        );
     }
 
     function buildERC721BatchSellOrder(
@@ -345,26 +333,22 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestItem721[] memory nfts,
         address feeRecipient
     ) internal view returns (Order memory order, Sig memory signature) {
-        bytes memory _calldata = encodeERC721BatchTransferFrom(
+        bytes memory _calldata =
+            encodeERC721BatchTransferFrom(maker, taker, nfts);
+
+        return buildOrder(
             maker,
             taker,
-            nfts
+            paymentToken,
+            price,
+            ATOMICIZER,
+            feeRecipient,
+            0,
+            Side.Sell,
+            HowToCall.DelegateCall,
+            _calldata,
+            ""
         );
-
-        return
-            buildOrder(
-                maker,
-                taker,
-                paymentToken,
-                price,
-                ATOMICIZER,
-                feeRecipient,
-                0,
-                Side.Sell,
-                HowToCall.DelegateCall,
-                _calldata,
-                ""
-            );
     }
 
     function buildERC721BatchBuyOrder(
@@ -375,26 +359,22 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestItem721[] memory nfts,
         address feeRecipient
     ) internal view returns (Order memory order, Sig memory signature) {
-        bytes memory _calldata = encodeERC721BatchTransferFrom(
-            taker,
-            maker,
-            nfts
-        );
+        bytes memory _calldata =
+            encodeERC721BatchTransferFrom(taker, maker, nfts);
 
-        return
-            buildOrder(
-                maker,
-                taker,
-                paymentToken,
-                price,
-                ATOMICIZER,
-                feeRecipient,
-                0,
-                Side.Buy,
-                HowToCall.DelegateCall,
-                _calldata,
-                ""
-            );
+        return buildOrder(
+            maker,
+            taker,
+            paymentToken,
+            price,
+            ATOMICIZER,
+            feeRecipient,
+            0,
+            Side.Buy,
+            HowToCall.DelegateCall,
+            _calldata,
+            ""
+        );
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -407,15 +387,14 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         uint256 identifier,
         uint256 amount
     ) internal pure returns (bytes memory) {
-        return
-            abi.encodeWithSelector(
-                IERC1155.safeTransferFrom.selector,
-                maker,
-                taker,
-                identifier,
-                amount,
-                EMPTY_BYTES
-            );
+        return abi.encodeWithSelector(
+            IERC1155.safeTransferFrom.selector,
+            maker,
+            taker,
+            identifier,
+            amount,
+            EMPTY_BYTES
+        );
     }
 
     function encodeERC1155ReplacementPatternSell()
@@ -472,27 +451,23 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         uint256 fee
     ) internal view returns (Order memory order, Sig memory signature) {
         bytes memory _calldata = encodeERC1155SafeTransferFrom(
-            maker,
-            taker,
-            nft.identifier,
-            nft.amount
+            maker, taker, nft.identifier, nft.amount
         );
         bytes memory replacementPattern = encodeERC1155ReplacementPatternSell();
 
-        return
-            buildOrder(
-                maker,
-                taker,
-                paymentToken,
-                price,
-                nft.token,
-                feeRecipient,
-                fee,
-                Side.Sell,
-                HowToCall.Call,
-                _calldata,
-                replacementPattern
-            );
+        return buildOrder(
+            maker,
+            taker,
+            paymentToken,
+            price,
+            nft.token,
+            feeRecipient,
+            fee,
+            Side.Sell,
+            HowToCall.Call,
+            _calldata,
+            replacementPattern
+        );
     }
 
     function buildERC1155BuyOrder(
@@ -505,27 +480,23 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         uint256 fee
     ) internal view returns (Order memory order, Sig memory signature) {
         bytes memory _calldata = encodeERC1155SafeTransferFrom(
-            taker,
-            maker,
-            nft.identifier,
-            nft.amount
+            taker, maker, nft.identifier, nft.amount
         );
         bytes memory replacementPattern = encodeERC1155ReplacementPatternBuy();
 
-        return
-            buildOrder(
-                maker,
-                taker,
-                paymentToken,
-                price,
-                nft.token,
-                feeRecipient,
-                fee,
-                Side.Buy,
-                HowToCall.Call,
-                _calldata,
-                replacementPattern
-            );
+        return buildOrder(
+            maker,
+            taker,
+            paymentToken,
+            price,
+            nft.token,
+            feeRecipient,
+            fee,
+            Side.Buy,
+            HowToCall.Call,
+            _calldata,
+            replacementPattern
+        );
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -557,7 +528,8 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         override
     {
         // Create Wyvern Proxy
-        buyerErc20ApprovalTarget = sellerErc20ApprovalTarget = 0xE5c783EE536cf5E63E792988335c4255169be4E1;
+        buyerErc20ApprovalTarget = sellerErc20ApprovalTarget =
+            0xE5c783EE536cf5E63E792988335c4255169be4E1;
         buyerNftApprovalTarget = proxyRegistry.proxies(buyer);
         sellerNftApprovalTarget = proxyRegistry.proxies(seller);
     }
@@ -571,19 +543,17 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestItem721 memory nft,
         uint256 ethAmount
     ) external view override returns (TestOrderPayload memory execution) {
-        (
-            Order memory sellOrder,
-            Sig memory sellSignature
-        ) = buildERC721SellOrder(
-                context.offerer,
-                NULL_ADDRESS,
-                0x0000000000000000000000000000000000000000,
-                ethAmount,
-                nft,
-                DEFAULT_FEE_RECIPIENT,
-                0
-            );
-        (Order memory buyOrder, ) = buildERC721BuyOrder(
+        (Order memory sellOrder, Sig memory sellSignature) =
+        buildERC721SellOrder(
+            context.offerer,
+            NULL_ADDRESS,
+            0x0000000000000000000000000000000000000000,
+            ethAmount,
+            nft,
+            DEFAULT_FEE_RECIPIENT,
+            0
+        );
+        (Order memory buyOrder,) = buildERC721BuyOrder(
             context.fulfiller,
             NULL_ADDRESS,
             0x0000000000000000000000000000000000000000,
@@ -594,9 +564,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         );
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
-                address(wyvern),
-                0,
-                encodeApproveOrder(sellOrder)
+                address(wyvern), 0, encodeApproveOrder(sellOrder)
             );
             sellSignature.v = 0;
             sellSignature.r = 0;
@@ -614,19 +582,17 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestItem1155 memory nft,
         uint256 ethAmount
     ) external view override returns (TestOrderPayload memory execution) {
-        (
-            Order memory sellOrder,
-            Sig memory sellSignature
-        ) = buildERC1155SellOrder(
-                context.offerer,
-                NULL_ADDRESS,
-                0x0000000000000000000000000000000000000000,
-                ethAmount,
-                nft,
-                DEFAULT_FEE_RECIPIENT,
-                0
-            );
-        (Order memory buyOrder, ) = buildERC1155BuyOrder(
+        (Order memory sellOrder, Sig memory sellSignature) =
+        buildERC1155SellOrder(
+            context.offerer,
+            NULL_ADDRESS,
+            0x0000000000000000000000000000000000000000,
+            ethAmount,
+            nft,
+            DEFAULT_FEE_RECIPIENT,
+            0
+        );
+        (Order memory buyOrder,) = buildERC1155BuyOrder(
             context.fulfiller,
             NULL_ADDRESS,
             0x0000000000000000000000000000000000000000,
@@ -638,9 +604,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
 
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
-                address(wyvern),
-                0,
-                encodeApproveOrder(sellOrder)
+                address(wyvern), 0, encodeApproveOrder(sellOrder)
             );
         }
         execution.executeOrder = TestCallParameters(
@@ -655,19 +619,17 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestItem721 memory nft,
         TestItem20 memory erc20
     ) external view override returns (TestOrderPayload memory execution) {
-        (
-            Order memory sellOrder,
-            Sig memory sellSignature
-        ) = buildERC721SellOrder(
-                context.offerer,
-                NULL_ADDRESS,
-                erc20.token,
-                erc20.amount,
-                nft,
-                DEFAULT_FEE_RECIPIENT,
-                0
-            );
-        (Order memory buyOrder, ) = buildERC721BuyOrder(
+        (Order memory sellOrder, Sig memory sellSignature) =
+        buildERC721SellOrder(
+            context.offerer,
+            NULL_ADDRESS,
+            erc20.token,
+            erc20.amount,
+            nft,
+            DEFAULT_FEE_RECIPIENT,
+            0
+        );
+        (Order memory buyOrder,) = buildERC721BuyOrder(
             context.fulfiller,
             NULL_ADDRESS,
             erc20.token,
@@ -678,9 +640,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         );
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
-                address(wyvern),
-                0,
-                encodeApproveOrder(sellOrder)
+                address(wyvern), 0, encodeApproveOrder(sellOrder)
             );
             sellSignature = EMPTY_SIG;
         }
@@ -696,19 +656,17 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestItem721 memory nft,
         TestItem20 memory erc20
     ) external view override returns (TestOrderPayload memory execution) {
-        (
-            Order memory sellOrder,
-            Sig memory sellSignature
-        ) = buildERC721SellOrder(
-                context.offerer,
-                NULL_ADDRESS,
-                erc20.token,
-                erc20.amount,
-                nft,
-                DEFAULT_FEE_RECIPIENT,
-                0
-            );
-        (Order memory buyOrder, ) = buildERC721BuyOrder(
+        (Order memory sellOrder, Sig memory sellSignature) =
+        buildERC721SellOrder(
+            context.offerer,
+            NULL_ADDRESS,
+            erc20.token,
+            erc20.amount,
+            nft,
+            DEFAULT_FEE_RECIPIENT,
+            0
+        );
+        (Order memory buyOrder,) = buildERC721BuyOrder(
             context.fulfiller,
             NULL_ADDRESS,
             erc20.token,
@@ -719,9 +677,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         );
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
-                address(wyvern),
-                0,
-                encodeApproveOrder(sellOrder)
+                address(wyvern), 0, encodeApproveOrder(sellOrder)
             );
             sellSignature = EMPTY_SIG;
         }
@@ -737,19 +693,17 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestItem1155 calldata nft,
         TestItem20 memory erc20
     ) external view override returns (TestOrderPayload memory execution) {
-        (
-            Order memory sellOrder,
-            Sig memory sellSignature
-        ) = buildERC1155SellOrder(
-                context.offerer,
-                NULL_ADDRESS,
-                erc20.token,
-                erc20.amount,
-                nft,
-                DEFAULT_FEE_RECIPIENT,
-                0
-            );
-        (Order memory buyOrder, ) = buildERC1155BuyOrder(
+        (Order memory sellOrder, Sig memory sellSignature) =
+        buildERC1155SellOrder(
+            context.offerer,
+            NULL_ADDRESS,
+            erc20.token,
+            erc20.amount,
+            nft,
+            DEFAULT_FEE_RECIPIENT,
+            0
+        );
+        (Order memory buyOrder,) = buildERC1155BuyOrder(
             context.fulfiller,
             NULL_ADDRESS,
             erc20.token,
@@ -761,9 +715,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
 
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
-                address(wyvern),
-                0,
-                encodeApproveOrder(sellOrder)
+                address(wyvern), 0, encodeApproveOrder(sellOrder)
             );
             sellSignature = EMPTY_SIG;
         }
@@ -788,7 +740,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             DEFAULT_FEE_RECIPIENT,
             0
         );
-        (Order memory sellOrder, ) = buildERC721SellOrder(
+        (Order memory sellOrder,) = buildERC721SellOrder(
             context.fulfiller,
             NULL_ADDRESS,
             erc20.token,
@@ -800,9 +752,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
 
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
-                address(wyvern),
-                0,
-                encodeApproveOrder(buyOrder)
+                address(wyvern), 0, encodeApproveOrder(buyOrder)
             );
             buySignature = EMPTY_SIG;
         }
@@ -828,7 +778,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             DEFAULT_FEE_RECIPIENT,
             0
         );
-        (Order memory sellOrder, ) = buildERC721SellOrder(
+        (Order memory sellOrder,) = buildERC721SellOrder(
             context.fulfiller,
             NULL_ADDRESS,
             erc20.token,
@@ -840,9 +790,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
 
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
-                address(wyvern),
-                0,
-                encodeApproveOrder(buyOrder)
+                address(wyvern), 0, encodeApproveOrder(buyOrder)
             );
             buySignature = EMPTY_SIG;
         }
@@ -868,7 +816,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             DEFAULT_FEE_RECIPIENT,
             0
         );
-        (Order memory sellOrder, ) = buildERC1155SellOrder(
+        (Order memory sellOrder,) = buildERC1155SellOrder(
             context.fulfiller,
             NULL_ADDRESS,
             erc20.token,
@@ -880,9 +828,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
 
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
-                address(wyvern),
-                0,
-                encodeApproveOrder(buyOrder)
+                address(wyvern), 0, encodeApproveOrder(buyOrder)
             );
             buySignature = EMPTY_SIG;
         }
@@ -900,7 +846,8 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         address feeRecipient,
         uint256 feeEthAmount
     ) external view override returns (TestOrderPayload memory execution) {
-        (Order memory sellOrder, Sig memory sellSignature) = buildERC721SellOrder(
+        (Order memory sellOrder, Sig memory sellSignature) =
+        buildERC721SellOrder(
             context.offerer,
             NULL_ADDRESS,
             0x0000000000000000000000000000000000000000,
@@ -909,7 +856,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
             feeRecipient,
             (feeEthAmount * 10000) / (priceEthAmount + feeEthAmount) + 1 // Calculate fee percentage
         );
-        (Order memory buyOrder, ) = buildERC721BuyOrder(
+        (Order memory buyOrder,) = buildERC721BuyOrder(
             context.fulfiller,
             NULL_ADDRESS,
             0x0000000000000000000000000000000000000000,
@@ -921,9 +868,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
 
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
-                address(wyvern),
-                0,
-                encodeApproveOrder(sellOrder)
+                address(wyvern), 0, encodeApproveOrder(sellOrder)
             );
             sellSignature = EMPTY_SIG;
         }
@@ -939,18 +884,16 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
         TestItem721[] calldata nfts,
         uint256 ethAmount
     ) external view override returns (TestOrderPayload memory execution) {
-        (
-            Order memory sellOrder,
-            Sig memory sellSignature
-        ) = buildERC721BatchSellOrder(
-                context.offerer,
-                context.fulfiller,
-                0x0000000000000000000000000000000000000000,
-                ethAmount,
-                nfts,
-                DEFAULT_FEE_RECIPIENT
-            );
-        (Order memory buyOrder, ) = buildERC721BatchBuyOrder(
+        (Order memory sellOrder, Sig memory sellSignature) =
+        buildERC721BatchSellOrder(
+            context.offerer,
+            context.fulfiller,
+            0x0000000000000000000000000000000000000000,
+            ethAmount,
+            nfts,
+            DEFAULT_FEE_RECIPIENT
+        );
+        (Order memory buyOrder,) = buildERC721BatchBuyOrder(
             context.fulfiller,
             context.offerer,
             0x0000000000000000000000000000000000000000,
@@ -961,9 +904,7 @@ contract WyvernConfig is BaseMarketConfig, WyvernTypeHashes {
 
         if (context.listOnChain) {
             execution.submitOrder = TestCallParameters(
-                address(wyvern),
-                0,
-                encodeApproveOrder(sellOrder)
+                address(wyvern), 0, encodeApproveOrder(sellOrder)
             );
             sellSignature = EMPTY_SIG;
         }

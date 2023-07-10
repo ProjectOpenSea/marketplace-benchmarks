@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.14;
+
 import { DSTestPlus } from "solmate/test/utils/DSTestPlus.sol";
 import { stdStorage, StdStorage } from "forge-std/Test.sol";
 import { TestERC1155 } from "../tokens/TestERC1155.sol";
@@ -9,6 +10,7 @@ import { TestERC721 } from "../tokens/TestERC721.sol";
 
 contract BaseOrderTest is DSTestPlus {
     using stdStorage for StdStorage;
+
     StdStorage stdstore;
 
     uint256 constant MAX_INT = ~uint256(0);
@@ -78,18 +80,11 @@ contract BaseOrderTest is DSTestPlus {
         _deployTestTokenContracts();
         accounts = [alice, bob, cal, address(this)];
         erc20s = [token1, token2, token3];
-        erc20Addresses = [
-            address(token1),
-            address(token2),
-            address(token3),
-            address(weth)
-        ];
+        erc20Addresses =
+            [address(token1), address(token2), address(token3), address(weth)];
         erc721s = [test721_1, test721_2, test721_3];
-        erc721Addresses = [
-            address(test721_1),
-            address(test721_2),
-            address(test721_3)
-        ];
+        erc721Addresses =
+            [address(test721_1), address(test721_2), address(test721_3)];
         erc1155s = [test1155_1, test1155_2, test1155_3];
         allTokens = [
             address(token1),
@@ -208,5 +203,5 @@ contract BaseOrderTest is DSTestPlus {
         }
     }
 
-    receive() external payable virtual {}
+    receive() external payable virtual { }
 }

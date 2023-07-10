@@ -118,7 +118,7 @@ struct BasicOrderParameters {
     uint256 totalOriginalAdditionalRecipients; // 0x204
     AdditionalRecipient[] additionalRecipients; // 0x224
     bytes signature; // 0x244
-    // Total length, excluding dynamic array data: 0x264 (580)
+        // Total length, excluding dynamic array data: 0x264 (580)
 }
 
 /**
@@ -149,7 +149,7 @@ struct OrderParameters {
     uint256 salt; // 0x100
     bytes32 conduitKey; // 0x120
     uint256 totalOriginalConsiderationItems; // 0x140
-    // offer.length                          // 0x160
+        // offer.length                          // 0x160
 }
 
 /**
