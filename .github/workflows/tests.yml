@@ -26,7 +26,7 @@ jobs:
         
       - name: Run tests
         run: forge test --fork-url ${{ secrets.ETH_RPC_URL }} -vv
-  exp-name-one:
+  lint:
     name: Run Lint
     runs-on: ubuntu-latest
     environment: build
@@ -35,10 +35,13 @@ jobs:
         with:
           ref: "refs/pull/${{ github.event.number }}/merge"
 
+      - name: Install Foundry
+        uses: onbjerg/foundry-toolchain@v1
+        with:
+          version: nightly
+          run: yarn lint:check
+
       - uses: actions/setup-node@v2
         with:
           node-version: 12.x
-
       - run: yarn install --frozen-lockfile
-      - run: forge install
-      - run: forge fmt --check
