@@ -198,10 +198,7 @@ contract BaseOrderTest is DSTestPlus {
             // Handle the Blur reentrancy guard.
             if (
                 market == 0xb2ecfE4E4D61f8790bbb9DE2D1259B9e2410CEA5 &&
-                writeSlots[i] ==
-                bytes32(
-                    0x00000000000000000000000000000000000000000000000000000000000000fb
-                )
+                writeSlots[i] == bytes32(uint256(0xfb))
             ) {
                 hevm.store(market, writeSlots[i], bytes32(uint256(1)));
             }
