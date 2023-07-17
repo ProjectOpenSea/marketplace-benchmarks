@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.14;
 
-import { TakeAsk, TakeBid, TakeAskSingle, TakeBidSingle, Order, Exchange, Fees, FeeRate, AssetType, OrderType, Transfer, FungibleTransfers, StateUpdate, Cancel, Listing } from "../lib/Structs.sol";
+import "../lib/Structs.sol";
 
 interface IBlurExchangeV2 {
     error InsufficientFunds();
@@ -62,8 +62,6 @@ interface IBlurExchangeV2 {
     function setOracle(address oracle, bool approved) external;
 
     function setBlockRange(uint256 _blockRange) external;
-
-    function cancelTrades(Cancel[] memory cancels) external;
 
     function incrementNonce() external;
 

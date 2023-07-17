@@ -74,7 +74,6 @@ contract BaseOrderTest is DSTestPlus {
     }
 
     function setUp() public virtual {
-        console.log("setup");
         hevm.label(alice, "alice");
         hevm.label(bob, "bob");
         hevm.label(cal, "cal");

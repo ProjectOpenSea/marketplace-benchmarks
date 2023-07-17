@@ -2,7 +2,13 @@
 pragma solidity >=0.8.7;
 
 // prettier-ignore
-import {OrderType, BasicOrderType, ItemType, Side, BasicOrderRouteType} from "./ConsiderationEnums.sol";
+import {
+    OrderType,
+    BasicOrderType,
+    ItemType,
+    Side,
+    BasicOrderRouteType
+} from "./ConsiderationEnums.sol";
 
 /**
  * @dev An order contains eleven components: an offerer, a zone (or account that

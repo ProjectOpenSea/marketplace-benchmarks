@@ -3,11 +3,6 @@ pragma solidity 0.8.14;
 
 import { Vm } from "forge-std/Vm.sol";
 
-import "./Constants.sol";
-import { TakeAsk, TakeBid, TakeAskSingle, TakeBidSingle, FeeRate, Order, OrderType, AssetType, Listing } from "./Structs.sol";
-
-import { BaseMarketConfig } from "../../../BaseMarketConfig.sol";
-
 address constant VM_ADDRESS = address(
     uint160(uint256(keccak256("hevm cheat code")))
 );
@@ -15,10 +10,12 @@ Vm constant vm = Vm(VM_ADDRESS);
 
 contract Oracle {
     error ExpiredOracleSignature();
-    error UnauthorizedOracle();
     error InvalidOracleSignature();
 
-    uint256 internal oraclePk = 0x0fac1e;
+    uint256 constant Bytes1_shift = 0xf8;
+    uint256 constant Bytes4_shift = 0xe0;
+
+    uint256 public oraclePk = 0x07ac1e;
     address payable internal oracle = payable(vm.addr(oraclePk));
 
     function produceOracleSignature(bytes32 _hash, uint32 blockNumber)
@@ -26,12 +23,6 @@ contract Oracle {
         view
         returns (bytes memory signature)
     {
-        // uint256 constant OracleSignatures_size = 0x59;
-        // uint256 constant OracleSignatures_s_offset = 0x20;
-        // uint256 constant OracleSignatures_v_offset = 0x40;
-        // uint256 constant OracleSignatures_blockNumber_offset = 0x41;
-        // uint256 constant OracleSignatures_oracle_offset = 0x45;
-
         bytes32 digest = keccak256(abi.encodePacked(_hash, blockNumber));
 
         bytes memory toBeSigned = abi.encodePacked(digest, blockNumber, oracle);
@@ -63,18 +54,12 @@ contract Oracle {
             s := mload(add(0x40, signature))
             v := shr(Bytes1_shift, mload(add(0x60, signature)))
             blockNumber := shr(Bytes4_shift, mload(add(0x61, signature)))
-            // oracle := shr(Bytes20_shift, calldataload(add(signatureOffset, OracleSignatures_oracle_offset)))
         }
 
         if (blockNumber + 0 < block.number) {
             revert ExpiredOracleSignature();
         }
 
-        // If there's an issue on chain and not in this function, it's probably
-        // related to oracle identity or auth.
-        // if (oracles[oracle] == 0) {
-        //     revert UnauthorizedOracle();
-        // }
         if (
             !_verify(
                 oracle,
@@ -88,14 +73,6 @@ contract Oracle {
         }
     }
 
-    /**
-     * @notice Verify signature of digest
-     * @param signer Address of expected signer
-     * @param digest Signature digest
-     * @param v v parameter
-     * @param r r parameter
-     * @param s s parameter
-     */
     function _verify(
         address signer,
         bytes32 digest,
