@@ -144,7 +144,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
             hevm.startPrank(setupCalls[i].sender);
             (bool success, ) = (setupCalls[i].target).call(setupCalls[i].data);
             if (!success) {
-                emit log("Failed");
+                emit log("");
             }
             hevm.stopPrank();
         }
