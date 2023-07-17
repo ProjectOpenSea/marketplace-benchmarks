@@ -8,8 +8,6 @@ import { TestERC20 } from "../tokens/TestERC20.sol";
 import { WETH } from "../tokens/WETH.sol";
 import { TestERC721 } from "../tokens/TestERC721.sol";
 
-import "forge-std/console.sol";
-
 contract BaseOrderTest is DSTestPlus {
     using stdStorage for StdStorage;
 
@@ -148,7 +146,6 @@ contract BaseOrderTest is DSTestPlus {
             erc20s[i].approve(_erc20Target, MAX_INT);
         }
         weth.approve(_erc20Target, MAX_INT);
-        // beth.approve(_erc20Target, MAX_INT);
         for (uint256 i = 0; i < erc721s.length; i++) {
             erc721s[i].setApprovalForAll(_erc721Target, true);
         }

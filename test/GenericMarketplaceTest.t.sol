@@ -49,45 +49,45 @@ contract GenericMarketplaceTest is BaseOrderTest {
         zeroExConfig = BaseMarketConfig(new ZeroExConfig());
     }
 
-    // function testBlur() external {
-    //     benchmarkMarket(blurConfig);
-    // }
+    function testBlur() external {
+        benchmarkMarket(blurConfig);
+    }
 
     function testBlurV2() external {
         benchmarkMarket(blurV2Config);
     }
 
-    // function testFoundation() external {
-    //     benchmarkMarket(foundationConfig);
-    // }
+    function testFoundation() external {
+        benchmarkMarket(foundationConfig);
+    }
 
-    // function testLooksRare() external {
-    //     benchmarkMarket(looksRareConfig);
-    // }
+    function testLooksRare() external {
+        benchmarkMarket(looksRareConfig);
+    }
 
-    // function testSeaportOnePointFour() external {
-    //     benchmarkMarket(seaportOnePointFourConfig);
-    // }
+    function testSeaportOnePointFour() external {
+        benchmarkMarket(seaportOnePointFourConfig);
+    }
 
-    // function testSeaportOnePointOne() external {
-    //     benchmarkMarket(seaportOnePointOneConfig);
-    // }
+    function testSeaportOnePointOne() external {
+        benchmarkMarket(seaportOnePointOneConfig);
+    }
 
-    // function testSudoswap() external {
-    //     benchmarkMarket(sudoswapConfig);
-    // }
+    function testSudoswap() external {
+        benchmarkMarket(sudoswapConfig);
+    }
 
-    // function testX2Y2() external {
-    //     benchmarkMarket(x2y2Config);
-    // }
+    function testX2Y2() external {
+        benchmarkMarket(x2y2Config);
+    }
 
-    // function testZeroEx() external {
-    //     benchmarkMarket(zeroExConfig);
-    // }
+    function testZeroEx() external {
+        benchmarkMarket(zeroExConfig);
+    }
 
-    // // function testWyvern() external {
-    // //     benchmarkMarket(wyvernConfig);
-    // // }
+    // function testWyvern() external {
+    //     benchmarkMarket(wyvernConfig);
+    // }
 
     function benchmarkMarket(BaseMarketConfig config) public {
         beforeAllPrepareMarketplaceTest(config);
@@ -144,7 +144,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
             hevm.startPrank(setupCalls[i].sender);
             (bool success, ) = (setupCalls[i].target).call(setupCalls[i].data);
             if (!success) {
-                console.log("Failed");
+                emit log("Failed");
             }
             hevm.stopPrank();
         }
