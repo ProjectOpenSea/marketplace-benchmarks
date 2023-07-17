@@ -4,3 +4,4 @@ bytecode_hash = "none"
 optimizer_runs = 1_000_000
 ignored_error_codes = [5574, 5667, 9302]
 evm_version='shanghai'
+libs = ["node_modules", "lib"]

@@ -45,12 +45,12 @@ contract ConsiderationTypeHashes {
         // prettier-ignore
         bytes memory considerationItemTypeString = abi.encodePacked(
             "ConsiderationItem(",
-                "uint8 itemType,",
-                "address token,",
-                "uint256 identifierOrCriteria,",
-                "uint256 startAmount,",
-                "uint256 endAmount,",
-                "address recipient",
+            "uint8 itemType,",
+            "address token,",
+            "uint256 identifierOrCriteria,",
+            "uint256 startAmount,",
+            "uint256 endAmount,",
+            "address recipient",
             ")"
         );
 
@@ -58,17 +58,17 @@ contract ConsiderationTypeHashes {
         // prettier-ignore
         bytes memory orderComponentsPartialTypeString = abi.encodePacked(
             "OrderComponents(",
-                "address offerer,",
-                "address zone,",
-                "OfferItem[] offer,",
-                "ConsiderationItem[] consideration,",
-                "uint8 orderType,",
-                "uint256 startTime,",
-                "uint256 endTime,",
-                "bytes32 zoneHash,",
-                "uint256 salt,",
-                "bytes32 conduitKey,",
-                "uint256 counter",
+            "address offerer,",
+            "address zone,",
+            "OfferItem[] offer,",
+            "ConsiderationItem[] consideration,",
+            "uint8 orderType,",
+            "uint256 startTime,",
+            "uint256 endTime,",
+            "bytes32 zoneHash,",
+            "uint256 salt,",
+            "bytes32 conduitKey,",
+            "uint256 counter",
             ")"
         );
         // Derive the OfferItem type hash using the corresponding type string.
@@ -83,12 +83,7 @@ contract ConsiderationTypeHashes {
         // prettier-ignore
         _EIP_712_DOMAIN_TYPEHASH = keccak256(
             abi.encodePacked(
-                "EIP712Domain(",
-                    "string name,",
-                    "string version,",
-                    "uint256 chainId,",
-                    "address verifyingContract",
-                ")"
+                "EIP712Domain(", "string name,", "string version,", "uint256 chainId,", "address verifyingContract", ")"
             )
         );
 
@@ -114,15 +109,7 @@ contract ConsiderationTypeHashes {
      */
     function _deriveDomainSeparator() internal view returns (bytes32) {
         // prettier-ignore
-        return keccak256(
-            abi.encode(
-                _EIP_712_DOMAIN_TYPEHASH,
-                _NAME_HASH,
-                _VERSION_HASH,
-                1,
-                seaportAddress
-            )
-        );
+        return keccak256(abi.encode(_EIP_712_DOMAIN_TYPEHASH, _NAME_HASH, _VERSION_HASH, 1, seaportAddress));
     }
 
     /**

@@ -131,6 +131,29 @@ abstract contract BaseMarketConfig {
     }
 
     /**
+     * @dev Get call parameters to execute an order selling a 721 token for WETH.
+     *   If `context.listOnChain` is true and marketplace does not support on-chain
+     *   listing, this function must revert with NotImplemented.
+     * @ param context Order context, including the buyer and seller and whether the
+     *  order should be listed on chain.
+     * @ param nft Address and ID of 721 token to be sold.
+     * @ param erc20 Address and amount for WETH to be received for nft.
+     */
+    function getPayload_BuyOfferedERC721WithBETH(
+        TestOrderContext calldata, /* context */
+        TestItem721 calldata, /* nft */
+        TestItem20 calldata /* erc20*/
+    )
+        external
+        virtual
+        returns (
+            TestOrderPayload memory /*execution*/
+        )
+    {
+        _notImplemented();
+    }
+
+    /**
      * @dev Get call parameters to execute an order selling an 1155 token for an ERC20.
      *   If `context.listOnChain` is true and marketplace does not support on-chain
      *   listing, this function must revert with NotImplemented.
@@ -168,16 +191,36 @@ abstract contract BaseMarketConfig {
      * @dev Get call parameters to execute an order selling WETH for an ERC721.
      *   If `context.listOnChain` is true and marketplace does not support on-chain
      *   listing, this function must revert with NotImplemented.
-     * @param context Order context, including the buyer and seller and whether the
+     * @ param context Order context, including the buyer and seller and whether the
      *  order should be listed on chain.
-     * @param erc20 Address and amount of WETH to be sold.
-     * @param nft Address and ID for 721 token to be received for WETH.
+     * @ param erc20 Address and amount of WETH to be sold.
+     * @ param nft Address and ID for 721 token to be received for WETH.
      */
     function getPayload_BuyOfferedWETHWithERC721(
-        TestOrderContext calldata context,
-        TestItem20 calldata erc20,
-        TestItem721 calldata nft
-    ) external virtual returns (TestOrderPayload memory execution) {
+        TestOrderContext calldata, /* context */
+        TestItem20 calldata, /* erc20 */
+        TestItem721 calldata /* nft */
+    )
+        external
+        virtual
+        returns (
+            TestOrderPayload memory /* execution */
+        )
+    {
+        _notImplemented();
+    }
+
+    function getPayload_BuyOfferedBETHWithERC721(
+        TestOrderContext calldata, /* context */
+        TestItem20 calldata, /* erc20 */
+        TestItem721 calldata /* nft */
+    )
+        external
+        virtual
+        returns (
+            TestOrderPayload memory /* execution */
+        )
+    {
         _notImplemented();
     }
 
@@ -366,6 +409,7 @@ abstract contract BaseMarketConfig {
                           Helpers
     //////////////////////////////////////////////////////////////*/
     ITestRunner private _tester;
+
     error NotImplemented();
 
     /**
