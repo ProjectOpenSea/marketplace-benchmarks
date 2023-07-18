@@ -5,10 +5,12 @@ enum Side {
     Buy,
     Sell
 }
+
 enum SignatureVersion {
     Single,
     Bulk
 }
+
 enum AssetType {
     ERC721,
     ERC1155

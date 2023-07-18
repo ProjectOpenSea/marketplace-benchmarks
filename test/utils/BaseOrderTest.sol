@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.14;
+
 import { DSTestPlus } from "solmate/test/utils/DSTestPlus.sol";
 import { stdStorage, StdStorage } from "forge-std/Test.sol";
 import { TestERC1155 } from "../tokens/TestERC1155.sol";
@@ -9,6 +10,7 @@ import { TestERC721 } from "../tokens/TestERC721.sol";
 
 contract BaseOrderTest is DSTestPlus {
     using stdStorage for StdStorage;
+
     StdStorage stdstore;
 
     uint256 constant MAX_INT = ~uint256(0);
@@ -30,6 +32,10 @@ contract BaseOrderTest is DSTestPlus {
     // TestERC20 internal weth;
     WETH internal constant weth =
         WETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+
+    // TestERC20 internal beth
+    WETH internal constant beth =
+        WETH(0x0000000000A39bb272e79075ade125fd351887Ac);
 
     TestERC721 internal test721_1;
     TestERC721 internal test721_2;
@@ -82,7 +88,8 @@ contract BaseOrderTest is DSTestPlus {
             address(token1),
             address(token2),
             address(token3),
-            address(weth)
+            address(weth),
+            address(beth)
         ];
         erc721s = [test721_1, test721_2, test721_3];
         erc721Addresses = [
@@ -96,6 +103,7 @@ contract BaseOrderTest is DSTestPlus {
             address(token2),
             address(token3),
             address(weth),
+            address(beth),
             address(test721_1),
             address(test721_2),
             address(test721_3),
@@ -120,6 +128,7 @@ contract BaseOrderTest is DSTestPlus {
         test1155_3 = new TestERC1155();
         hevm.label(address(token1), "token1");
         hevm.label(address(weth), "weth");
+        hevm.label(address(beth), "beth");
         hevm.label(address(test721_1), "test721_1");
         hevm.label(address(test1155_1), "test1155_1");
         hevm.label(address(feeReciever1), "feeReciever1");
@@ -183,7 +192,16 @@ contract BaseOrderTest is DSTestPlus {
         (, bytes32[] memory writeSlots) = hevm.accesses(market);
         for (uint256 i = 0; i < writeSlots.length; i++) {
             if (originalMarketWriteSlots[writeSlots[i]]) continue;
+
             hevm.store(market, writeSlots[i], bytes32(0));
+
+            // Handle the Blur reentrancy guard.
+            if (
+                market == 0xb2ecfE4E4D61f8790bbb9DE2D1259B9e2410CEA5 &&
+                writeSlots[i] == bytes32(uint256(0xfb))
+            ) {
+                hevm.store(market, writeSlots[i], bytes32(uint256(1)));
+            }
         }
     }
 

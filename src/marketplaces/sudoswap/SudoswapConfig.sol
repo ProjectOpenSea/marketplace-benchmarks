@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "solmate/tokens/ERC20.sol";
@@ -138,8 +139,9 @@ contract SudoswapConfig is BaseMarketConfig {
         TestItem721 memory nft,
         uint256 ethAmount
     ) external override returns (TestOrderPayload memory execution) {
-        if (!context.listOnChain || nft.token != erc721Address)
+        if (!context.listOnChain || nft.token != erc721Address) {
             _notImplemented();
+        }
 
         // update market address so tests know where the ERC721 will be escrowed
         currentMarket = address(ethNftPool);

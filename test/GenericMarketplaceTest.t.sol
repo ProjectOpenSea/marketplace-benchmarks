@@ -3,11 +3,12 @@ pragma solidity 0.8.14;
 
 import { BaseMarketConfig } from "../src/BaseMarketConfig.sol";
 import { BlurConfig } from "../src/marketplaces/blur/BlurConfig.sol";
+import { BlurV2Config } from "../src/marketplaces/blur-2.0/BlurV2Config.sol";
 import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
 import { LooksRareConfig } from "../src/marketplaces/looksRare/LooksRareConfig.sol";
 import { LooksRareV2Config } from "../src/marketplaces/looksRare-v2/LooksRareV2Config.sol";
-import { SeaportOnePointOneConfig } from "../src/marketplaces/seaport-1.1/SeaportOnePointOneConfig.sol";
 import { SeaportOnePointFourConfig } from "../src/marketplaces/seaport-1.4/SeaportOnePointFourConfig.sol";
+import { SeaportOnePointOneConfig } from "../src/marketplaces/seaport-1.1/SeaportOnePointOneConfig.sol";
 import { SudoswapConfig } from "../src/marketplaces/sudoswap/SudoswapConfig.sol";
 import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
 import { X2Y2Config } from "../src/marketplaces/X2Y2/X2Y2Config.sol";
@@ -22,6 +23,7 @@ import "./utils/BaseOrderTest.sol";
 
 contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig blurConfig;
+    BaseMarketConfig blurV2Config;
     BaseMarketConfig foundationConfig;
     BaseMarketConfig looksRareConfig;
     BaseMarketConfig looksRareV2Config;
@@ -34,6 +36,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
     constructor() {
         blurConfig = BaseMarketConfig(new BlurConfig());
+        blurV2Config = BaseMarketConfig(new BlurV2Config());
         foundationConfig = BaseMarketConfig(new FoundationConfig());
         looksRareConfig = BaseMarketConfig(new LooksRareConfig());
         looksRareV2Config = BaseMarketConfig(new LooksRareV2Config());
@@ -49,24 +52,16 @@ contract GenericMarketplaceTest is BaseOrderTest {
         zeroExConfig = BaseMarketConfig(new ZeroExConfig());
     }
 
-    function testSeaportOnePointOne() external {
-        benchmarkMarket(seaportOnePointOneConfig);
+    function testBlur() external {
+        benchmarkMarket(blurConfig);
     }
 
-    function testSeaportOnePointFour() external {
-        benchmarkMarket(seaportOnePointFourConfig);
+    function testBlurV2() external {
+        benchmarkMarket(blurV2Config);
     }
-
-    // function testWyvern() external {
-    //     benchmarkMarket(wyvernConfig);
-    // }
 
     function testFoundation() external {
         benchmarkMarket(foundationConfig);
-    }
-
-    function testX2Y2() external {
-        benchmarkMarket(x2y2Config);
     }
 
     function testLooksRare() external {
@@ -77,17 +72,29 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmarkMarket(looksRareV2Config);
     }
 
+    function testSeaportOnePointFour() external {
+        benchmarkMarket(seaportOnePointFourConfig);
+    }
+
+    function testSeaportOnePointOne() external {
+        benchmarkMarket(seaportOnePointOneConfig);
+    }
+
     function testSudoswap() external {
         benchmarkMarket(sudoswapConfig);
+    }
+
+    function testX2Y2() external {
+        benchmarkMarket(x2y2Config);
     }
 
     function testZeroEx() external {
         benchmarkMarket(zeroExConfig);
     }
 
-    function testBlur() external {
-        benchmarkMarket(blurConfig);
-    }
+    // function testWyvern() external {
+    //     benchmarkMarket(wyvernConfig);
+    // }
 
     function benchmarkMarket(BaseMarketConfig config) public {
         beforeAllPrepareMarketplaceTest(config);
@@ -99,12 +106,14 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmark_BuyOfferedERC721WithWETH(config);
         benchmark_BuyOfferedERC721WithERC20_ListOnChain(config);
         benchmark_BuyOfferedERC721WithERC20(config);
+        benchmark_BuyOfferedERC721WithBETH(config);
         benchmark_BuyOfferedERC1155WithERC20_ListOnChain(config);
         benchmark_BuyOfferedERC1155WithERC20(config);
         benchmark_BuyOfferedERC20WithERC721_ListOnChain(config);
         benchmark_BuyOfferedERC20WithERC721(config);
         benchmark_BuyOfferedWETHWithERC721_ListOnChain(config);
         benchmark_BuyOfferedWETHWithERC721(config);
+        benchmark_BuyOfferedBETHWithERC721(config);
         benchmark_BuyOfferedERC20WithERC1155_ListOnChain(config);
         benchmark_BuyOfferedERC20WithERC1155(config);
         benchmark_BuyOfferedERC721WithERC1155_ListOnChain(config);
@@ -140,7 +149,10 @@ contract GenericMarketplaceTest is BaseOrderTest {
         );
         for (uint256 i = 0; i < setupCalls.length; i++) {
             hevm.startPrank(setupCalls[i].sender);
-            (setupCalls[i].target).call(setupCalls[i].data);
+            (bool success, ) = (setupCalls[i].target).call(setupCalls[i].data);
+            if (!success) {
+                emit log("");
+            }
             hevm.stopPrank();
         }
 
@@ -353,6 +365,43 @@ contract GenericMarketplaceTest is BaseOrderTest {
             assertEq(test721_1.ownerOf(1), bob);
             assertEq(token1.balanceOf(alice), 100);
             assertEq(token1.balanceOf(bob), 0);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyOfferedERC721WithBETH(BaseMarketConfig config)
+        internal
+        prepareTest(config)
+    {
+        string memory testLabel = "(ERC721 -> BETH)";
+        test721_1.mint(alice, 1);
+        hevm.deal(alice, 0);
+        hevm.deal(bob, 100);
+        hevm.prank(bob);
+        beth.deposit{ value: 100 }();
+        try
+            config.getPayload_BuyOfferedERC721WithBETH(
+                TestOrderContext(false, alice, bob),
+                TestItem721(address(test721_1), 1),
+                TestItem20(address(beth), 100)
+            )
+        returns (TestOrderPayload memory payload) {
+            assertEq(test721_1.ownerOf(1), alice);
+            assertEq(beth.balanceOf(alice), 0);
+            assertEq(alice.balance, 0);
+            assertEq(beth.balanceOf(bob), 100);
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill, w/ Sig")),
+                bob,
+                payload.executeOrder
+            );
+
+            assertEq(test721_1.ownerOf(1), bob);
+            assertEq(alice.balance, 100);
+            assertEq(beth.balanceOf(bob), 0);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
@@ -662,6 +711,41 @@ contract GenericMarketplaceTest is BaseOrderTest {
             assertEq(test721_1.ownerOf(1), alice);
             assertEq(weth.balanceOf(alice), 0);
             assertEq(weth.balanceOf(bob), 100);
+        } catch {
+            _logNotSupported(config.name(), testLabel);
+        }
+    }
+
+    function benchmark_BuyOfferedBETHWithERC721(BaseMarketConfig config)
+        internal
+        prepareTest(config)
+    {
+        string memory testLabel = "(BETH -> ERC721)";
+        hevm.deal(alice, 100);
+        hevm.prank(alice);
+        beth.deposit{ value: 100 }();
+        test721_1.mint(bob, 1);
+        try
+            config.getPayload_BuyOfferedBETHWithERC721(
+                TestOrderContext(false, alice, bob),
+                TestItem20(address(beth), 100),
+                TestItem721(address(test721_1), 1)
+            )
+        returns (TestOrderPayload memory payload) {
+            assertEq(test721_1.ownerOf(1), bob);
+            assertEq(beth.balanceOf(alice), 100);
+            assertEq(beth.balanceOf(bob), 0);
+
+            _benchmarkCallWithParams(
+                config.name(),
+                string(abi.encodePacked(testLabel, " Fulfill w/ Sig")),
+                bob,
+                payload.executeOrder
+            );
+
+            assertEq(test721_1.ownerOf(1), alice);
+            assertEq(beth.balanceOf(alice), 0);
+            assertEq(beth.balanceOf(bob), 100);
         } catch {
             _logNotSupported(config.name(), testLabel);
         }
