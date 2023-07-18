@@ -6,8 +6,8 @@ import { BlurConfig } from "../src/marketplaces/blur/BlurConfig.sol";
 import { BlurV2Config } from "../src/marketplaces/blur-2.0/BlurV2Config.sol";
 import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
 import { LooksRareConfig } from "../src/marketplaces/looksRare/LooksRareConfig.sol";
+import { SeaportOnePointFiveConfig } from "../src/marketplaces/seaport-1.5/SeaportOnePointFiveConfig.sol";
 import { LooksRareV2Config } from "../src/marketplaces/looksRare-v2/LooksRareV2Config.sol";
-import { SeaportOnePointFourConfig } from "../src/marketplaces/seaport-1.4/SeaportOnePointFourConfig.sol";
 import { SeaportOnePointOneConfig } from "../src/marketplaces/seaport-1.1/SeaportOnePointOneConfig.sol";
 import { SudoswapConfig } from "../src/marketplaces/sudoswap/SudoswapConfig.sol";
 import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
@@ -28,7 +28,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig looksRareConfig;
     BaseMarketConfig looksRareV2Config;
     BaseMarketConfig seaportOnePointOneConfig;
-    BaseMarketConfig seaportOnePointFourConfig;
+    BaseMarketConfig seaportOnePointFiveConfig;
     BaseMarketConfig sudoswapConfig;
     BaseMarketConfig wyvernConfig;
     BaseMarketConfig x2y2Config;
@@ -43,8 +43,8 @@ contract GenericMarketplaceTest is BaseOrderTest {
         seaportOnePointOneConfig = BaseMarketConfig(
             new SeaportOnePointOneConfig()
         );
-        seaportOnePointFourConfig = BaseMarketConfig(
-            new SeaportOnePointFourConfig()
+        seaportOnePointFiveConfig = BaseMarketConfig(
+            new SeaportOnePointFiveConfig()
         );
         sudoswapConfig = BaseMarketConfig(new SudoswapConfig());
         wyvernConfig = BaseMarketConfig(new WyvernConfig());
@@ -72,8 +72,8 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmarkMarket(looksRareV2Config);
     }
 
-    function testSeaportOnePointFour() external {
-        benchmarkMarket(seaportOnePointFourConfig);
+    function testSeaportOnePointFive() external {
+        benchmarkMarket(seaportOnePointFiveConfig);
     }
 
     function testSeaportOnePointOne() external {
