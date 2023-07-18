@@ -7,6 +7,7 @@ import { BlurV2Config } from "../src/marketplaces/blur-2.0/BlurV2Config.sol";
 import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
 import { LooksRareConfig } from "../src/marketplaces/looksRare/LooksRareConfig.sol";
 import { SeaportOnePointFiveConfig } from "../src/marketplaces/seaport-1.5/SeaportOnePointFiveConfig.sol";
+import { LooksRareV2Config } from "../src/marketplaces/looksRare-v2/LooksRareV2Config.sol";
 import { SeaportOnePointOneConfig } from "../src/marketplaces/seaport-1.1/SeaportOnePointOneConfig.sol";
 import { SudoswapConfig } from "../src/marketplaces/sudoswap/SudoswapConfig.sol";
 import { WyvernConfig } from "../src/marketplaces/wyvern/WyvernConfig.sol";
@@ -25,6 +26,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig blurV2Config;
     BaseMarketConfig foundationConfig;
     BaseMarketConfig looksRareConfig;
+    BaseMarketConfig looksRareV2Config;
     BaseMarketConfig seaportOnePointOneConfig;
     BaseMarketConfig seaportOnePointFiveConfig;
     BaseMarketConfig sudoswapConfig;
@@ -37,6 +39,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
         blurV2Config = BaseMarketConfig(new BlurV2Config());
         foundationConfig = BaseMarketConfig(new FoundationConfig());
         looksRareConfig = BaseMarketConfig(new LooksRareConfig());
+        looksRareV2Config = BaseMarketConfig(new LooksRareV2Config());
         seaportOnePointOneConfig = BaseMarketConfig(
             new SeaportOnePointOneConfig()
         );
@@ -63,6 +66,10 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
     function testLooksRare() external {
         benchmarkMarket(looksRareConfig);
+    }
+
+    function testLooksRareV2() external {
+        benchmarkMarket(looksRareV2Config);
     }
 
     function testSeaportOnePointFive() external {
