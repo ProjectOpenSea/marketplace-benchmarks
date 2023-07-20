@@ -101,7 +101,6 @@ abstract contract BaseMarketConfig {
         uint256 /* ethAmount */
     )
         external
-        view
         virtual
         returns (
             TestOrderPayload memory /* execution */
@@ -194,7 +193,6 @@ abstract contract BaseMarketConfig {
         TestItem20 calldata /* erc20 */
     )
         external
-        view
         virtual
         returns (
             TestOrderPayload memory /* execution */
@@ -278,7 +276,6 @@ abstract contract BaseMarketConfig {
         TestItem1155 calldata /* nft */
     )
         external
-        view
         virtual
         returns (
             TestOrderPayload memory /* execution */
@@ -354,7 +351,6 @@ abstract contract BaseMarketConfig {
         uint256 /* feeEthAmount */
     )
         external
-        view
         virtual
         returns (
             TestOrderPayload memory /* execution */
@@ -386,7 +382,6 @@ abstract contract BaseMarketConfig {
         uint256 /* feeEthAmount2 */
     )
         external
-        view
         virtual
         returns (
             TestOrderPayload memory /* execution */
@@ -493,7 +488,6 @@ abstract contract BaseMarketConfig {
         uint256[] calldata /* ethAmounts */
     )
         external
-        view
         virtual
         returns (
             TestOrderPayload memory /* execution */
@@ -516,7 +510,7 @@ abstract contract BaseMarketConfig {
         address erc20Address,
         TestItem721[] calldata nfts,
         uint256[] calldata erc20Amounts
-    ) external view virtual returns (TestOrderPayload memory execution) {
+    ) external virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
 
@@ -534,7 +528,7 @@ abstract contract BaseMarketConfig {
         address erc20Address,
         TestItem721[] calldata nfts,
         uint256[] calldata erc20Amounts
-    ) external view virtual returns (TestOrderPayload memory execution) {
+    ) external virtual returns (TestOrderPayload memory execution) {
         _notImplemented();
     }
 
