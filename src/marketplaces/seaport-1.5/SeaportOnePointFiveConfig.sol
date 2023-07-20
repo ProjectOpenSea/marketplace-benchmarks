@@ -969,13 +969,14 @@ contract SeaportOnePointFiveConfig is
         TestItem721[] calldata nfts,
         uint256[] calldata ethAmounts
     ) external view override returns (TestOrderPayload memory execution) {
-
         uint256 sumPayments = 0;
         address alice = context.offerer;
         uint256 numItemsInBundle = nfts.length;
 
         OfferItem[] memory offerItems = new OfferItem[](numItemsInBundle);
-        ConsiderationItem[] memory considerationItems = new ConsiderationItem[](numItemsInBundle);
+        ConsiderationItem[] memory considerationItems = new ConsiderationItem[](
+            numItemsInBundle
+        );
 
         for (uint256 i = 0; i < numItemsInBundle; i++) {
             offerItems[i] = OfferItem(
@@ -998,11 +999,7 @@ contract SeaportOnePointFiveConfig is
             sumPayments += ethAmounts[i];
         }
 
-        Order memory order = buildOrder(
-            alice,
-            offerItems,
-            considerationItems
-        );
+        Order memory order = buildOrder(alice, offerItems, considerationItems);
 
         if (context.listOnChain) {
             order.signature = "";
@@ -1016,7 +1013,7 @@ contract SeaportOnePointFiveConfig is
             );
         }
 
-         execution.executeOrder = TestCallParameters(
+        execution.executeOrder = TestCallParameters(
             address(seaport),
             sumPayments,
             abi.encodeWithSelector(ISeaport.fulfillOrder.selector, order, 0)
@@ -1026,17 +1023,18 @@ contract SeaportOnePointFiveConfig is
     function getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividuallyOneFeeRecipient(
         TestBundleOrderWithSingleFeeReceiver memory args
     ) external view override returns (TestOrderPayload memory execution) {
-
         uint256 sumPayments = 0;
         address alice = args.context.offerer;
         uint256 numItemsInBundle = args.nfts.length;
 
         OfferItem[] memory offerItems = new OfferItem[](numItemsInBundle);
-        ConsiderationItem[] memory considerationItems = new ConsiderationItem[](numItemsInBundle * 2);
+        ConsiderationItem[] memory considerationItems = new ConsiderationItem[](
+            numItemsInBundle * 2
+        );
 
         for (uint256 i = 0; i < numItemsInBundle; i++) {
             uint256 itemPrice = args.itemPrices[i];
-            uint256 itemFee = itemPrice * args.feeRate / 10000;
+            uint256 itemFee = (itemPrice * args.feeRate) / 10000;
             uint256 sellerProceeds = itemPrice - itemFee;
             offerItems[i] = OfferItem(
                 ItemType.ERC721,
@@ -1067,11 +1065,7 @@ contract SeaportOnePointFiveConfig is
             sumPayments += args.itemPrices[i];
         }
 
-        Order memory order = buildOrder(
-            alice,
-            offerItems,
-            considerationItems
-        );
+        Order memory order = buildOrder(alice, offerItems, considerationItems);
 
         if (args.context.listOnChain) {
             order.signature = "";
@@ -1085,7 +1079,7 @@ contract SeaportOnePointFiveConfig is
             );
         }
 
-         execution.executeOrder = TestCallParameters(
+        execution.executeOrder = TestCallParameters(
             address(seaport),
             sumPayments,
             abi.encodeWithSelector(ISeaport.fulfillOrder.selector, order, 0)
@@ -1095,18 +1089,19 @@ contract SeaportOnePointFiveConfig is
     function getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividuallyTwoFeeRecipients(
         TestBundleOrderWithTwoFeeReceivers memory args
     ) external view override returns (TestOrderPayload memory execution) {
-
         uint256 sumPayments = 0;
         address alice = args.context.offerer;
         uint256 numItemsInBundle = args.nfts.length;
 
         OfferItem[] memory offerItems = new OfferItem[](numItemsInBundle);
-        ConsiderationItem[] memory considerationItems = new ConsiderationItem[](numItemsInBundle * 3);
+        ConsiderationItem[] memory considerationItems = new ConsiderationItem[](
+            numItemsInBundle * 3
+        );
 
         for (uint256 i = 0; i < numItemsInBundle; i++) {
             uint256 itemPrice = args.itemPrices[i];
-            uint256 itemFee1 = itemPrice * args.feeRate1 / 10000;
-            uint256 itemFee2 = itemPrice * args.feeRate2 / 10000;
+            uint256 itemFee1 = (itemPrice * args.feeRate1) / 10000;
+            uint256 itemFee2 = (itemPrice * args.feeRate2) / 10000;
             uint256 sellerProceeds = itemPrice - itemFee1 - itemFee2;
             offerItems[i] = OfferItem(
                 ItemType.ERC721,
@@ -1146,11 +1141,7 @@ contract SeaportOnePointFiveConfig is
             sumPayments += args.itemPrices[i];
         }
 
-        Order memory order = buildOrder(
-            alice,
-            offerItems,
-            considerationItems
-        );
+        Order memory order = buildOrder(alice, offerItems, considerationItems);
 
         if (args.context.listOnChain) {
             order.signature = "";
@@ -1164,7 +1155,7 @@ contract SeaportOnePointFiveConfig is
             );
         }
 
-         execution.executeOrder = TestCallParameters(
+        execution.executeOrder = TestCallParameters(
             address(seaport),
             sumPayments,
             abi.encodeWithSelector(ISeaport.fulfillOrder.selector, order, 0)

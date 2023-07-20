@@ -6,7 +6,7 @@ import { BlurConfig } from "../src/marketplaces/blur/BlurConfig.sol";
 import { BlurV2Config } from "../src/marketplaces/blur-2.0/BlurV2Config.sol";
 import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
 import { LooksRareConfig } from "../src/marketplaces/looksRare/LooksRareConfig.sol";
-import { PaymentProcessorConfig } from '../src/marketplaces/lb-payment-processor/PaymentProcessorConfig.sol';
+import { PaymentProcessorConfig } from "../src/marketplaces/lb-payment-processor/PaymentProcessorConfig.sol";
 import { SeaportOnePointFiveConfig } from "../src/marketplaces/seaport-1.5/SeaportOnePointFiveConfig.sol";
 import { LooksRareV2Config } from "../src/marketplaces/looksRare-v2/LooksRareV2Config.sol";
 import { SeaportOnePointOneConfig } from "../src/marketplaces/seaport-1.1/SeaportOnePointOneConfig.sol";
@@ -127,8 +127,12 @@ contract GenericMarketplaceTest is BaseOrderTest {
         benchmark_BuyTenOfferedERC721WithWETHDistinctOrders(config);
         benchmark_MatchOrders_ABCA(config);
         benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividually(config);
-        benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFee(config);
-        benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFeeTwoRecipients(config);
+        benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFee(
+            config
+        );
+        benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFeeTwoRecipients(
+            config
+        );
 
         benchmark_BuyOfferedERC721WithEther_ListOnChain(config);
         benchmark_BuyOfferedERC1155WithEther_ListOnChain(config);
@@ -1221,10 +1225,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividually(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
+    function benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividually(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
         string memory testLabel = "(ERC721x10 -> ETH (Priced Indvidually))";
 
         TestItem721[] memory nfts = new TestItem721[](10);
@@ -1237,11 +1240,12 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
 
         try
-            config.getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividually(
-                TestOrderContext(false, alice, bob),
-                nfts,
-                nftPrices
-            )
+            config
+                .getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividually(
+                    TestOrderContext(false, alice, bob),
+                    nfts,
+                    nftPrices
+                )
         returns (TestOrderPayload memory payload) {
             for (uint256 i = 0; i < 10; i++) {
                 assertEq(test721_1.ownerOf(i + 1), alice);
@@ -1262,11 +1266,11 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFee(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
-        string memory testLabel = "(ERC721x10 -> ETH One-Fee-Recipient (Priced Indvidually))";
+    function benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFee(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string
+            memory testLabel = "(ERC721x10 -> ETH One-Fee-Recipient (Priced Indvidually))";
 
         TestItem721[] memory nfts = new TestItem721[](10);
         uint256[] memory nftPrices = new uint256[](10);
@@ -1281,15 +1285,16 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
 
         try
-            config.getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividuallyOneFeeRecipient(
-                TestBundleOrderWithSingleFeeReceiver({
-                    context: TestOrderContext(false, alice, bob),
-                    nfts: nfts,
-                    itemPrices: nftPrices,
-                    feeRecipient: feeReciever1,
-                    feeRate: feeRate
-                })
-            )
+            config
+                .getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividuallyOneFeeRecipient(
+                    TestBundleOrderWithSingleFeeReceiver({
+                        context: TestOrderContext(false, alice, bob),
+                        nfts: nfts,
+                        itemPrices: nftPrices,
+                        feeRecipient: feeReciever1,
+                        feeRate: feeRate
+                    })
+                )
         returns (TestOrderPayload memory payload) {
             for (uint256 i = 0; i < 10; i++) {
                 assertEq(test721_1.ownerOf(i + 1), alice);
@@ -1312,11 +1317,11 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
     }
 
-    function benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFeeTwoRecipients(BaseMarketConfig config)
-        internal
-        prepareTest(config)
-    {
-        string memory testLabel = "(ERC721x10 -> ETH Two-Fee-Recipients (Priced Indvidually))";
+    function benchmark_BuyTenOfferedERC721WithEtherItemsPricedIndividuallyWithEtherFeeTwoRecipients(
+        BaseMarketConfig config
+    ) internal prepareTest(config) {
+        string
+            memory testLabel = "(ERC721x10 -> ETH Two-Fee-Recipients (Priced Indvidually))";
 
         TestItem721[] memory nfts = new TestItem721[](10);
         uint256[] memory nftPrices = new uint256[](10);
@@ -1332,17 +1337,18 @@ contract GenericMarketplaceTest is BaseOrderTest {
         }
 
         try
-            config.getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividuallyTwoFeeRecipients(
-                TestBundleOrderWithTwoFeeReceivers({
-                    context: TestOrderContext(false, alice, bob),
-                    nfts: nfts,
-                    itemPrices: nftPrices,
-                    feeRecipient1: feeReciever1,
-                    feeRate1: feeRate1,
-                    feeRecipient2: feeReciever2,
-                    feeRate2: feeRate2
-                })
-            )
+            config
+                .getPayload_BuyOfferedManyERC721WithEtherItemsPricedIndividuallyTwoFeeRecipients(
+                    TestBundleOrderWithTwoFeeReceivers({
+                        context: TestOrderContext(false, alice, bob),
+                        nfts: nfts,
+                        itemPrices: nftPrices,
+                        feeRecipient1: feeReciever1,
+                        feeRate1: feeRate1,
+                        feeRecipient2: feeReciever2,
+                        feeRate2: feeRate2
+                    })
+                )
         returns (TestOrderPayload memory payload) {
             for (uint256 i = 0; i < 10; i++) {
                 assertEq(test721_1.ownerOf(i + 1), alice);

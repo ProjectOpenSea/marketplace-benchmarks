@@ -438,7 +438,7 @@ abstract contract BaseMarketConfig {
      *   listing, this function must revert with NotImplemented.
      *   Each token is priced individually as royalties can exist per individual NFT
      *   and context is lost when pricing the entire bundle.
-     * @param args Struct containing the data needed to create the payload: 
+     * @param args Struct containing the data needed to create the payload:
      *      args.context        Order context, including the buyer and seller and whether the
      *                          order should be listed on chain.
      *      args.nfts           Array of Address and ID for ERC721 tokens to be sold.
@@ -458,7 +458,7 @@ abstract contract BaseMarketConfig {
      *   listing, this function must revert with NotImplemented.
      *   Each token is priced individually as royalties can exist per individual NFT
      *   and context is lost when pricing the entire bundle.
-     * @param args Struct containing the data needed to create the payload: 
+     * @param args Struct containing the data needed to create the payload:
      *      args.context        Order context, including the buyer and seller and whether the
      *                          order should be listed on chain.
      *      args.nfts           Array of Address and ID for ERC721 tokens to be sold.

@@ -14,11 +14,17 @@ contract TestERC721 is ERC721("Test721", "TST721"), ERC2981 {
         return "tokenURI";
     }
 
-    function setDefaultRoyaltyInfo(address receiver, uint96 feeNumerator) public {
+    function setDefaultRoyaltyInfo(address receiver, uint96 feeNumerator)
+        public
+    {
         _setDefaultRoyalty(receiver, feeNumerator);
     }
 
-    function setTokenRoyalty(uint256 tokenId, address receiver, uint96 feeNumerator) public {
+    function setTokenRoyalty(
+        uint256 tokenId,
+        address receiver,
+        uint96 feeNumerator
+    ) public {
         _setTokenRoyalty(tokenId, receiver, feeNumerator);
     }
 }

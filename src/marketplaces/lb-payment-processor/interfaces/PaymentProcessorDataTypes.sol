@@ -3,7 +3,10 @@ pragma solidity >=0.8.7;
 
 import "test/tokens/interfaces/IERC20.sol";
 
-enum TokenProtocols { ERC721, ERC1155 }
+enum TokenProtocols {
+    ERC721,
+    ERC1155
+}
 
 /**
  * @dev The `v`, `r`, and `s` components of an ECDSA signature.  For more information
@@ -42,12 +45,12 @@ struct SignatureECDSA {
  * @dev for signature.
  * @dev **listingNonce**: The nonce the seller signed in the listing.
  * @dev **offerNonce**: The nonce the buyer signed in the offer.
- * @dev **listingMinPrice**: The minimum price the seller signed off on, in wei.  Buyer can buy above, 
+ * @dev **listingMinPrice**: The minimum price the seller signed off on, in wei.  Buyer can buy above,
  * @dev but not below the seller-approved minimum price.
  * @dev **offerPrice**: The sale price of the matched order, in wei.  Buyer signs off on the final offer price.
  * @dev **listingExpiration**: The timestamp at which the listing expires.
  * @dev **offerExpiration**: The timestamp at which the offer expires.
- * @dev **tokenId**: The id of the token being sold.  For ERC-721 tokens, this is the specific NFT token id.  
+ * @dev **tokenId**: The id of the token being sold.  For ERC-721 tokens, this is the specific NFT token id.
  * @dev For ERC-1155 tokens, this denotes the token type id.
  * @dev **amount**: The number of tokens being sold.  For ERC-721 tokens, this must always be `1`.
  * @dev For ERC-1155 tokens where balances are transferred, this must be greater than or equal to `1`.
@@ -86,7 +89,7 @@ struct MatchedOrder {
  * @dev **listingExpiration**: The timestamp at which the listing expires.
  */
 struct MatchedOrderBundleExtended {
-    MatchedOrderBundleBase bundleBase; 
+    MatchedOrderBundleBase bundleBase;
     address seller;
     uint256 listingNonce;
     uint256 listingExpiration;
@@ -130,7 +133,7 @@ struct MatchedOrderBundleBase {
  * @dev This struct is used as input to `sweepCollection` and `buyBundledListing` calls.
  * @dev These fields are required per individual item listed.
  *
- * @dev **tokenId**: The id of the token being sold.  For ERC-721 tokens, this is the specific NFT token id.  
+ * @dev **tokenId**: The id of the token being sold.  For ERC-721 tokens, this is the specific NFT token id.
  * @dev For ERC-1155 tokens, this denotes the token type id.
  * @dev **amount**: The number of tokens being sold.  For ERC-721 tokens, this must always be `1`.
  * @dev For ERC-1155 tokens where balances are transferred, this must be greater than or equal to `1`.
@@ -138,7 +141,7 @@ struct MatchedOrderBundleBase {
  * @dev 0.5% fee numerator is 50, 1% fee numerator is 100, 10% fee numerator is 1,000 and so on.
  * @dev Marketplaces are responsible to query EIP-2981 royalty info from the NFT contract when presenting this
  * @dev for signature.
- * @dev **itemPrice**: The exact price the seller signed off on for an individual item, in wei. 
+ * @dev **itemPrice**: The exact price the seller signed off on for an individual item, in wei.
  * @dev Purchase price for the item must be exactly the listing item price.
  * @dev **listingNonce**: The nonce the seller signed in the listing for an individual item.  This should be set
  * @dev for collection sweep transactions, but it should be zero for bundled listings, as the listing nonce is global
@@ -165,7 +168,7 @@ struct BundledItem {
  *      marketplace behavior(s).
  *
  * @dev **enforceExchangeWhitelist**: Requires `buy` calls from smart contracts to be whitelisted.
- * @dev **enforcePaymentMethodWhitelist**: Requires ERC-20 payment coins for `buy` calls to be whitelisted as an 
+ * @dev **enforcePaymentMethodWhitelist**: Requires ERC-20 payment coins for `buy` calls to be whitelisted as an
  * @dev approved payment method.
  * @dev **enforcePricingConstraints**: Allows the creator to specify exactly one approved payment method, a minimum
  * @dev floor price and a maximum ceiling price.  When true, this value supercedes `enforcePaymentMethodWhitelist`.
@@ -200,7 +203,7 @@ struct SecurityPolicy {
  *
  * @dev **isEnabled**: When true, this indicates that pricing constraints are set for the collection or token.
  * @dev **isImmutable**: When true, this indicates that pricing constraints are immutable and cannot be changed.
- * @dev **floorPrice**: The minimum price for a token or collection.  This is only enforced when 
+ * @dev **floorPrice**: The minimum price for a token or collection.  This is only enforced when
  * @dev `enforcePricingConstraints` is `true`.
  * @dev **ceilingPrice**: The maximum price for a token or collection.  This is only enforced when
  * @dev `enforcePricingConstraints` is `true`.
@@ -212,7 +215,7 @@ struct PricingBounds {
     uint256 ceilingPrice;
 }
 
-/** 
+/**
  * @dev Internal contract use only - this is not a public-facing struct
  */
 struct SplitProceeds {
@@ -222,7 +225,7 @@ struct SplitProceeds {
     uint256 sellerProceeds;
 }
 
-/** 
+/**
  * @dev Internal contract use only - this is not a public-facing struct
  */
 struct Accumulator {
@@ -234,7 +237,7 @@ struct Accumulator {
     uint256 sumListingPrices;
 }
 
-/** 
+/**
  * @dev Internal contract use only - this is not a public-facing struct
  */
 struct AccumulatorHashes {
@@ -244,7 +247,7 @@ struct AccumulatorHashes {
     bytes32 itemPricesKeccakHash;
 }
 
-/** 
+/**
  * @dev Internal contract use only - this is not a public-facing struct
  */
 struct PayoutsAccumulator {
@@ -263,6 +266,7 @@ struct ComputeAndDistributeProceedsArgs {
     uint256 pushPaymentGasLimit;
     address purchaser;
     IERC20 paymentCoin;
-    function(address,address,IERC20,uint256,uint256) funcPayout;
-    function(address,address,address,uint256,uint256) returns (bool) funcDispenseToken;
+    function(address, address, IERC20, uint256, uint256) funcPayout;
+    function(address, address, address, uint256, uint256)
+        returns (bool) funcDispenseToken;
 }
