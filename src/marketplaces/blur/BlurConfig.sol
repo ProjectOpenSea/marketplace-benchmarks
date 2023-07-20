@@ -341,98 +341,112 @@ contract BlurConfig is BaseMarketConfig, BlurTypeHashes {
     }
 
     function getPayload_BuyOfferedERC721WithEtherOneFeeRecipient(
-        TestOrderContext calldata context,
-        TestItem721 memory nft,
-        uint256 priceEthAmount,
-        address feeRecipient,
-        uint256 feeEthAmount
-    ) external view override returns (TestOrderPayload memory execution) {
+        TestOrderContext calldata, /* context*/
+        TestItem721 memory, /* nft*/
+        uint256, /* priceEthAmount*/
+        address, /* feeRecipient*/
+        uint256 /* feeEthAmount */
+    )
+        external
+        pure
+        override
+        returns (
+            TestOrderPayload memory /* execution */
+        )
+    {
         // TODO: figure out why this isn't working
         _notImplemented();
 
-        Fee[] memory fees = new Fee[](1);
-        uint256 rate;
-        rate = (feeEthAmount * 10000) / (priceEthAmount) + 1;
-        uint16 convertedRate;
-        convertedRate = convert(rate);
-        fees[0] = Fee({
-            recipient: payable(feeRecipient),
-            rate: convertedRate
-        });
-        (Input memory makerInput, Input memory takerInput) = buildInputPair(
-            context.offerer,
-            context.fulfiller,
-            nft.token,
-            nft.identifier,
-            address(0),
-            priceEthAmount,
-            fees,
-            false
-        );
+        // Fee[] memory fees = new Fee[](1);
+        // uint256 rate;
+        // rate = (feeEthAmount * 10000) / (priceEthAmount) + 1;
+        // uint16 convertedRate;
+        // convertedRate = convert(rate);
+        // fees[0] = Fee({
+        //     recipient: payable(feeRecipient),
+        //     rate: convertedRate
+        // });
+        // (Input memory makerInput, Input memory takerInput) = buildInputPair(
+        //     context.offerer,
+        //     context.fulfiller,
+        //     nft.token,
+        //     nft.identifier,
+        //     address(0),
+        //     priceEthAmount,
+        //     fees,
+        //     false
+        // );
 
-        if (context.listOnChain) {
-            _notImplemented();
-        }
+        // if (context.listOnChain) {
+        //     _notImplemented();
+        // }
 
-        execution.executeOrder = TestCallParameters(
-            address(blur),
-            priceEthAmount + feeEthAmount,
-            abi.encodeWithSelector(
-                IBlurExchange.execute.selector,
-                makerInput,
-                takerInput
-            )
-        );
+        // execution.executeOrder = TestCallParameters(
+        //     address(blur),
+        //     priceEthAmount + feeEthAmount,
+        //     abi.encodeWithSelector(
+        //         IBlurExchange.execute.selector,
+        //         makerInput,
+        //         takerInput
+        //     )
+        // );
     }
 
     function getPayload_BuyOfferedERC721WithEtherTwoFeeRecipient(
-        TestOrderContext calldata context,
-        TestItem721 memory nft,
-        uint256 priceEthAmount,
-        address feeRecipient1,
-        uint256 feeEthAmount1,
-        address feeRecipient2,
-        uint256 feeEthAmount2
-    ) external view override returns (TestOrderPayload memory execution) {
+        TestOrderContext calldata, /* context */
+        TestItem721 memory, /* nft */
+        uint256, /* priceEthAmount */
+        address, /* feeRecipient1 */
+        uint256, /* feeEthAmount1 */
+        address, /* feeRecipient2 */
+        uint256 /* feeEthAmount2 */
+    )
+        external
+        pure
+        override
+        returns (
+            TestOrderPayload memory /* execution */
+        )
+    {
         // TODO: figure out why this isn't working
         _notImplemented();
 
-        Fee[] memory fees = new Fee[](2);
-        uint256 rate;
-        rate = (feeEthAmount1 * 10000) / (priceEthAmount) + 1;
-        fees[0] = Fee({
-            recipient: payable(feeRecipient1),
-            rate: convert(rate)
-        });
-        rate = (feeEthAmount2 * 10000) / (priceEthAmount) + 1;
-        fees[1] = Fee({
-            recipient: payable(feeRecipient2),
-            rate: convert(rate)
-        });
-        (Input memory makerInput, Input memory takerInput) = buildInputPair(
-            context.offerer,
-            context.fulfiller,
-            nft.token,
-            nft.identifier,
-            address(0),
-            priceEthAmount,
-            fees,
-            false
-        );
+        // Fee[] memory fees = new Fee[](2);
+        // uint256 rate;
+        // rate = (feeEthAmount1 * 10000) / (priceEthAmount) + 1;
+        // fees[0] = Fee({
+        //     recipient: payable(feeRecipient1),
+        //     rate: convert(rate)
+        // });
+        // rate = (feeEthAmount2 * 10000) / (priceEthAmount) + 1;
+        // fees[1] = Fee({
+        //     recipient: payable(feeRecipient2),
+        //     rate: convert(rate)
+        // });
+        // (Input memory makerInput, Input memory takerInput) = buildInputPair(
+        //     context.offerer,
+        //     context.fulfiller,
+        //     nft.token,
+        //     nft.identifier,
+        //     address(0),
+        //     priceEthAmount,
+        //     fees,
+        //     false
+        // );
 
-        if (context.listOnChain) {
-            _notImplemented();
-        }
+        // if (context.listOnChain) {
+        //     _notImplemented();
+        // }
 
-        execution.executeOrder = TestCallParameters(
-            address(blur),
-            priceEthAmount + feeEthAmount1 + feeEthAmount2,
-            abi.encodeWithSelector(
-                IBlurExchange.execute.selector,
-                makerInput,
-                takerInput
-            )
-        );
+        // execution.executeOrder = TestCallParameters(
+        //     address(blur),
+        //     priceEthAmount + feeEthAmount1 + feeEthAmount2,
+        //     abi.encodeWithSelector(
+        //         IBlurExchange.execute.selector,
+        //         makerInput,
+        //         takerInput
+        //     )
+        // );
     }
 
     function getPayload_BuyOfferedManyERC721WithEtherDistinctOrders(

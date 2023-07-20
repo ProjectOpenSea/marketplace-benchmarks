@@ -8,12 +8,12 @@ import "./lib/ConsiderationTypeHashes.sol";
 import { ConsiderationInterface as ISeaport } from "./interfaces/ConsiderationInterface.sol";
 import "forge-std/console2.sol";
 
-contract SeaportOnePointFourConfig is
+contract SeaportOnePointFiveConfig is
     BaseMarketConfig,
     ConsiderationTypeHashes
 {
     function name() external pure override returns (string memory) {
-        return "Seaport 1.4";
+        return "Seaport 1.5";
     }
 
     function market() public pure override returns (address) {
@@ -21,7 +21,7 @@ contract SeaportOnePointFourConfig is
     }
 
     ISeaport internal constant seaport =
-        ISeaport(0x00000000000001ad428e4906aE43D8F9852d0dD6);
+        ISeaport(0x00000000000000ADc04C56Bf30aC9d3c0aAF14dC);
 
     function buildBasicOrder(
         BasicOrderRouteType routeType,
