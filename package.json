@@ -2,7 +2,7 @@
   "name": "marketplace-benchmarks",
   "license": "MIT",
   "version": "1.0.0",
-  "description": "Marketplace Benchmarking for various NFT marketplaces",
+  "description": "Marketplace Benchmarking for various NFT marketplace",
   "files": [
     "src/**/*.sol"
   ],
