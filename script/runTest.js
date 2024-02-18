@@ -15,7 +15,6 @@ exec(
             throw Error("Forge test failed");
         }
 
-        /// {market:{testName:{actionName:{gas,direct}}}}
         let eoaTests = {};
         eoaTests.results = {};
         parseOutput(eoaTests, stdout, false);
