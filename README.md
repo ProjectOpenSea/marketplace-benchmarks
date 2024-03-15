@@ -23,7 +23,7 @@ forge install
 ```
 
 ### Run Tests
-Tests are all run against mainnet deployments of active marketplaces, as such, a Mainnet Ethereum RPC is required. This will log gas snapshots for each individual test operation.
+Tests are all run against mainnet deployments of active marketplaces. As such, a Mainnet Ethereum RPC is required. This will log gas snapshots for each individual test operation.
 ```bash
 forge test --fork-url <ETH_MAINNET_RPC> -vv
 ```
