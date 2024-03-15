@@ -7,6 +7,7 @@ import { BlurV2Config } from "../src/marketplaces/blur-2.0/BlurV2Config.sol";
 import { FoundationConfig } from "../src/marketplaces/foundation/FoundationConfig.sol";
 import { LooksRareConfig } from "../src/marketplaces/looksRare/LooksRareConfig.sol";
 import { SeaportOnePointFiveConfig } from "../src/marketplaces/seaport-1.5/SeaportOnePointFiveConfig.sol";
+import { SeaportOnePointSixConfig } from "../src/marketplaces/seaport-1.6/SeaportOnePointSixConfig.sol";
 import { LooksRareV2Config } from "../src/marketplaces/looksRare-v2/LooksRareV2Config.sol";
 import { SeaportOnePointOneConfig } from "../src/marketplaces/seaport-1.1/SeaportOnePointOneConfig.sol";
 import { SudoswapConfig } from "../src/marketplaces/sudoswap/SudoswapConfig.sol";
@@ -29,6 +30,7 @@ contract GenericMarketplaceTest is BaseOrderTest {
     BaseMarketConfig looksRareV2Config;
     BaseMarketConfig seaportOnePointOneConfig;
     BaseMarketConfig seaportOnePointFiveConfig;
+    BaseMarketConfig seaportOnePointSixConfig;
     BaseMarketConfig sudoswapConfig;
     BaseMarketConfig wyvernConfig;
     BaseMarketConfig x2y2Config;
@@ -45,6 +47,9 @@ contract GenericMarketplaceTest is BaseOrderTest {
         );
         seaportOnePointFiveConfig = BaseMarketConfig(
             new SeaportOnePointFiveConfig()
+        );
+        seaportOnePointSixConfig = BaseMarketConfig(
+            new SeaportOnePointSixConfig()
         );
         sudoswapConfig = BaseMarketConfig(new SudoswapConfig());
         wyvernConfig = BaseMarketConfig(new WyvernConfig());
@@ -70,6 +75,10 @@ contract GenericMarketplaceTest is BaseOrderTest {
 
     function testLooksRareV2() external {
         benchmarkMarket(looksRareV2Config);
+    }
+
+    function testSeaportOnePointSix() external {
+        benchmarkMarket(seaportOnePointSixConfig);
     }
 
     function testSeaportOnePointFive() external {
