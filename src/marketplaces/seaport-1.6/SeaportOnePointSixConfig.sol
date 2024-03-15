@@ -8,10 +8,7 @@ import "./lib/ConsiderationTypeHashes.sol";
 import { ConsiderationInterface as ISeaport } from "./interfaces/ConsiderationInterface.sol";
 import "forge-std/console2.sol";
 
-contract SeaportOnePointSixConfig is
-    BaseMarketConfig,
-    ConsiderationTypeHashes
-{
+contract SeaportOnePointSixConfig is BaseMarketConfig, ConsiderationTypeHashes {
     function name() external pure override returns (string memory) {
         return "Seaport 1.6";
     }
