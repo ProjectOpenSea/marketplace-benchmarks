@@ -1,6 +1,5 @@
 [profile.default]
-solc = "0.8.14"
 bytecode_hash = "none"
-optimizer_runs = 1_000_000
+optimizer_runs = 9_999_999
 ignored_error_codes = [5574, 5667, 9302]
-evm_version='shanghai'
+evm_version='cancun'
