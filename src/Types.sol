@@ -41,3 +41,21 @@ struct TestOrderPayload {
     // Call needed to actually execute the order
     TestCallParameters executeOrder;
 }
+
+struct TestBundleOrderWithSingleFeeReceiver {
+    TestOrderContext context;
+    TestItem721[] nfts;
+    uint256[] itemPrices;
+    address feeRecipient;
+    uint256 feeRate;
+}
+
+struct TestBundleOrderWithTwoFeeReceivers {
+    TestOrderContext context;
+    TestItem721[] nfts;
+    uint256[] itemPrices;
+    address feeRecipient1;
+    uint256 feeRate1;
+    address feeRecipient2;
+    uint256 feeRate2;
+}
